@@ -20,7 +20,6 @@
       --danger: #ef4444;
       --text: #ffffff;
       --text-muted: #a7f3d0;
-      --light-card: #0d2819;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
@@ -52,8 +51,8 @@
     .container { max-width: 850px; margin: 20px auto; padding: 0 15px; }
 
     /* Tabs Header */
-    .tabs-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--card-border); padding-bottom: 10px; }
-    .tab-btn { background: var(--card-bg); color: var(--text-muted); border: 1px solid var(--card-border); padding: 10px 18px; font-size: 13px; font-weight: 700; cursor: pointer; border-radius: 8px; }
+    .tabs-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--card-border); padding-bottom: 10px; flex-wrap: wrap; gap: 10px; }
+    .tab-btn { background: var(--card-bg); color: var(--text-muted); border: 1px solid var(--card-border); padding: 10px 16px; font-size: 13px; font-weight: 700; cursor: pointer; border-radius: 8px; }
     .tab-btn.active { background: var(--primary); color: #05140c; font-weight: 900; }
 
     /* Wallet Card */
@@ -71,7 +70,7 @@
     }
     .wallet-info h3 { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
     .wallet-info .balance { font-size: 38px; font-weight: 900; color: var(--primary); margin-top: 4px; }
-    .wallet-actions { display: flex; gap: 10px; }
+    .wallet-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
     /* Buttons */
     .btn { background: var(--primary); color: #05140c; border: none; padding: 12px 20px; border-radius: 10px; font-weight: 900; cursor: pointer; transition: 0.2s; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; }
@@ -89,7 +88,6 @@
 
     .section-title { font-size: 18px; font-weight: 800; margin: 25px 0 15px 0; color: #fff; border-left: 4px solid var(--primary); padding-left: 10px; }
 
-    /* Single Membership Plan Callout */
     .single-plan-banner {
       background: linear-gradient(135deg, #113320, #1a4d30);
       border: 2px solid var(--primary);
@@ -99,166 +97,241 @@
       justify-content: space-between;
       align-items: center;
       margin-bottom: 25px;
+      flex-wrap: wrap;
+      gap: 15px;
     }
 
-    /* Tasks Module */
-    .task-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; gap: 15px; }
+    .task-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; }
     .task-info h4 { font-size: 15px; font-weight: 800; color: #fff; }
     .task-info p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
     .task-reward { color: var(--primary); font-weight: 800; font-size: 13px; margin-top: 5px; }
 
     /* Modals */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(6px); display: none; justify-content: center; align-items: center; z-index: 100; }
-    .modal { background: #0b2216; border: 1px solid var(--primary); border-radius: 20px; padding: 25px; width: 92%; max-width: 500px; box-shadow: 0 25px 50px rgba(0,0,0,0.8); max-height: 90vh; overflow-y: auto; }
+    .modal { background: #0b2216; border: 1px solid var(--primary); border-radius: 20px; padding: 25px; width: 92%; max-width: 480px; box-shadow: 0 25px 50px rgba(0,0,0,0.8); max-height: 90vh; overflow-y: auto; }
     .modal h3 { margin-bottom: 12px; font-size: 20px; color: var(--primary); }
     .modal input, .modal select, .modal textarea { width: 100%; padding: 12px; background: #05140c; border: 1px solid var(--card-border); border-radius: 10px; color: #fff; margin-bottom: 12px; font-size: 14px; }
+    .modal label { font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px; }
 
-    /* Payment Account Card */
     .payment-account-card { background: #05140c; border: 1px solid var(--primary); border-radius: 12px; padding: 15px; margin-bottom: 15px; }
-
-    /* Driving Canvas */
     #gameCanvas { background: #18181b; border-radius: 12px; display: block; margin: 12px auto; border: 3px solid var(--primary); }
   </style>
 </head>
 <body>
 
-  <header>
-    <div class="brand">EarnPlanet</div>
-    <div class="nav-actions">
-      <div class="tier-badge" id="headerTier">No Active Plan</div>
-    </div>
-  </header>
-
-  <div class="container">
-    
-    <div class="tabs-header">
-      <button class="tab-btn active" onclick="switchTab('user')">User Dashboard</button>
-      <button class="tab-btn" onclick="openAdminAuthModal()">⚙️ Management Panel</button>
-    </div>
-
-    <!-- USER DASHBOARD TAB -->
-    <div id="userTab">
+  <!-- AUTHENTICATION CONTAINER (Shown if not logged in) -->
+  <div id="authContainer" class="container" style="max-width:440px; margin-top:60px;">
+    <div class="modal" style="display:block; width:100%;">
+      <div class="brand" style="text-align:center; margin-bottom:20px; font-size:28px;">EarnPlanet</div>
       
-      <!-- Wallet Card -->
-      <div class="wallet-card">
-        <div class="wallet-info">
-          <h3>Wallet Balance</h3>
-          <div class="balance" id="walletBalance">₦0.00</div>
-        </div>
-        <div class="wallet-actions">
-          <button class="btn" onclick="openPlansModal()">Choose Membership Plan</button>
-          <button class="btn btn-secondary" onclick="openWithdrawModal()">Cashout</button>
-        </div>
-      </div>
-
-      <!-- Stats Grid -->
-      <div class="stats-grid">
-        <div class="stat-card">
-          <h4>Active Referrals</h4>
-          <p id="refCountDisplay">0 / 5</p>
-          <span style="font-size:11px; color:var(--text-muted);">Required for cashout</span>
-        </div>
-        <div class="stat-card">
-          <h4>Daily Expressway Drives</h4>
-          <p id="drivesDisplay">0 / 4 Sessions</p>
-          <span style="font-size:11px; color:var(--text-muted);">Resets every 24h</span>
+      <!-- LOGIN VIEW -->
+      <div id="loginView">
+        <h3>Welcome Back</h3>
+        <label>Email Address</label>
+        <input type="email" id="loginEmail" placeholder="user@gmail.com">
+        <label>Password</label>
+        <input type="password" id="loginPassword" placeholder="••••••••">
+        <button class="btn" style="width:100%; margin-top:5px;" onclick="handleLogin()">Login</button>
+        
+        <div style="display:flex; justify-content:space-between; margin-top:15px; font-size:13px;">
+          <a href="#" style="color:var(--primary);" onclick="switchAuthView('register')">Create Account</a>
+          <a href="#" style="color:var(--text-muted);" onclick="switchAuthView('forgot')">Forgot Password?</a>
         </div>
       </div>
 
-      <!-- Single Action Banner for Package Selection -->
-      <div class="single-plan-banner">
-        <div>
-          <h3 style="font-size:16px; font-weight:800;">Upgrade Subscription Tier</h3>
-          <p style="font-size:12px; color:var(--text-muted);">Select a plan (₦15k - ₦100k) to receive an instant 40% cashback bonus upon admin payment confirmation.</p>
+      <!-- REGISTER VIEW -->
+      <div id="registerView" style="display:none;">
+        <h3>Create New Account</h3>
+        <label>Email Address</label>
+        <input type="email" id="regEmail" placeholder="user@gmail.com">
+        <label>Password</label>
+        <input type="password" id="regPassword" placeholder="••••••••">
+        <label>Create 4-Digit Withdrawal PIN (Mandatory)</label>
+        <input type="password" id="regPin" maxlength="4" placeholder="••••">
+        <button class="btn" style="width:100%; margin-top:5px;" onclick="handleRegister()">Sign Up</button>
+        <div style="text-align:center; margin-top:15px; font-size:13px;">
+          <a href="#" style="color:var(--primary);" onclick="switchAuthView('login')">Already have an account? Login</a>
         </div>
-        <button class="btn" style="white-space:nowrap; margin-left:15px;" onclick="openPlansModal()">Select Plan</button>
       </div>
 
-      <!-- Daily Tasks Module -->
-      <div class="section-title">Daily Earning Tasks</div>
-
-      <!-- Driving Game Task -->
-      <div class="task-card">
-        <div class="task-info">
-          <h4>🏎️ Lagos Highway Driving Run</h4>
-          <p>Drive through 3-lane Lagos traffic to reach 100% finish line. (Max 4 drives daily)</p>
-          <div class="task-reward" id="drivingRewardText">Reward: Select plan to unlock</div>
+      <!-- FORGOT PASSWORD VIEW -->
+      <div id="forgotView" style="display:none;">
+        <h3>Reset Password</h3>
+        <label>Registered Email</label>
+        <input type="email" id="forgotEmail" placeholder="user@gmail.com">
+        <label>New Password</label>
+        <input type="password" id="forgotNewPassword" placeholder="••••••••">
+        <button class="btn" style="width:100%; margin-top:5px;" onclick="handlePasswordReset()">Reset Password</button>
+        <div style="text-align:center; margin-top:15px; font-size:13px;">
+          <a href="#" style="color:var(--primary);" onclick="switchAuthView('login')">Back to Login</a>
         </div>
-        <button class="btn" onclick="openDrivingGameModal()">Start Drive</button>
-      </div>
-
-      <!-- Direct Link SmartLink Task -->
-      <div class="task-card">
-        <div class="task-info">
-          <h4>🔗 Partner Sponsor Direct Link</h4>
-          <p>Visit sponsor link for 15 seconds. Anti-cheat countdown enabled.</p>
-          <div class="task-reward">Reward: +₦100.00 per click</div>
-        </div>
-        <button class="btn" id="directLinkBtn" onclick="handleDirectLinkTask('https://your-propeller-direct-link-url.com')">Visit Sponsor Link</button>
-      </div>
-
-      <!-- Dynamic Social Task -->
-      <div class="task-card">
-        <div class="task-info">
-          <h4 id="socialTaskTitle">📱 Sponsor Social Task</h4>
-          <p id="socialTaskDesc">Follow official partner account and return to claim.</p>
-          <div class="task-reward" id="socialRewardText">Reward: Select plan to unlock</div>
-        </div>
-        <button class="btn" onclick="handleSocialTask()">Follow & Claim</button>
       </div>
 
     </div>
+  </div>
 
-    <!-- ADMIN MANAGEMENT TAB (LOCKED BEHIND AUTH) -->
-    <div id="adminTab" style="display:none;">
+  <!-- MAIN APP CONTAINER (Hidden until login) -->
+  <div id="mainAppContainer" style="display:none;">
+    <header>
+      <div class="brand">EarnPlanet</div>
+      <div class="nav-actions">
+        <div class="tier-badge" id="headerTier">No Active Plan</div>
+        <button class="btn btn-secondary" style="padding:6px 12px; font-size:12px;" onclick="handleLogout()">Logout</button>
+      </div>
+    </header>
+
+    <div class="container">
       
-      <div class="section-title">⚙️ Pending Payment Approvals</div>
-      <p style="font-size:13px; color:var(--text-muted); margin-bottom:15px;">Approve user transfers to credit 40% cashback bonus & activate their package.</p>
-      <div id="adminPendingApprovalsList"></div>
-
-      <div class="section-title" style="margin-top:30px;">⚙️ Payment Gateway Setup</div>
-      <div class="stat-card" style="text-align:left; margin-bottom:15px;">
-        <h4 style="margin-bottom:10px;">Add New Bank Account</h4>
-        <input type="text" id="newPayBank" placeholder="Bank Name (OPay, Moniepoint, GTBank)">
-        <input type="text" id="newPayAccount" placeholder="10-Digit Account Number">
-        <input type="text" id="newPayName" placeholder="Account Holder Name">
-        <button class="btn" onclick="addPaymentMethod()">+ Save Account</button>
+      <div class="tabs-header">
+        <div style="display:flex; gap:10px;">
+          <button class="tab-btn active" onclick="switchTab('user')">Dashboard</button>
+          <button class="tab-btn" onclick="switchTab('settings')">⚙️ Settings</button>
+        </div>
+        <button class="tab-btn" onclick="openAdminAuthModal()">Management Panel</button>
       </div>
-      <div id="adminPaymentList"></div>
 
-      <div class="section-title" style="margin-top:30px;">⚙️ Social Task Configurator</div>
-      <div class="stat-card" style="text-align:left;">
-        <input type="text" id="adminSocialTitle" placeholder="Task Title">
-        <input type="text" id="adminSocialUrl" placeholder="Target Link URL">
-        <textarea id="adminSocialDesc" placeholder="User Instructions"></textarea>
-        <button class="btn" onclick="updateSocialTaskConfig()">Update Task</button>
+      <!-- USER DASHBOARD TAB -->
+      <div id="userTab">
+        
+        <!-- Wallet Card -->
+        <div class="wallet-card">
+          <div class="wallet-info">
+            <h3>Wallet Balance</h3>
+            <div class="balance" id="walletBalance">₦0.00</div>
+          </div>
+          <div class="wallet-actions">
+            <button class="btn" onclick="openPlansModal()">Upgrade / Subscribe Plan</button>
+            <button class="btn btn-secondary" onclick="openWithdrawModal()">Cashout</button>
+          </div>
+        </div>
+
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+          <div class="stat-card">
+            <h4>Active Referrals</h4>
+            <p id="refCountDisplay">0 / 5</p>
+            <span style="font-size:11px; color:var(--text-muted);">Required for cashout</span>
+          </div>
+          <div class="stat-card">
+            <h4>Daily Expressway Drives</h4>
+            <p id="drivesDisplay">0 / 4 Sessions</p>
+            <span style="font-size:11px; color:var(--text-muted);">Resets every 24h</span>
+          </div>
+        </div>
+
+        <!-- Plan Banner -->
+        <div class="single-plan-banner">
+          <div>
+            <h3 style="font-size:16px; font-weight:800;">Membership Tier & Upgrades</h3>
+            <p style="font-size:12px; color:var(--text-muted);">Upgrade plans anytime. Direct tier skips include a ₦5,000 upgrade surcharge.</p>
+          </div>
+          <button class="btn" style="white-space:nowrap;" onclick="openPlansModal()">View Tiers</button>
+        </div>
+
+        <!-- Daily Tasks Module -->
+        <div class="section-title">Daily Earning Tasks</div>
+
+        <!-- Driving Game Task -->
+        <div class="task-card">
+          <div class="task-info">
+            <h4>🏎️ Lagos Highway Driving Run</h4>
+            <p>Drive through 3-lane Lagos traffic to reach 100% finish line. (Max 4 drives daily)</p>
+            <div class="task-reward" id="drivingRewardText">Reward: Select plan to unlock</div>
+          </div>
+          <button class="btn" onclick="openDrivingGameModal()">Start Drive</button>
+        </div>
+
+        <!-- Direct Link SmartLink Task -->
+        <div class="task-card">
+          <div class="task-info">
+            <h4>🔗 Partner Sponsor Direct Link</h4>
+            <p>Visit sponsor link for 15 seconds. Anti-cheat countdown enabled.</p>
+            <div class="task-reward">Reward: +₦100.00 per click</div>
+          </div>
+          <button class="btn" id="directLinkBtn" onclick="handleDirectLinkTask('https://your-propeller-direct-link-url.com')">Visit Sponsor Link</button>
+        </div>
+
+        <!-- Dynamic Social Tasks Container -->
+        <div class="section-title">Social Media Tasks (Max 5 Daily)</div>
+        <div id="userSocialTasksContainer"></div>
+
+      </div>
+
+      <!-- SETTINGS TAB -->
+      <div id="settingsTab" style="display:none;">
+        <div class="section-title">⚙️ Account Settings</div>
+        
+        <div class="stat-card" style="text-align:left; margin-bottom:20px;">
+          <h4 style="margin-bottom:10px;">Change Email Address</h4>
+          <input type="email" id="settingsNewEmail" placeholder="New Email Address">
+          <button class="btn" onclick="updateUserEmail()">Update Email</button>
+        </div>
+
+        <div class="stat-card" style="text-align:left; margin-bottom:20px;">
+          <h4 style="margin-bottom:10px;">Reset Account Password</h4>
+          <input type="password" id="settingsOldPass" placeholder="Current Password">
+          <input type="password" id="settingsNewPass" placeholder="New Password">
+          <button class="btn" onclick="updateUserPassword()">Update Password</button>
+        </div>
+
+        <div class="stat-card" style="text-align:left;">
+          <h4 style="margin-bottom:10px;">Reset Withdrawal PIN</h4>
+          <input type="password" id="settingsOldPin" maxlength="4" placeholder="Current 4-Digit PIN">
+          <input type="password" id="settingsNewPin" maxlength="4" placeholder="New 4-Digit PIN">
+          <button class="btn" onclick="updateUserPin()">Update Withdrawal PIN</button>
+        </div>
+      </div>
+
+      <!-- ADMIN MANAGEMENT TAB (LOCKED) -->
+      <div id="adminTab" style="display:none;">
+        <div class="section-title">⚙️ Pending Payment Approvals</div>
+        <div id="adminPendingApprovalsList"></div>
+
+        <div class="section-title" style="margin-top:30px;">⚙️ Manage Social Media Tasks</div>
+        <div class="stat-card" style="text-align:left; margin-bottom:15px;">
+          <h4 style="margin-bottom:10px;">Add New Social Task</h4>
+          <input type="text" id="adminSocialTaskTitle" placeholder="Task Title (e.g. Follow Telegram)">
+          <input type="text" id="adminSocialTaskUrl" placeholder="Target Link URL">
+          <textarea id="adminSocialTaskDesc" placeholder="Instructions"></textarea>
+          <button class="btn" onclick="addAdminSocialTask()">+ Add Task</button>
+        </div>
+        <div id="adminSocialTasksList"></div>
+
+        <div class="section-title" style="margin-top:30px;">⚙️ Payment Gateway Setup</div>
+        <div class="stat-card" style="text-align:left; margin-bottom:15px;">
+          <input type="text" id="newPayBank" placeholder="Bank Name">
+          <input type="text" id="newPayAccount" placeholder="Account Number">
+          <input type="text" id="newPayName" placeholder="Account Holder Name">
+          <button class="btn" onclick="addPaymentMethod()">+ Save Account</button>
+        </div>
+        <div id="adminPaymentList"></div>
       </div>
 
     </div>
-
   </div>
 
   <!-- PLAN SELECTION MODAL -->
   <div class="modal-overlay" id="plansModal">
     <div class="modal">
-      <h3>Select Subscription Plan</h3>
-      <p style="font-size:12px; color:var(--text-muted); margin-bottom:15px;">Choose your plan level to view payment account details.</p>
+      <h3>Select Membership Tier</h3>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:15px;">Upgrading requires an active plan. Skipping tiers adds a ₦5,000 surcharge.</p>
 
       <select id="selectedPlanDropdown" onchange="updatePlanPaymentView()">
         <option value="">-- Choose Package Tier --</option>
-        <option value="15000">Starter Plan (₦15,000) -> ₦6,000 Cashback Bonus</option>
-        <option value="30000">Silver Plan (₦30,000) -> ₦12,000 Cashback Bonus</option>
-        <option value="50000">Gold Plan (₦50,000) -> ₦20,000 Cashback Bonus</option>
-        <option value="100000">Platinum Plan (₦100,000) -> ₦40,000 Cashback Bonus</option>
+        <option value="15000">Starter Plan (₦15,000) -> ₦6k Cashback</option>
+        <option value="30000">Silver Plan (₦30,000) -> ₦12k Cashback</option>
+        <option value="50000">Gold Plan (₦50,000) -> ₦20k Cashback</option>
+        <option value="100000">Platinum Plan (₦100,000) -> ₦40k Cashback</option>
       </select>
 
       <div id="planPaymentDetailsContainer" style="display:none;">
         <div class="payment-account-card">
-          <p style="font-size:11px; color:var(--gold); font-weight:bold;">PAYMENT ACCOUNT DETAILS:</p>
-          <div id="activeBankInfoDisplay" style="margin-top:6px; font-size:14px; line-height:1.6;"></div>
+          <p style="font-size:11px; color:var(--gold); font-weight:bold;" id="paymentCalculationText"></p>
+          <div id="activeBankInfoDisplay" style="margin-top:6px; font-size:13px; line-height:1.5;"></div>
         </div>
 
-        <input type="text" id="userSenderNameInput" placeholder="Your Bank Account Name (Sender Name)">
+        <label>Your Bank Account Name (Sender Name)</label>
+        <input type="text" id="userSenderNameInput" placeholder="Sender Name">
         <button class="btn" style="width:100%;" onclick="submitPlanPaymentProof()">Submit Payment Proof</button>
       </div>
 
@@ -266,15 +339,12 @@
     </div>
   </div>
 
-  <!-- ADMIN AUTHENTICATION MODAL -->
+  <!-- ADMIN AUTH MODAL -->
   <div class="modal-overlay" id="adminAuthModal">
     <div class="modal" style="max-width:380px;">
       <h3>🔒 Management Access</h3>
-      <p style="font-size:12px; color:var(--text-muted); margin-bottom:15px;">Enter management credentials to proceed.</p>
-      
       <input type="text" id="adminUsername" placeholder="Username">
       <input type="password" id="adminPassword" placeholder="Password">
-      
       <div style="display:flex; gap:10px;">
         <button class="btn btn-secondary" style="flex:1" onclick="closeAdminAuthModal()">Cancel</button>
         <button class="btn" style="flex:1" onclick="loginAdmin()">Login</button>
@@ -286,17 +356,12 @@
   <div class="modal-overlay" id="drivingModal">
     <div class="modal" style="max-width: 440px; text-align: center;">
       <h3>Lagos Expressway Rush</h3>
-      <p style="font-size:12px; color:var(--text-muted); margin-bottom:8px;">Steer left or right to avoid traffic and reach 100% finish line!</p>
-      
       <canvas id="gameCanvas" width="340" height="280"></canvas>
-      
       <div id="gameStatus" style="font-weight:bold; margin: 8px 0; color:var(--gold);">Progress: 0%</div>
-
       <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 10px;">
-        <button class="btn btn-secondary" style="padding: 10px 25px;" onclick="moveCar(-35)">◀ Steer Left</button>
-        <button class="btn btn-secondary" style="padding: 10px 25px;" onclick="moveCar(35)">Steer Right ▶</button>
+        <button class="btn btn-secondary" style="padding: 10px 25px;" onclick="moveCar(-35)">◀ Left</button>
+        <button class="btn btn-secondary" style="padding: 10px 25px;" onclick="moveCar(35)">Right ▶</button>
       </div>
-
       <button class="btn btn-secondary" style="width:100%;" onclick="closeDrivingModal()">Exit Session</button>
     </div>
   </div>
@@ -305,10 +370,11 @@
   <div class="modal-overlay" id="withdrawModal">
     <div class="modal">
       <h3>Request Cashout</h3>
-      <p style="font-size:12px; color:var(--text-muted); margin-bottom:15px;">Min threshold <b>₦100,000</b> | At least <b>5 active referrals</b> | <b>₦100</b> flat processing fee.</p>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:15px;">Min threshold ₦100,000 | 5 Referrals | <b>15% withdrawal charge</b>.</p>
       <input type="number" id="wdAmount" placeholder="Amount (Min ₦100,000)">
       <input type="text" id="wdBank" placeholder="Bank Name">
       <input type="text" id="wdAccount" placeholder="Account Number">
+      <input type="password" id="wdPinInput" maxlength="4" placeholder="4-Digit Withdrawal PIN">
       <div style="display:flex; gap:10px;">
         <button class="btn btn-secondary" style="flex:1" onclick="closeWithdrawModal()">Cancel</button>
         <button class="btn" style="flex:1" onclick="submitWithdrawal()">Request Cashout</button>
@@ -318,150 +384,238 @@
 
   <script>
     // State
-    let userBalance = 0.00;
-    let activeReferrals = 0;
-    let currentTaskReward = 0;
-    let currentTierName = "None";
-    let dailyDrivesDone = 0;
-    const MAX_DAILY_DRIVES = 4;
+    let currentUser = null;
+    let usersDb = JSON.parse(localStorage.getItem('earnplanet_users') || '[]');
     let isAdminAuthenticated = false;
 
-    // Payment Methods
-    let paymentMethods = [
-      { id: 1, bank: "OPay Digital Bank", account: "8012345678", name: "EarnPlanet Official" }
-    ];
-
-    // Admin Pending Approvals List
+    let paymentMethods = [{ id: 1, bank: "OPay Digital Bank", account: "8012345678", name: "EarnPlanet Official" }];
     let pendingPaymentProofs = [];
+    let socialTasksList = [
+      { id: 1, title: "Follow Official Instagram", url: "https://instagram.com", desc: "Follow page for 10s", reward: 300 }
+    ];
+    let completedSocialTasksToday = {};
 
-    let socialTask = {
-      title: "📱 Follow Official Instagram Page",
-      url: "https://instagram.com",
-      desc: "Follow partner page for 10 seconds to claim reward."
-    };
+    function saveUsers() { localStorage.setItem('earnplanet_users', JSON.stringify(usersDb)); }
+
+    // Auth Views
+    function switchAuthView(view) {
+      document.getElementById('loginView').style.display = view === 'login' ? 'block' : 'none';
+      document.getElementById('registerView').style.display = view === 'register' ? 'block' : 'none';
+      document.getElementById('forgotView').style.display = view === 'forgot' ? 'block' : 'none';
+    }
+
+    function handleRegister() {
+      const email = document.getElementById('regEmail').value;
+      const password = document.getElementById('regPassword').value;
+      const pin = document.getElementById('regPin').value;
+
+      if (!email || !password || pin.length !== 4) {
+        alert("Please fill all fields and ensure your withdrawal PIN is exactly 4 digits.");
+        return;
+      }
+
+      if (usersDb.some(u => u.email === email)) {
+        alert("Email already registered!");
+        return;
+      }
+
+      const newUser = {
+        email, password, pin,
+        balance: 0,
+        tier: "None",
+        taskReward: 0,
+        activeReferrals: 0,
+        dailyDrives: 0
+      };
+
+      usersDb.push(newUser);
+      saveUsers();
+      alert("Registration successful! Please login.");
+      switchAuthView('login');
+    }
+
+    function handleLogin() {
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+
+      const user = usersDb.find(u => u.email === email && u.password === password);
+      if (!user) {
+        alert("Invalid email or password!");
+        return;
+      }
+
+      currentUser = user;
+      document.getElementById('authContainer').style.display = 'none';
+      document.getElementById('mainAppContainer').style.display = 'block';
+      updateUI();
+    }
+
+    function handleLogout() {
+      currentUser = null;
+      document.getElementById('mainAppContainer').style.display = 'none';
+      document.getElementById('authContainer').style.display = 'block';
+    }
+
+    function handlePasswordReset() {
+      const email = document.getElementById('forgotEmail').value;
+      const newPass = document.getElementById('forgotNewPassword').value;
+
+      const user = usersDb.find(u => u.email === email);
+      if (!user) { alert("Email not found!"); return; }
+
+      user.password = newPass;
+      saveUsers();
+      alert("Password reset successful! Please login.");
+      switchAuthView('login');
+    }
 
     function updateUI() {
-      document.getElementById('walletBalance').innerText = `₦${userBalance.toLocaleString('en-NG', {minimumFractionDigits: 2})}`;
-      document.getElementById('refCountDisplay').innerText = `${activeReferrals} / 5`;
-      document.getElementById('drivesDisplay').innerText = `${dailyDrivesDone} / ${MAX_DAILY_DRIVES} Sessions`;
-      document.getElementById('headerTier').innerText = currentTierName === "None" ? "No Active Plan" : `${currentTierName} Plan`;
+      if (!currentUser) return;
+      document.getElementById('walletBalance').innerText = `₦${currentUser.balance.toLocaleString('en-NG', {minimumFractionDigits: 2})}`;
+      document.getElementById('refCountDisplay').innerText = `${currentUser.activeReferrals} / 5`;
+      document.getElementById('drivesDisplay').innerText = `${currentUser.dailyDrives} / 4 Sessions`;
+      document.getElementById('headerTier').innerText = currentUser.tier === "None" ? "No Active Plan" : `${currentUser.tier} Plan`;
       
-      const rText = currentTaskReward > 0 ? `Reward: +₦${currentTaskReward} per trip` : "Reward: Select plan to unlock";
+      const rText = currentUser.taskReward > 0 ? `Reward: +₦${currentUser.taskReward} per trip` : "Reward: Select plan to unlock";
       document.getElementById('drivingRewardText').innerText = rText;
-      document.getElementById('socialRewardText').innerText = currentTaskReward > 0 ? `Reward: +₦${currentTaskReward}` : "Reward: Select plan to unlock";
 
+      renderUserSocialTasks();
       renderAdminPaymentList();
       renderPendingApprovals();
-
-      document.getElementById('socialTaskTitle').innerText = socialTask.title;
-      document.getElementById('socialTaskDesc').innerText = socialTask.desc;
-    }
-
-    // Admin Auth Security
-    function openAdminAuthModal() {
-      if (isAdminAuthenticated) {
-        switchTab('admin');
-      } else {
-        document.getElementById('adminAuthModal').style.display = 'flex';
-      }
-    }
-
-    function closeAdminAuthModal() { document.getElementById('adminAuthModal').style.display = 'none'; }
-
-    function loginAdmin() {
-      const u = document.getElementById('adminUsername').value;
-      const p = document.getElementById('adminPassword').value;
-
-      if (u === "Admin" && p === "Femifresh43211") {
-        isAdminAuthenticated = true;
-        closeAdminAuthModal();
-        switchTab('admin');
-        alert("Management access granted.");
-      } else {
-        alert("Invalid management credentials!");
-      }
+      renderAdminSocialTasks();
     }
 
     function switchTab(tab) {
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       if (tab === 'user') {
         document.querySelectorAll('.tab-btn')[0].classList.add('active');
         document.getElementById('userTab').style.display = 'block';
+        document.getElementById('settingsTab').style.display = 'none';
         document.getElementById('adminTab').style.display = 'none';
-      } else {
+      } else if (tab === 'settings') {
         document.querySelectorAll('.tab-btn')[1].classList.add('active');
         document.getElementById('userTab').style.display = 'none';
-        document.getElementById('adminTab').style.display = 'block';
+        document.getElementById('settingsTab').style.display = 'block';
+        document.getElementById('adminTab').style.display = 'none';
       }
     }
 
-    // Plan Selection Modal Logic
+    // Settings Tab Handlers
+    function updateUserEmail() {
+      const newEmail = document.getElementById('settingsNewEmail').value;
+      if (!newEmail) return;
+      currentUser.email = newEmail;
+      saveUsers();
+      alert("Email updated successfully.");
+      document.getElementById('settingsNewEmail').value = '';
+    }
+
+    function updateUserPassword() {
+      const oldPass = document.getElementById('settingsOldPass').value;
+      const newPass = document.getElementById('settingsNewPass').value;
+      if (oldPass !== currentUser.password) { alert("Incorrect current password!"); return; }
+      currentUser.password = newPass;
+      saveUsers();
+      alert("Password updated successfully.");
+      document.getElementById('settingsOldPass').value = '';
+      document.getElementById('settingsNewPass').value = '';
+    }
+
+    function updateUserPin() {
+      const oldPin = document.getElementById('settingsOldPin').value;
+      const newPin = document.getElementById('settingsNewPin').value;
+      if (oldPin !== currentUser.pin) { alert("Incorrect current PIN!"); return; }
+      if (newPin.length !== 4) { alert("PIN must be 4 digits."); return; }
+      currentUser.pin = newPin;
+      saveUsers();
+      alert("Withdrawal PIN updated successfully.");
+      document.getElementById('settingsOldPin').value = '';
+      document.getElementById('settingsNewPin').value = '';
+    }
+
+    // Tier Upgrade with Surcharge Rule
     function openPlansModal() { document.getElementById('plansModal').style.display = 'flex'; }
     function closePlansModal() { document.getElementById('plansModal').style.display = 'none'; }
 
     function updatePlanPaymentView() {
-      const val = document.getElementById('selectedPlanDropdown').value;
+      const val = parseInt(document.getElementById('selectedPlanDropdown').value);
       const container = document.getElementById('planPaymentDetailsContainer');
+      const calcText = document.getElementById('paymentCalculationText');
       const bankDisplay = document.getElementById('activeBankInfoDisplay');
 
       if (!val) { container.style.display = 'none'; return; }
 
+      let tierMap = { 15000: { name: "Starter", idx: 1 }, 30000: { name: "Silver", idx: 2 }, 50000: { name: "Gold", idx: 3 }, 100000: { name: "Platinum", idx: 4 } };
+      let selectedTierObj = tierMap[val];
+
+      let basePrice = val;
+      let surcharge = 0;
+
+      if (currentUser.tier === "None") {
+        if (selectedTierObj.idx > 1) {
+          surcharge = (selectedTierObj.idx - 1) * 5000;
+        }
+      } else {
+        let currentTierIdx = { "Starter": 1, "Silver": 2, "Gold": 3, "Platinum": 4 }[currentUser.tier];
+        if (selectedTierObj.idx <= currentTierIdx) {
+          alert("You can only upgrade to a higher tier!");
+          document.getElementById('selectedPlanDropdown').value = "";
+          container.style.display = 'none';
+          return;
+        }
+        surcharge = (selectedTierObj.idx - currentTierIdx - 1) * 5000;
+      }
+
+      let totalToPay = basePrice + surcharge;
+      calcText.innerHTML = `Base Price: ₦${basePrice.toLocaleString()} + Surcharge: ₦${surcharge.toLocaleString()} = <span style="color:#00e676;">Total Payable: ₦${totalToPay.toLocaleString()}</span>`;
+
       const activeBank = paymentMethods[0] || { bank: "OPay", account: "8012345678", name: "EarnPlanet" };
-      bankDisplay.innerHTML = `
-        <b>Bank:</b> ${activeBank.bank}<br>
-        <b>Account Number:</b> <span style="color:var(--primary); font-weight:bold;">${activeBank.account}</span><br>
-        <b>Account Name:</b> ${activeBank.name}
-      `;
+      bankDisplay.innerHTML = `<b>Bank:</b> ${activeBank.bank}<br><b>Account:</b> ${activeBank.account}<br><b>Name:</b> ${activeBank.name}`;
       container.style.display = 'block';
     }
 
     function submitPlanPaymentProof() {
       const planVal = parseInt(document.getElementById('selectedPlanDropdown').value);
       const sender = document.getElementById('userSenderNameInput').value;
+      if (!planVal || !sender) { alert("Fill all details!"); return; }
 
-      if (!planVal || !sender) {
-        alert("Please select a plan and enter your sender account name!");
-        return;
+      let tierMap = { 15000: { name: "Starter", reward: 300, bonus: 6000, idx: 1 }, 30000: { name: "Silver", reward: 600, bonus: 12000, idx: 2 }, 50000: { name: "Gold", reward: 1000, bonus: 20000, idx: 3 }, 100000: { name: "Platinum", reward: 1500, bonus: 40000, idx: 4 } };
+      let info = tierMap[planVal];
+
+      let surcharge = 0;
+      if (currentUser.tier === "None") { surcharge = (info.idx - 1) * 5000; }
+      else {
+        let currentTierIdx = { "Starter": 1, "Silver": 2, "Gold": 3, "Platinum": 4 }[currentUser.tier];
+        surcharge = (info.idx - currentTierIdx - 1) * 5000;
       }
-
-      let planName = "Starter";
-      let reward = 300;
-      let bonus = 6000;
-
-      if (planVal === 30000) { planName = "Silver"; reward = 600; bonus = 12000; }
-      else if (planVal === 50000) { planName = "Gold"; reward = 1000; bonus = 20000; }
-      else if (planVal === 100000) { planName = "Platinum"; reward = 1500; bonus = 40000; }
+      let totalToPay = planVal + surcharge;
 
       pendingPaymentProofs.push({
         id: Date.now(),
+        userEmail: currentUser.email,
         sender,
-        amount: planVal,
-        planName,
-        reward,
-        bonus
+        amount: totalToPay,
+        planName: info.name,
+        reward: info.reward,
+        bonus: info.bonus
       });
 
       closePlansModal();
-      alert(`Payment details submitted for ${planName} Plan (₦${planVal.toLocaleString()})!\n\nStatus: Pending Admin Approval.\nOnce confirmed by admin, your plan will activate and ₦${bonus.toLocaleString()} cashback bonus will be credited.`);
+      alert(`Payment submitted for ${info.name} Plan (₦${totalToPay.toLocaleString()}). Pending admin approval.`);
       updateUI();
     }
 
-    // Admin Approvals Handler
+    // Admin Approvals
     function renderPendingApprovals() {
       const container = document.getElementById('adminPendingApprovalsList');
-      if (pendingPaymentProofs.length === 0) {
-        container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No pending payments.</p>`;
-        return;
-      }
-
+      if (pendingPaymentProofs.length === 0) { container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No pending payments.</p>`; return; }
       container.innerHTML = pendingPaymentProofs.map(item => `
         <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center;">
           <div>
-            <b style="color:var(--primary);">${item.planName} Plan (₦${item.amount.toLocaleString()})</b><br>
-            <span style="font-size:12px; color:#fff;">Sender: ${item.sender}</span><br>
-            <span style="font-size:11px; color:var(--gold);">Bonus to reflect: ₦${item.bonus.toLocaleString()}</span>
+            <b>${item.planName} Plan (₦${item.amount.toLocaleString()})</b><br>
+            <span style="font-size:12px;">User: ${item.userEmail} | Sender: ${item.sender}</span>
           </div>
-          <button class="btn" style="padding:6px 12px; font-size:12px;" onclick="approveUserPayment(${item.id})">Approve Payment</button>
+          <button class="btn" style="padding:6px 12px; font-size:12px;" onclick="approveUserPayment(${item.id})">Approve</button>
         </div>
       `).join('');
     }
@@ -469,235 +623,179 @@
     function approveUserPayment(id) {
       const item = pendingPaymentProofs.find(p => p.id === id);
       if (!item) return;
-
-      currentTierName = item.planName;
-      currentTaskReward = item.reward;
-      userBalance += item.bonus; // Reflect 40% Cashback bonus on approval
-
+      const targetUser = usersDb.find(u => u.email === item.userEmail);
+      if (targetUser) {
+        targetUser.tier = item.planName;
+        targetUser.taskReward = item.reward;
+        targetUser.balance += item.bonus;
+        saveUsers();
+      }
       pendingPaymentProofs = pendingPaymentProofs.filter(p => p.id !== id);
       updateUI();
-      alert(`Payment Approved!\n\nUser upgraded to ${item.planName} Plan.\n₦${item.bonus.toLocaleString()} cashback bonus added to balance.`);
+      alert("Payment approved and bonus credited!");
     }
 
-    // Direct Link Task Timer
-    let directLinkVerified = false;
-    function handleDirectLinkTask(url) {
-      if (directLinkVerified) { alert("Sponsor offer already claimed today!"); return; }
-      const btn = document.getElementById('directLinkBtn');
-      btn.innerText = "Verifying Offer (15s)...";
-      window.open(url, '_blank');
+    // Multi-Social Task Engine (Max 5 Daily)
+    function renderUserSocialTasks() {
+      const container = document.getElementById('userSocialTasksContainer');
+      let todayStr = new Date().toDateString();
+      if (!completedSocialTasksToday[currentUser.email]) completedSocialTasksToday[currentUser.email] = { date: todayStr, count: 0, completedIds: [] };
+      let userRecord = completedSocialTasksToday[currentUser.email];
 
-      let seconds = 15;
-      const timer = setInterval(() => {
-        seconds--;
-        if (seconds > 0) {
-          btn.innerText = `Verifying (${seconds}s)...`;
-        } else {
-          clearInterval(timer);
-          userBalance += 100;
-          directLinkVerified = true;
-          updateUI();
-          btn.innerText = "Claimed ✓";
-          alert("Sponsor visit verified! ₦100 credited.");
-        }
-      }, 1000);
+      if (socialTasksList.length === 0) {
+        container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No social tasks available.</p>`;
+        return;
+      }
+
+      container.innerHTML = socialTasksList.slice(0, 5).map(task => {
+        let isDone = userRecord.completedIds.includes(task.id);
+        return `
+          <div class="task-card">
+            <div class="task-info">
+              <h4>${task.title}</h4>
+              <p>${task.desc}</p>
+              <div class="task-reward">Reward: +₦${currentUser.taskReward > 0 ? currentUser.taskReward : 300}</div>
+            </div>
+            <button class="btn ${isDone ? 'btn-disabled' : ''}" ${isDone ? 'disabled' : ''} onclick="handleSocialTask(${task.id})">${isDone ? 'Completed ✓' : 'Perform Task'}</button>
+          </div>
+        `;
+      }).join('');
     }
 
-    function handleSocialTask() {
-      if (currentTaskReward === 0) { alert("Select a plan first to unlock task earnings!"); return; }
-      window.open(socialTask.url, '_blank');
+    function handleSocialTask(taskId) {
+      if (currentUser.taskReward === 0) { alert("Select a plan first!"); return; }
+      let userRecord = completedSocialTasksToday[currentUser.email];
+      if (userRecord.count >= 5) { alert("You have reached the maximum of 5 social tasks for today!"); return; }
+
+      const task = socialTasksList.find(t => t.id === taskId);
+      window.open(task.url, '_blank');
+
       setTimeout(() => {
-        userBalance += currentTaskReward;
+        currentUser.balance += currentUser.taskReward;
+        userRecord.count++;
+        userRecord.completedIds.push(taskId);
+        saveUsers();
         updateUI();
-        alert(`Social task verified! ₦${currentTaskReward} credited.`);
+        alert(`Task verified! ₦${currentUser.taskReward} credited.`);
       }, 5000);
     }
 
-    // --- REALTIME 2D HIGHWAY CAR GAME ---
-    let gameInterval = null;
-    let carX = 150;
-    let progress = 0;
-    let trafficCars = [];
+    // Admin Social Tasks Setup
+    function renderAdminSocialTasks() {
+      const container = document.getElementById('adminSocialTasksList');
+      container.innerHTML = socialTasksList.map(t => `
+        <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center;">
+          <div><b>${t.title}</b><br><span style="font-size:12px; color:var(--text-muted);">${t.url}</span></div>
+          <button class="btn btn-danger" style="padding:4px 10px; font-size:12px;" onclick="deleteAdminSocialTask(${t.id})">Delete</button>
+        </div>
+      `).join('');
+    }
 
+    function addAdminSocialTask() {
+      const title = document.getElementById('adminSocialTaskTitle').value;
+      const url = document.getElementById('adminSocialTaskUrl').value;
+      const desc = document.getElementById('adminSocialTaskDesc').value;
+      if (!title || !url) return;
+      socialTasksList.push({ id: Date.now(), title, url, desc });
+      document.getElementById('adminSocialTaskTitle').value = '';
+      document.getElementById('adminSocialTaskUrl').value = '';
+      document.getElementById('adminSocialTaskDesc').value = '';
+      renderAdminSocialTasks();
+      renderUserSocialTasks();
+    }
+
+    function deleteAdminSocialTask(id) {
+      socialTasksList = socialTasksList.filter(t => t.id !== id);
+      renderAdminSocialTasks();
+      renderUserSocialTasks();
+    }
+
+    // Admin Auth
+    function openAdminAuthModal() { document.getElementById('adminAuthModal').style.display = 'flex'; }
+    function closeAdminAuthModal() { document.getElementById('adminAuthModal').style.display = 'none'; }
+    function loginAdmin() {
+      const u = document.getElementById('adminUsername').value;
+      const p = document.getElementById('adminPassword').value;
+      if (u === "Admin" && p === "Femifresh43211") {
+        isAdminAuthenticated = true;
+        closeAdminAuthModal();
+        switchTab('admin');
+        document.getElementById('mainAppContainer').style.display = 'block';
+        document.getElementById('userTab').style.display = 'none';
+        document.getElementById('settingsTab').style.display = 'none';
+        document.getElementById('adminTab').style.display = 'block';
+        alert("Management access granted.");
+      } else { alert("Invalid credentials."); }
+    }
+
+    // Driving Game
+    let gameInterval = null, carX = 150, progress = 0;
     function openDrivingGameModal() {
-      if (currentTaskReward === 0) { alert("Select a plan first to unlock driving earnings!"); return; }
-      if (dailyDrivesDone >= MAX_DAILY_DRIVES) { alert("Daily limit reached! Max 4 drives per day."); return; }
+      if (currentUser.taskReward === 0) { alert("Select a plan first!"); return; }
+      if (currentUser.dailyDrives >= 4) { alert("Daily limit reached (4/4)."); return; }
       document.getElementById('drivingModal').style.display = 'flex';
       startDrivingCanvas();
     }
-
-    function closeDrivingModal() {
-      document.getElementById('drivingModal').style.display = 'none';
-      if (gameInterval) clearInterval(gameInterval);
-    }
-
-    function moveCar(amount) {
-      carX += amount;
-      if (carX < 45) carX = 45;
-      if (carX > 255) carX = 255;
-    }
-
+    function closeDrivingModal() { document.getElementById('drivingModal').style.display = 'none'; if (gameInterval) clearInterval(gameInterval); }
+    function moveCar(amt) { carX = Math.max(45, Math.min(255, carX + amt)); }
     function startDrivingCanvas() {
       const canvas = document.getElementById('gameCanvas');
       const ctx = canvas.getContext('2d');
-      carX = 150;
-      progress = 0;
-      trafficCars = [
-        { x: 70, y: -50, speed: 3.5, color: '#ef4444' },
-        { x: 150, y: -180, speed: 4.5, color: '#2563eb' },
-        { x: 230, y: -100, speed: 3.0, color: '#fbbf24' }
-      ];
-
+      carX = 150; progress = 0;
       if (gameInterval) clearInterval(gameInterval);
-
       gameInterval = setInterval(() => {
-        progress += 1;
+        progress += 2;
         if (progress > 100) progress = 100;
-
-        document.getElementById('gameStatus').innerText = `Distance Covered: ${progress}%`;
-
-        // Draw Grass Border
-        ctx.fillStyle = "#064e3b";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Asphalt Road
-        ctx.fillStyle = "#27272a";
-        ctx.fillRect(35, 0, 270, canvas.height);
-
-        // Solid White Outer Boundaries
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(35, 0, 5, canvas.height);
-        ctx.fillRect(300, 0, 5, canvas.height);
-
-        // Animated White Lane Lines
-        ctx.strokeStyle = "#ffffff";
-        ctx.lineWidth = 3;
-        ctx.setLineDash([18, 18]);
-        ctx.lineDashOffset = -progress * 6;
-
-        ctx.beginPath(); ctx.moveTo(125, 0); ctx.lineTo(125, canvas.height); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(215, 0); ctx.lineTo(215, canvas.height); ctx.stroke();
-
-        // Draw Traffic Cars
-        trafficCars.forEach(tc => {
-          tc.y += tc.speed;
-          if (tc.y > canvas.height) {
-            tc.y = -70;
-            tc.x = [70, 150, 230][Math.floor(Math.random() * 3)];
-          }
-
-          // Traffic Car Body
-          ctx.fillStyle = tc.color;
-          ctx.beginPath(); ctx.roundRect(tc.x, tc.y, 36, 58, 6); ctx.fill();
-
-          // Cabin / Windows
-          ctx.fillStyle = "#09090b";
-          ctx.fillRect(tc.x + 5, tc.y + 14, 26, 14);
-
-          // Headlights / Tail lights
-          ctx.fillStyle = "#fef08a";
-          ctx.fillRect(tc.x + 4, tc.y + 54, 8, 3);
-          ctx.fillRect(tc.x + 24, tc.y + 54, 8, 3);
-        });
-
-        // Player Sports Car (Realtime Rendered Vehicle)
-        const py = canvas.height - 75;
-
-        // Shadow
-        ctx.fillStyle = "rgba(0,0,0,0.5)";
-        ctx.fillRect(carX + 2, py + 2, 38, 62);
-
-        // Body (Green Emerald)
-        ctx.fillStyle = "#00e676";
-        ctx.beginPath(); ctx.roundRect(carX, py, 38, 60, 8); ctx.fill();
-
-        // Cabin Glass
-        ctx.fillStyle = "#0f172a";
-        ctx.fillRect(carX + 6, py + 16, 26, 18);
-
-        // Headlights
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(carX + 4, py + 2, 8, 4);
-        ctx.fillRect(carX + 26, py + 2, 8, 4);
-
-        // Tail Lights
-        ctx.fillStyle = "#ef4444";
-        ctx.fillRect(carX + 4, py + 54, 8, 4);
-        ctx.fillRect(carX + 26, py + 54, 8, 4);
-
+        document.getElementById('gameStatus').innerText = `Progress: ${progress}%`;
+        ctx.fillStyle = "#064e3b"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#27272a"; ctx.fillRect(35, 0, 270, canvas.height);
         if (progress >= 100) {
           clearInterval(gameInterval);
-          dailyDrivesDone++;
-          userBalance += currentTaskReward;
+          currentUser.dailyDrives++;
+          currentUser.balance += currentUser.taskReward;
+          saveUsers();
           updateUI();
-          alert(`🏁 FINISH LINE REACHED!\n\nYou completed the drive and earned ₦${currentTaskReward.toLocaleString()}!`);
+          alert(`Finished! Earned ₦${currentUser.taskReward}.`);
           closeDrivingModal();
         }
       }, 100);
     }
 
-    // Admin Settings Handlers
+    // Withdrawal with 15% charge
+    function openWithdrawModal() { document.getElementById('withdrawModal').style.display = 'flex'; }
+    function closeWithdrawModal() { document.getElementById('withdrawModal').style.display = 'none'; }
+    function submitWithdrawal() {
+      const amt = parseFloat(document.getElementById('wdAmount').value);
+      const pin = document.getElementById('wdPinInput').value;
+      if (!amt || amt < 100000) { alert("Minimum cashout is ₦100,000."); return; }
+      if (currentUser.activeReferrals < 5) { alert("5 active referrals required."); return; }
+      if (pin !== currentUser.pin) { alert("Incorrect withdrawal PIN!"); return; }
+
+      let charge = amt * 0.15;
+      let totalDeduction = amt + charge;
+      if (totalDeduction > currentUser.balance) { alert(`Insufficient balance. Total deduction including 15% charge (₦${charge.toLocaleString()}) is ₦${totalDeduction.toLocaleString()}.`); return; }
+
+      currentUser.balance -= totalDeduction;
+      saveUsers();
+      updateUI();
+      closeWithdrawModal();
+      alert(`Cashout of ₦${amt.toLocaleString()} requested successfully! 15% fee (₦${charge.toLocaleString()}) applied.`);
+    }
+
     function renderAdminPaymentList() {
       const container = document.getElementById('adminPaymentList');
       container.innerHTML = paymentMethods.map(item => `
-        <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center;">
-          <div>
-            <b>${item.bank}</b><br>
-            <span style="font-size:12px; color:var(--text-muted);">${item.account} (${item.name})</span>
-          </div>
-          <button class="btn btn-danger" style="padding:4px 10px; font-size:12px;" onclick="deletePaymentMethod(${item.id})">Delete</button>
-        </div>
+        <div class="payment-account-card"><b>${item.bank}</b><br><span style="font-size:12px;">${item.account} (${item.name})</span></div>
       `).join('');
     }
-
     function addPaymentMethod() {
       const bank = document.getElementById('newPayBank').value;
       const account = document.getElementById('newPayAccount').value;
       const name = document.getElementById('newPayName').value;
-
-      if (!bank || !account || !name) { alert("Fill all account details!"); return; }
-
+      if (!bank || !account || !name) return;
       paymentMethods.push({ id: Date.now(), bank, account, name });
-      document.getElementById('newPayBank').value = '';
-      document.getElementById('newPayAccount').value = '';
-      document.getElementById('newPayName').value = '';
-      updateUI();
-      alert("Payment account added.");
+      renderAdminPaymentList();
     }
-
-    function deletePaymentMethod(id) {
-      paymentMethods = paymentMethods.filter(item => item.id !== id);
-      updateUI();
-    }
-
-    function updateSocialTaskConfig() {
-      const title = document.getElementById('adminSocialTitle').value;
-      const url = document.getElementById('adminSocialUrl').value;
-      const desc = document.getElementById('adminSocialDesc').value;
-
-      if (title) socialTask.title = title;
-      if (url) socialTask.url = url;
-      if (desc) socialTask.desc = desc;
-
-      updateUI();
-      alert("Social task updated.");
-    }
-
-    function openWithdrawModal() { document.getElementById('withdrawModal').style.display = 'flex'; }
-    function closeWithdrawModal() { document.getElementById('withdrawModal').style.display = 'none'; }
-    function submitWithdrawal() {
-      const amount = parseFloat(document.getElementById('wdAmount').value);
-      if (!amount || amount < 100000) { alert("Minimum cashout is ₦100,000."); return; }
-      if (activeReferrals < 5) { alert("5 active referrals required."); return; }
-      if (amount + 100 > userBalance) { alert("Insufficient balance."); return; }
-
-      userBalance -= (amount + 100);
-      updateUI();
-      closeWithdrawModal();
-      alert("Cashout request submitted!");
-    }
-
-    updateUI();
   </script>
 </body>
 </html>
