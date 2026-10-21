@@ -4,8 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>EarnPlanet - Your Universe of Daily Earnings</title>
-  
-  <!-- PROPELLERADS MULTITAG / POPUNDER SCRIPT (Replace YOUR_ZONE_ID with your actual PropellerAds zone code) -->
+
+  <!-- PROPELLERADS MULTITAG / POPUNDER SCRIPT (Replace YOUR_ZONE_ID with your zone code) -->
   <script src="https://alwingulla.com/88/tag.min.js" data-zone="YOUR_ZONE_ID" async data-cfasync="false"></script>
 
   <style>
@@ -17,257 +17,441 @@
       --primary-hover: #00c853;
       --accent: #3b82f6;
       --gold: #f59e0b;
+      --danger: #ef4444;
       --text: #f9fafb;
       --text-muted: #9ca3af;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); padding-bottom: 50px; }
+    body { background-color: var(--bg); color: var(--text); padding-bottom: 60px; }
 
-    header { background: #0b0f19; border-bottom: 1px solid var(--card-border); padding: 18px 25px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; }
-    .brand { font-size: 24px; font-weight: 900; color: var(--primary); letter-spacing: 0.5px; }
-    .tier-badge { background: rgba(245, 158, 11, 0.15); color: var(--gold); border: 1px solid rgba(245, 158, 11, 0.3); padding: 6px 14px; border-radius: 20px; font-size: 13px; font-weight: bold; }
+    header {
+      background: #0b0f19;
+      border-bottom: 1px solid var(--card-border);
+      padding: 16px 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 50;
+    }
+    .brand { font-size: 22px; font-weight: 900; color: var(--primary); letter-spacing: 0.5px; }
+    .nav-actions { display: flex; gap: 10px; align-items: center; }
+    .tier-badge {
+      background: rgba(245, 158, 11, 0.15);
+      color: var(--gold);
+      border: 1px solid rgba(245, 158, 11, 0.3);
+      padding: 6px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: 700;
+    }
 
-    .container { max-width: 850px; margin: 25px auto; padding: 0 15px; }
+    .container { max-width: 850px; margin: 20px auto; padding: 0 15px; }
+
+    /* Tabs */
+    .tabs-header { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 1px solid var(--card-border); padding-bottom: 10px; }
+    .tab-btn { background: transparent; color: var(--text-muted); border: none; padding: 10px 18px; font-size: 14px; font-weight: 700; cursor: pointer; border-radius: 8px; }
+    .tab-btn.active { background: var(--card-bg); color: var(--primary); border: 1px solid var(--card-border); }
 
     /* Glassmorphism Wallet */
-    .wallet-card { background: linear-gradient(135deg, #111827, #1f2937); border: 1px solid var(--card-border); border-radius: 20px; padding: 30px; display: flex; flex-wrap: wrap; justify-content: space-between; align-items: center; gap: 20px; box-shadow: 0 15px 30px rgba(0,0,0,0.5); }
-    .wallet-info h3 { font-size: 13px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
-    .wallet-info .balance { font-size: 38px; font-weight: 900; color: var(--primary); margin-top: 5px; }
-    .wallet-actions { display: flex; gap: 12px; }
+    .wallet-card {
+      background: linear-gradient(135deg, #111827, #1f2937);
+      border: 1px solid var(--card-border);
+      border-radius: 20px;
+      padding: 25px;
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      box-shadow: 0 15px 30px rgba(0,0,0,0.5);
+    }
+    .wallet-info h3 { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
+    .wallet-info .balance { font-size: 36px; font-weight: 900; color: var(--primary); margin-top: 4px; }
+    .wallet-actions { display: flex; gap: 10px; }
 
     /* Buttons */
-    .btn { background: var(--primary); color: #000; border: none; padding: 12px 22px; border-radius: 10px; font-weight: 800; cursor: pointer; transition: 0.2s; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; }
+    .btn { background: var(--primary); color: #000; border: none; padding: 12px 20px; border-radius: 10px; font-weight: 800; cursor: pointer; transition: 0.2s; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; }
     .btn:hover { background: var(--primary-hover); transform: translateY(-2px); }
     .btn-secondary { background: #1f2937; color: var(--text); border: 1px solid var(--card-border); }
     .btn-secondary:hover { background: #374151; }
+    .btn-danger { background: rgba(239, 68, 68, 0.2); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.4); }
+    .btn-danger:hover { background: var(--danger); color: #fff; }
     .btn-disabled { background: #374151; color: var(--text-muted); cursor: not-allowed; }
 
     /* Stats Grid */
-    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin: 25px 0; }
-    .stat-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 20px; text-align: center; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin: 20px 0; }
+    .stat-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 18px; text-align: center; }
     .stat-card h4 { font-size: 12px; color: var(--text-muted); text-transform: uppercase; }
-    .stat-card p { font-size: 22px; font-weight: 800; margin-top: 8px; color: var(--gold); }
+    .stat-card p { font-size: 20px; font-weight: 800; margin-top: 6px; color: var(--gold); }
+
+    /* Section Header */
+    .section-title { font-size: 18px; font-weight: 800; margin: 25px 0 15px 0; display: flex; justify-content: space-between; align-items: center; }
 
     /* Packages */
-    .section-title { font-size: 20px; font-weight: 800; margin: 30px 0 15px 0; display: flex; justify-content: space-between; align-items: center; }
     .tiers-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; }
-    .tier-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; text-align: center; position: relative; overflow: hidden; }
+    .tier-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; text-align: center; position: relative; }
     .tier-card.active-tier { border-color: var(--primary); box-shadow: 0 0 20px rgba(0,230,118,0.15); }
     .tier-name { font-weight: 800; font-size: 18px; color: var(--gold); }
-    .tier-price { font-size: 20px; font-weight: 900; margin: 10px 0; color: #fff; }
+    .tier-price { font-size: 22px; font-weight: 900; margin: 8px 0; color: #fff; }
     .tier-perks { font-size: 12px; color: var(--text-muted); margin-bottom: 15px; line-height: 1.6; }
+    .bonus-tag { background: rgba(0,230,118,0.15); color: var(--primary); font-size: 11px; font-weight: bold; padding: 4px 8px; border-radius: 10px; margin-bottom: 10px; display: inline-block; }
 
     /* Task Cards */
-    .task-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 22px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; gap: 15px; }
-    .task-info h4 { font-size: 16px; font-weight: 700; margin-bottom: 4px; }
-    .task-info p { font-size: 13px; color: var(--text-muted); }
-    .task-reward { color: var(--primary); font-weight: 800; font-size: 14px; margin-top: 6px; }
+    .task-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; gap: 15px; }
+    .task-info h4 { font-size: 15px; font-weight: 700; margin-bottom: 4px; }
+    .task-info p { font-size: 12px; color: var(--text-muted); }
+    .task-reward { color: var(--primary); font-weight: 800; font-size: 13px; margin-top: 5px; }
 
-    /* Game Modal & General Modals */
+    /* Modals */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(5px); display: none; justify-content: center; align-items: center; z-index: 100; }
-    .modal { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 30px; width: 92%; max-width: 500px; box-shadow: 0 25px 50px rgba(0,0,0,0.7); }
-    .modal h3 { margin-bottom: 15px; font-size: 22px; }
-    .modal input { width: 100%; padding: 14px; background: #07090e; border: 1px solid var(--card-border); border-radius: 10px; color: #fff; margin-bottom: 15px; font-size: 15px; }
+    .modal { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 20px; padding: 25px; width: 92%; max-width: 500px; box-shadow: 0 25px 50px rgba(0,0,0,0.7); max-height: 90vh; overflow-y: auto; }
+    .modal h3 { margin-bottom: 12px; font-size: 20px; }
+    .modal input, .modal select, .modal textarea { width: 100%; padding: 12px; background: #07090e; border: 1px solid var(--card-border); border-radius: 10px; color: #fff; margin-bottom: 12px; font-size: 14px; }
 
-    /* Canvas Game Styling */
-    #gameCanvas { background: #1a1e29; border-radius: 12px; display: block; margin: 15px auto; border: 2px solid var(--card-border); }
+    /* Payment Gateway Option Card */
+    .payment-method-card { background: #07090e; border: 1px solid var(--card-border); border-radius: 12px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; }
+
+    /* Driving Canvas */
+    #gameCanvas { background: #1a1e29; border-radius: 12px; display: block; margin: 12px auto; border: 2px solid var(--card-border); }
+    .ad-banner-placeholder { background: #07090e; border: 1px dashed var(--card-border); padding: 10px; text-align: center; font-size: 11px; color: var(--text-muted); border-radius: 8px; margin-bottom: 10px; }
   </style>
 </head>
 <body>
 
   <header>
     <div class="brand">EarnPlanet</div>
-    <div class="tier-badge" id="headerTier">Starter Package (₦15k)</div>
+    <div class="nav-actions">
+      <div class="tier-badge" id="headerTier">No Active Plan</div>
+    </div>
   </header>
 
   <div class="container">
     
-    <!-- Wallet Card -->
-    <div class="wallet-card">
-      <div class="wallet-info">
-        <h3>Available Balance</h3>
-        <div class="balance" id="walletBalance">₦15,000.00</div>
-      </div>
-      <div class="wallet-actions">
-        <button class="btn btn-secondary" onclick="alert('Redirecting to payment gateway...')">Deposit</button>
-        <button class="btn" onclick="openWithdrawModal()">Withdraw Cash</button>
-      </div>
+    <!-- Navigation Tabs -->
+    <div class="tabs-header">
+      <button class="tab-btn active" onclick="switchTab('user')">User Dashboard</button>
+      <button class="tab-btn" onclick="switchTab('admin')">⚙️ Admin Management</button>
     </div>
 
-    <!-- Stats & Referral Gate Tracker -->
-    <div class="stats-grid">
-      <div class="stat-card">
-        <h4>Active Referrals</h4>
-        <p id="refCountDisplay">0 / 5</p>
-        <span style="font-size:11px; color:var(--text-muted);">Required for ₦100k cashout</span>
+    <!-- USER DASHBOARD TAB -->
+    <div id="userTab">
+      
+      <!-- Wallet Card -->
+      <div class="wallet-card">
+        <div class="wallet-info">
+          <h3>Available Wallet Balance</h3>
+          <div class="balance" id="walletBalance">₦0.00</div>
+        </div>
+        <div class="wallet-actions">
+          <button class="btn btn-secondary" onclick="openDepositModal()">Deposit / Subscribe</button>
+          <button class="btn" onclick="openWithdrawModal()">Cashout</button>
+        </div>
       </div>
-      <div class="stat-card">
-        <h4>EarnPlanet Referral Link</h4>
-        <p style="color:var(--accent); font-size:15px; word-break:break-all;" id="refLinkText">earnplanet.com.ng/?ref=EP90124</p>
+
+      <!-- Stats Grid -->
+      <div class="stats-grid">
+        <div class="stat-card">
+          <h4>Active Referrals</h4>
+          <p id="refCountDisplay">0 / 5</p>
+          <span style="font-size:11px; color:var(--text-muted);">Req. for ₦100k cashout</span>
+        </div>
+        <div class="stat-card">
+          <h4>Today's Drives</h4>
+          <p id="drivesDisplay">0 / 4 Sessions</p>
+          <span style="font-size:11px; color:var(--text-muted);">Resets daily</span>
+        </div>
       </div>
+
+      <!-- Membership Packages -->
+      <div class="section-title">Select Subscription Plan</div>
+      <div class="tiers-grid">
+        
+        <div class="tier-card" id="tier1">
+          <div class="bonus-tag">Get ₦6,000 Bonus (40%)</div>
+          <div class="tier-name">Starter</div>
+          <div class="tier-price">₦15,000</div>
+          <div class="tier-perks">Earn ₦300/day<br>₦300 per task<br>10 Daily Tasks</div>
+          <button class="btn" style="width:100%; font-size:12px;" onclick="subscribePackage('Starter', 15000, 300, 6000)">Activate Starter</button>
+        </div>
+
+        <div class="tier-card" id="tier2">
+          <div class="bonus-tag">Get ₦12,000 Bonus (40%)</div>
+          <div class="tier-name">Silver</div>
+          <div class="tier-price">₦30,000</div>
+          <div class="tier-perks">Earn ₦600/day<br>₦600 per task<br>10 Daily Tasks</div>
+          <button class="btn" style="width:100%; font-size:12px;" onclick="subscribePackage('Silver', 30000, 600, 12000)">Activate Silver</button>
+        </div>
+
+        <div class="tier-card" id="tier3">
+          <div class="bonus-tag">Get ₦20,000 Bonus (40%)</div>
+          <div class="tier-name">Gold</div>
+          <div class="tier-price">₦50,000</div>
+          <div class="tier-perks">Earn ₦1,000/day<br>₦1,000 per task<br>10 Daily Tasks</div>
+          <button class="btn" style="width:100%; font-size:12px;" onclick="subscribePackage('Gold', 50000, 1000, 20000)">Activate Gold</button>
+        </div>
+
+        <div class="tier-card" id="tier4">
+          <div class="bonus-tag">Get ₦40,000 Bonus (40%)</div>
+          <div class="tier-name">Platinum</div>
+          <div class="tier-price">₦100,000</div>
+          <div class="tier-perks">Earn ₦1,500/day<br>₦1,500 per task<br>10 Daily Tasks</div>
+          <button class="btn" style="width:100%; font-size:12px;" onclick="subscribePackage('Platinum', 100000, 1500, 40000)">Activate Platinum</button>
+        </div>
+
+      </div>
+
+      <!-- Tasks Module -->
+      <div class="section-title">Daily Earning Tasks</div>
+
+      <!-- Driving Game Task -->
+      <div class="task-card">
+        <div class="task-info">
+          <h4>🚗 Lagos Highway Expressway Rush</h4>
+          <p>Drive to the finish line to earn trip reward. (Max 4 sessions per day)</p>
+          <div class="task-reward" id="drivingRewardText">Reward: Subscribe to unlock</div>
+        </div>
+        <button class="btn" id="startDriveBtn" onclick="openDrivingGameModal()">Start Drive</button>
+      </div>
+
+      <!-- PropellerAds SmartLink Direct Task -->
+      <div class="task-card">
+        <div class="task-info">
+          <h4>🔗 Partner Direct Link Offer</h4>
+          <p>Visit sponsor link for 15 seconds. Anti-fake click protection enabled.</p>
+          <div class="task-reward">Reward: +₦100.00 fixed</div>
+        </div>
+        <button class="btn" id="directLinkBtn" onclick="handleDirectLinkTask('https://your-propeller-direct-link-url.com')">Visit Sponsor Link</button>
+      </div>
+
+      <!-- Admin Dynamic Social Media Task -->
+      <div class="task-card">
+        <div class="task-info">
+          <h4 id="socialTaskTitle">📱 Dynamic Sponsor Social Task</h4>
+          <p id="socialTaskDesc">Follow partner page and return to verify claim.</p>
+          <div class="task-reward" id="socialRewardText">Reward: Subscribe to unlock</div>
+        </div>
+        <button class="btn" id="socialTaskBtn" onclick="handleSocialTask()">Follow & Claim</button>
+      </div>
+
     </div>
 
-    <!-- Package Tiers (No Free Tier) -->
-    <div class="section-title">Membership Tiers</div>
-    <div class="tiers-grid">
-      <div class="tier-card active-tier" id="tier1">
-        <div class="tier-name">Starter</div>
-        <div class="tier-price">₦15,000</div>
-        <div class="tier-perks">₦300 Daily Base<br>₦300 per task<br>10 Tasks Daily</div>
-        <button class="btn btn-secondary" style="width:100%; font-size:12px;" disabled>Active Tier</button>
+    <!-- ADMIN MANAGEMENT TAB -->
+    <div id="adminTab" style="display:none;">
+      
+      <div class="section-title">⚙️ Payment Gateway Management</div>
+      <p style="font-size:13px; color:var(--text-muted); margin-bottom:15px;">Add or delete deposit accounts that users see when subscribing.</p>
+
+      <div class="stat-card" style="text-align:left; margin-bottom:20px;">
+        <h4 style="margin-bottom:10px;">Add New Payment Account</h4>
+        <input type="text" id="newPayBank" placeholder="Bank Name (e.g. OPay, Moniepoint, GTBank)">
+        <input type="text" id="newPayAccount" placeholder="Account Number">
+        <input type="text" id="newPayName" placeholder="Account Name / Holder Name">
+        <button class="btn" onclick="addPaymentMethod()">+ Save Payment Method</button>
       </div>
-      <div class="tier-card" id="tier2">
-        <div class="tier-name">Silver</div>
-        <div class="tier-price">₦30,000</div>
-        <div class="tier-perks">₦600 Daily Base<br>₦600 per task<br>10 Tasks Daily</div>
-        <button class="btn" style="width:100%; font-size:12px;" onclick="upgradePackage('Silver', 30000, 600)">Upgrade</button>
+
+      <div style="font-size:14px; font-weight:bold; margin-bottom:10px;">Active Payment Gateways:</div>
+      <div id="adminPaymentList"></div>
+
+      <div class="section-title" style="margin-top:35px;">⚙️ Social Media Task Configurator</div>
+      <p style="font-size:13px; color:var(--text-muted); margin-bottom:15px;">Change the page users must follow to earn daily rewards.</p>
+
+      <div class="stat-card" style="text-align:left;">
+        <input type="text" id="adminSocialTitle" placeholder="Task Title (e.g. Follow Our Instagram)">
+        <input type="text" id="adminSocialUrl" placeholder="Target Target URL (e.g. https://instagram.com/yourhandle)">
+        <textarea id="adminSocialDesc" placeholder="Task Instructions for Users"></textarea>
+        <button class="btn" onclick="updateSocialTaskConfig()">Update Social Task</button>
       </div>
-      <div class="tier-card" id="tier3">
-        <div class="tier-name">Gold</div>
-        <div class="tier-price">₦50,000</div>
-        <div class="tier-perks">₦1,000 Daily Base<br>₦1,000 per task<br>10 Tasks Daily</div>
-        <button class="btn" style="width:100%; font-size:12px;" onclick="upgradePackage('Gold', 50000, 1000)">Upgrade</button>
-      </div>
-      <div class="tier-card" id="tier4">
-        <div class="tier-name">Platinum</div>
-        <div class="tier-price">₦100,000</div>
-        <div class="tier-perks">₦1,500 Daily Base<br>₦1,500 per task<br>10 Tasks Daily</div>
-        <button class="btn" style="width:100%; font-size:12px;" onclick="upgradePackage('Platinum', 100000, 1500)">Upgrade</button>
-      </div>
+
     </div>
 
-    <!-- Tasks Engine -->
-    <div class="section-title">Daily Tasks (10 Tasks Available)</div>
+  </div>
 
-    <!-- TASK 1: CAR DRIVING GAME TASK -->
-    <div class="task-card">
-      <div class="task-info">
-        <h4>🚗 Lagos Expressway Driving Session</h4>
-        <p>Drive to the finish line to claim task reward. (Max 4 sessions daily)</p>
-        <div class="task-reward" id="drivingRewardText">Reward: +₦300 per trip</div>
+  <!-- DEPOSIT & PAYMENT METHOD MODAL -->
+  <div class="modal-overlay" id="depositModal">
+    <div class="modal">
+      <h3>Select Payment Gateway</h3>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:15px;">Transfer exact package fee to any account below and upload proof.</p>
+      
+      <div id="userPaymentMethodsList"></div>
+
+      <div style="margin-top:15px;">
+        <input type="number" id="depAmount" placeholder="Amount Paid (e.g. 15000)">
+        <input type="text" id="depSender" placeholder="Sender Account Name / Reference">
+        <div style="display:flex; gap:10px;">
+          <button class="btn btn-secondary" style="flex:1" onclick="closeDepositModal()">Close</button>
+          <button class="btn" style="flex:1" onclick="submitDepositProof()">Submit Proof</button>
+        </div>
       </div>
-      <button class="btn" onclick="openDrivingGameModal()">Start Driving</button>
     </div>
-
-    <!-- TASK 2: PROPELLERADS DIRECT LINK SPONSOR VISIT -->
-    <div class="task-card">
-      <div class="task-info">
-        <h4>🔗 Partner Offer Visit (PropellerAds SmartLink)</h4>
-        <p>Visit sponsor offer and stay for 15 seconds to receive ₦100 instantly.</p>
-        <div class="task-reward">Reward: +₦100.00 per click</div>
-      </div>
-      <button class="btn" id="directLinkBtn" onclick="handleDirectLinkTask('https://your-propeller-direct-link-url.com')">Visit Sponsor</button>
-    </div>
-
-    <!-- TASK 3: STANDARD TASK -->
-    <div class="task-card">
-      <div class="task-info">
-        <h4>📱 Sponsor Social Media Verification</h4>
-        <p>Follow partner pages and complete quick verification.</p>
-        <div class="task-reward" id="standardRewardText">Reward: +₦300 per task</div>
-      </div>
-      <button class="btn" onclick="completeStandardTask()">Complete Task</button>
-    </div>
-
   </div>
 
   <!-- DRIVING GAME MODAL -->
   <div class="modal-overlay" id="drivingModal">
     <div class="modal" style="max-width: 440px; text-align: center;">
-      <h3>EarnPlanet Highway Rush</h3>
-      <p style="font-size:13px; color:var(--text-muted); margin-bottom:10px;">Dodge traffic using Left / Right buttons to reach 100% progress!</p>
+      <h3>Lagos Expressway Rush</h3>
       
-      <canvas id="gameCanvas" width="380" height="260"></canvas>
-      
-      <div id="gameStatus" style="font-weight:bold; margin: 10px 0; color:var(--gold);">Progress: 0%</div>
+      <!-- Ad slot container inside driving modal -->
+      <div class="ad-banner-placeholder">
+        📢 Sponsor Ad Slot (PropellerAds MultiTag Active)
+      </div>
 
-      <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 15px;">
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:10px;">Dodge traffic using controls. Reach 100% to finish trip.</p>
+      
+      <canvas id="gameCanvas" width="360" height="240"></canvas>
+      
+      <div id="gameStatus" style="font-weight:bold; margin: 8px 0; color:var(--gold);">Progress: 0%</div>
+
+      <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 12px;">
         <button class="btn btn-secondary" style="padding: 10px 25px;" onclick="moveCar(-30)">◀ Left</button>
         <button class="btn btn-secondary" style="padding: 10px 25px;" onclick="moveCar(30)">Right ▶</button>
       </div>
 
-      <button class="btn btn-secondary" style="width:100%;" onclick="closeDrivingModal()">Close Session</button>
+      <button class="btn btn-secondary" style="width:100%;" onclick="closeDrivingModal()">Exit Session</button>
     </div>
   </div>
 
   <!-- WITHDRAWAL MODAL -->
   <div class="modal-overlay" id="withdrawModal">
     <div class="modal">
-      <h3>EarnPlanet Cashout Request</h3>
+      <h3>EarnPlanet Cashout</h3>
       <p style="font-size:12px; color:var(--text-muted); margin-bottom:15px;">
-        Rules: Min threshold <b>₦100,000</b> | At least <b>5 active referrals</b> | <b>₦100</b> flat processing fee.
+        Requirements: Min threshold <b>₦100,000</b> | At least <b>5 active referrals</b> | <b>₦100</b> flat processing fee.
       </p>
       <input type="number" id="wdAmount" placeholder="Enter Amount (Min ₦100,000)">
       <input type="text" id="wdBank" placeholder="Bank Name (e.g. OPay, GTB, Kuda)">
       <input type="text" id="wdAccount" placeholder="10-Digit Account Number">
       <div style="display:flex; gap:10px;">
         <button class="btn btn-secondary" style="flex:1" onclick="closeWithdrawModal()">Cancel</button>
-        <button class="btn" style="flex:1" onclick="submitWithdrawal()">Submit Cashout</button>
+        <button class="btn" style="flex:1" onclick="submitWithdrawal()">Request Cashout</button>
       </div>
     </div>
   </div>
 
   <script>
-    let userBalance = 15000.00;
+    // State
+    let userBalance = 0.00; // Initial balance starts at 0
     let activeReferrals = 0;
-    let currentTaskReward = 300;
-    let currentTierName = "Starter";
+    let currentTaskReward = 0;
+    let currentTierName = "None";
+    let dailyDrivesDone = 0;
+    const MAX_DAILY_DRIVES = 4;
+
+    // Dynamic Payment Methods Managed by Admin
+    let paymentMethods = [
+      { id: 1, bank: "OPay Digital Bank", account: "8012345678", name: "EarnPlanet Official" },
+      { id: 2, bank: "Moniepoint Microfinance", account: "5098765432", name: "EarnPlanet Platform" }
+    ];
+
+    // Dynamic Social Task Managed by Admin
+    let socialTask = {
+      title: "📱 Follow Official Instagram Page",
+      url: "https://instagram.com",
+      desc: "Follow partner instagram page for 10 seconds to claim reward."
+    };
 
     function updateUI() {
       document.getElementById('walletBalance').innerText = `₦${userBalance.toLocaleString('en-NG', {minimumFractionDigits: 2})}`;
       document.getElementById('refCountDisplay').innerText = `${activeReferrals} / 5`;
-      document.getElementById('headerTier').innerText = `${currentTierName} Package`;
-      document.getElementById('drivingRewardText').innerText = `Reward: +₦${currentTaskReward} per trip`;
-      document.getElementById('standardRewardText').innerText = `Reward: +₦${currentTaskReward} per task`;
+      document.getElementById('drivesDisplay').innerText = `${dailyDrivesDone} / ${MAX_DAILY_DRIVES} Sessions`;
+      document.getElementById('headerTier').innerText = currentTierName === "None" ? "No Active Plan" : `${currentTierName} Plan`;
+      
+      const rText = currentTaskReward > 0 ? `Reward: +₦${currentTaskReward} per trip` : "Reward: Subscribe to unlock";
+      document.getElementById('drivingRewardText').innerText = rText;
+      document.getElementById('socialRewardText').innerText = currentTaskReward > 0 ? `Reward: +₦${currentTaskReward}` : "Reward: Subscribe to unlock";
+
+      // Render Admin Lists & User Deposit Gateways
+      renderAdminPaymentList();
+      renderUserPaymentMethods();
+
+      // Render Social Task
+      document.getElementById('socialTaskTitle').innerText = socialTask.title;
+      document.getElementById('socialTaskDesc').innerText = socialTask.desc;
     }
 
-    function upgradePackage(tierName, cost, rewardPerTask) {
-      if (userBalance >= cost) {
-        userBalance -= cost;
-        currentTierName = tierName;
-        currentTaskReward = rewardPerTask;
-        updateUI();
-        alert(`Upgraded to EarnPlanet ${tierName} Package! Task rewards are now ₦${rewardPerTask} per task.`);
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+      if (tab === 'user') {
+        document.querySelectorAll('.tab-btn')[0].classList.add('active');
+        document.getElementById('userTab').style.display = 'block';
+        document.getElementById('adminTab').style.display = 'none';
       } else {
-        alert(`Insufficient balance! You need ₦${cost.toLocaleString()} to upgrade to ${tierName}. Deposit funds to proceed.`);
+        document.querySelectorAll('.tab-btn')[1].classList.add('active');
+        document.getElementById('userTab').style.display = 'none';
+        document.getElementById('adminTab').style.display = 'block';
       }
     }
 
-    function handleDirectLinkTask(directLinkUrl) {
+    // Package Activation & 40% Bonus Logic
+    function subscribePackage(tierName, price, taskReward, bonusAmount) {
+      if (confirm(`Confirm subscription to ${tierName} Package for ₦${price.toLocaleString()}?\n\nYou will receive a 40% instant cash back bonus of ₦${bonusAmount.toLocaleString()} in your balance!`)) {
+        currentTierName = tierName;
+        currentTaskReward = taskReward;
+        userBalance += bonusAmount; // Crediting 40% welcome bonus
+        updateUI();
+        alert(`Congratulations! Your ${tierName} Package is active. ₦${bonusAmount.toLocaleString()} welcome bonus credited to your wallet balance.`);
+      }
+    }
+
+    // Direct Link Anti-Fake Click Task
+    let directLinkVerified = false;
+    function handleDirectLinkTask(url) {
+      if (directLinkVerified) {
+        alert("You have already claimed this sponsor offer today!");
+        return;
+      }
       const btn = document.getElementById('directLinkBtn');
       btn.innerText = "Verifying Offer (15s)...";
       btn.className = "btn btn-disabled";
-      btn.onclick = null;
 
-      window.open(directLinkUrl, '_blank');
+      window.open(url, '_blank');
 
       let seconds = 15;
-      const countdown = setInterval(() => {
+      const timer = setInterval(() => {
         seconds--;
         if (seconds > 0) {
           btn.innerText = `Verifying (${seconds}s)...`;
         } else {
-          clearInterval(countdown);
+          clearInterval(timer);
           userBalance += 100;
+          directLinkVerified = true;
           updateUI();
           btn.innerText = "Claimed ✓";
-          alert("Sponsor offer verified! ₦100 credited to your EarnPlanet wallet.");
+          alert("Sponsor visit verified! ₦100 credited to your wallet.");
         }
       }, 1000);
     }
 
-    function completeStandardTask() {
-      userBalance += currentTaskReward;
-      updateUI();
-      alert(`Task verified! ₦${currentTaskReward} credited to your EarnPlanet wallet.`);
+    // Social Task
+    function handleSocialTask() {
+      if (currentTaskReward === 0) {
+        alert("Please subscribe to a membership package first to unlock daily task rewards!");
+        return;
+      }
+      window.open(socialTask.url, '_blank');
+      setTimeout(() => {
+        userBalance += currentTaskReward;
+        updateUI();
+        alert(`Social task verified! ₦${currentTaskReward} credited to your wallet.`);
+      }, 5000);
     }
 
+    // 2D Driving Game Logic + 4 Drives Daily Lock
     let gameInterval = null;
-    let carX = 160;
+    let carX = 150;
     let progress = 0;
 
     function openDrivingGameModal() {
+      if (currentTaskReward === 0) {
+        alert("Please subscribe to a membership package first to unlock driving earnings!");
+        return;
+      }
+      if (dailyDrivesDone >= MAX_DAILY_DRIVES) {
+        alert("Daily limit reached! You can only drive 4 times per day. Please come back tomorrow for your next driving session.");
+        return;
+      }
       document.getElementById('drivingModal').style.display = 'flex';
       startDrivingCanvas();
     }
@@ -279,14 +463,14 @@
 
     function moveCar(amount) {
       carX += amount;
-      if (carX < 20) carX = 20;
-      if (carX > 300) carX = 300;
+      if (carX < 10) carX = 10;
+      if (carX > 290) carX = 290;
     }
 
     function startDrivingCanvas() {
       const canvas = document.getElementById('gameCanvas');
       const ctx = canvas.getContext('2d');
-      carX = 160;
+      carX = 150;
       progress = 0;
 
       if (gameInterval) clearInterval(gameInterval);
@@ -295,55 +479,117 @@
         progress += 2;
         if (progress > 100) progress = 100;
 
-        document.getElementById('gameStatus').innerText = `Driving Progress: ${progress}%`;
+        document.getElementById('gameStatus').innerText = `Progress: ${progress}%`;
 
         ctx.fillStyle = "#111827";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         ctx.strokeStyle = "#ffffff";
-        ctx.setLineDash([20, 20]);
+        ctx.setLineDash([15, 15]);
         ctx.beginPath();
-        ctx.moveTo(190, 0); ctx.lineTo(190, canvas.height);
+        ctx.moveTo(180, 0); ctx.lineTo(180, canvas.height);
         ctx.stroke();
 
         ctx.fillStyle = "#00e676";
-        ctx.fillRect(carX, canvas.height - 70, 40, 60);
+        ctx.fillRect(carX, canvas.height - 60, 35, 50);
 
         if (progress >= 100) {
           clearInterval(gameInterval);
+          dailyDrivesDone++;
           userBalance += currentTaskReward;
           updateUI();
-          alert(`Destination reached! You earned ₦${currentTaskReward} from your EarnPlanet driving session.`);
+          alert(`Trip completed! You earned ₦${currentTaskReward}. You have completed ${dailyDrivesDone}/${MAX_DAILY_DRIVES} drives today.`);
           closeDrivingModal();
         }
       }, 100);
     }
 
+    // Admin Payment Methods Logic
+    function renderAdminPaymentList() {
+      const container = document.getElementById('adminPaymentList');
+      container.innerHTML = paymentMethods.map(item => `
+        <div class="payment-method-card">
+          <div>
+            <b>${item.bank}</b><br>
+            <span style="font-size:13px; color:var(--text-muted);">${item.account} (${item.name})</span>
+          </div>
+          <button class="btn btn-danger" style="padding:6px 12px; font-size:12px;" onclick="deletePaymentMethod(${item.id})">Delete</button>
+        </div>
+      `).join('');
+    }
+
+    function renderUserPaymentMethods() {
+      const container = document.getElementById('userPaymentMethodsList');
+      container.innerHTML = paymentMethods.map(item => `
+        <div class="payment-method-card">
+          <div>
+            <b style="color:var(--primary);">${item.bank}</b><br>
+            <span style="font-size:14px; font-weight:bold;">${item.account}</span><br>
+            <span style="font-size:12px; color:var(--text-muted);">${item.name}</span>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function addPaymentMethod() {
+      const bank = document.getElementById('newPayBank').value;
+      const account = document.getElementById('newPayAccount').value;
+      const name = document.getElementById('newPayName').value;
+
+      if (!bank || !account || !name) {
+        alert("Please fill in all bank payment details!");
+        return;
+      }
+
+      paymentMethods.push({ id: Date.now(), bank, account, name });
+      document.getElementById('newPayBank').value = '';
+      document.getElementById('newPayAccount').value = '';
+      document.getElementById('newPayName').value = '';
+      updateUI();
+      alert("New payment gateway added successfully!");
+    }
+
+    function deletePaymentMethod(id) {
+      paymentMethods = paymentMethods.filter(item => item.id !== id);
+      updateUI();
+      alert("Payment method removed!");
+    }
+
+    function updateSocialTaskConfig() {
+      const title = document.getElementById('adminSocialTitle').value;
+      const url = document.getElementById('adminSocialUrl').value;
+      const desc = document.getElementById('adminSocialDesc').value;
+
+      if (title) socialTask.title = title;
+      if (url) socialTask.url = url;
+      if (desc) socialTask.desc = desc;
+
+      updateUI();
+      alert("Social task updated!");
+    }
+
+    // Deposit & Withdraw Modals
+    function openDepositModal() { document.getElementById('depositModal').style.display = 'flex'; }
+    function closeDepositModal() { document.getElementById('depositModal').style.display = 'none'; }
+    function submitDepositProof() {
+      const amount = document.getElementById('depAmount').value;
+      if (!amount) { alert("Enter amount paid."); return; }
+      closeDepositModal();
+      alert(`Proof of payment for ₦${parseFloat(amount).toLocaleString()} submitted! Admin will verify and activate your package shortly.`);
+    }
+
     function openWithdrawModal() { document.getElementById('withdrawModal').style.display = 'flex'; }
     function closeWithdrawModal() { document.getElementById('withdrawModal').style.display = 'none'; }
-
     function submitWithdrawal() {
       const amount = parseFloat(document.getElementById('wdAmount').value);
-      const MIN_THRESHOLD = 100000;
-      const FEE = 100;
+      if (!amount || amount < 100000) { alert("Minimum cashout is ₦100,000."); return; }
+      if (activeReferrals < 5) { alert("You need at least 5 active referrals to cash out."); return; }
+      if (amount + 100 > userBalance) { alert("Insufficient balance."); return; }
 
-      if (!amount || amount < MIN_THRESHOLD) {
-        alert("Minimum withdrawal threshold is ₦100,000.");
-        return;
-      }
-      if (activeReferrals < 5) {
-        alert(`Withdrawal locked! You have ${activeReferrals}/5 active referrals. EarnPlanet requires 5 active referrals to cash out.`);
-        return;
-      }
-      if (amount + FEE > userBalance) {
-        alert(`Insufficient balance! Total deduction including ₦100 fee is ₦${(amount + FEE).toLocaleString()}.`);
-        return;
-      }
-
-      userBalance -= (amount + FEE);
+      userBalance -= (amount + 100);
       updateUI();
       closeWithdrawModal();
-      alert(`Withdrawal request of ₦${amount.toLocaleString()} submitted successfully! Payment will hit your account after verification.`);
+      alert("Cashout request submitted!");
     }
 
     updateUI();
