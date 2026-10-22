@@ -79,7 +79,6 @@
     .btn-secondary:hover { background: #16422b; }
     .btn-danger { background: rgba(239, 68, 68, 0.2); color: var(--danger); border: 1px solid var(--danger); }
     .btn-danger:hover { background: var(--danger); color: #fff; }
-    .btn-disabled { background: #16422b; color: var(--text-muted); cursor: not-allowed; }
 
     /* Stats Grid */
     .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin: 20px 0; }
@@ -89,15 +88,16 @@
 
     .section-title { font-size: 18px; font-weight: 800; margin: 25px 0 15px 0; color: #fff; border-left: 4px solid var(--primary); padding-left: 10px; }
 
-    .single-plan-banner {
+    /* Upgrade Banner (Bottom) */
+    .upgrade-banner {
       background: linear-gradient(135deg, #0d281a, #16422b);
-      border: 2px solid var(--primary);
+      border: 1px dashed var(--primary);
       border-radius: 16px;
-      padding: 22px;
+      padding: 20px;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 25px;
+      margin: 25px 0;
       flex-wrap: wrap;
       gap: 15px;
     }
@@ -106,6 +106,14 @@
     .task-info h4 { font-size: 15px; font-weight: 800; color: #fff; }
     .task-info p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
     .task-reward { color: var(--primary); font-weight: 800; font-size: 13px; margin-top: 5px; }
+
+    /* Chatbot Box */
+    .chat-container { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; height: 350px; display: flex; flex-direction: column; }
+    .chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
+    .msg { padding: 10px 14px; border-radius: 12px; font-size: 13px; max-width: 80%; line-height: 1.4; }
+    .msg-bot { background: #16422b; color: #fff; align-self: flex-start; }
+    .msg-user { background: var(--primary); color: #04100a; font-weight: 700; align-self: flex-end; }
+    .chat-input-row { display: flex; gap: 10px; }
 
     /* Modals */
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(6px); display: none; justify-content: center; align-items: center; z-index: 100; }
@@ -184,8 +192,9 @@
     <div class="container">
       
       <div class="tabs-header">
-        <div style="display:flex; gap:10px;">
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
           <button class="tab-btn active" onclick="switchTab('user')">Dashboard</button>
+          <button class="tab-btn" onclick="switchTab('support')">💬 Support & Chatbot</button>
           <button class="tab-btn" onclick="switchTab('settings')">⚙️ Settings</button>
         </div>
         <button class="tab-btn" onclick="openAdminAuthModal()">Management Panel</button>
@@ -201,7 +210,8 @@
             <div class="balance" id="walletBalance">₦0.00</div>
           </div>
           <div class="wallet-actions">
-            <button class="btn" onclick="openPlansModal()">Upgrade / Subscribe Plan</button>
+            <!-- SUBSCRIBE PLAN BUTTON (UP) -->
+            <button class="btn" onclick="openPlansModal('subscribe')">Subscribe Plan</button>
             <button class="btn btn-secondary" onclick="openWithdrawModal()">Cashout</button>
           </div>
         </div>
@@ -218,15 +228,6 @@
             <p id="drivesDisplay">0 / 4 Sessions</p>
             <span style="font-size:11px; color:var(--text-muted);">Resets every 24h</span>
           </div>
-        </div>
-
-        <!-- Plan Banner -->
-        <div class="single-plan-banner">
-          <div>
-            <h3 style="font-size:16px; font-weight:800;">Membership Tier & Upgrades</h3>
-            <p style="font-size:12px; color:var(--text-muted);">Upgrading deducts your current tier balance and adds a ₦5,000 upgrade surcharge.</p>
-          </div>
-          <button class="btn" style="white-space:nowrap;" onclick="openPlansModal()">View Tiers</button>
         </div>
 
         <!-- Daily Tasks Module -->
@@ -252,10 +253,31 @@
           <button class="btn" id="directLinkBtn" onclick="handleDirectLinkTask('https://your-propeller-direct-link-url.com')">Visit Sponsor Link</button>
         </div>
 
-        <!-- Dynamic Social Tasks Container -->
-        <div class="section-title">Social Media Tasks (Max 5 Daily)</div>
-        <div id="userSocialTasksContainer"></div>
+        <!-- UPGRADE PLAN BANNER (DOWN) -->
+        <div class="upgrade-banner">
+          <div>
+            <h3 style="font-size:15px; font-weight:800; color:var(--gold);">Need Higher Task Payouts?</h3>
+            <p style="font-size:12px; color:var(--text-muted);">Upgrade your tier. Previous plan amount will be deducted + ₦5k surcharge.</p>
+          </div>
+          <button class="btn btn-secondary" style="white-space:nowrap;" onclick="openPlansModal('upgrade')">Upgrade Plan</button>
+        </div>
 
+      </div>
+
+      <!-- SUPPORT & CHATBOT TAB -->
+      <div id="supportTab" style="display:none;">
+        <div class="section-title">💬 EarnPlanet Instant Assistant</div>
+        <p style="font-size:13px; color:var(--text-muted); margin-bottom:15px;">Ask questions regarding subscriptions, cashouts, referrals, or driving tasks.</p>
+
+        <div class="chat-container">
+          <div class="chat-messages" id="chatMessagesList">
+            <div class="msg msg-bot">Hello! I am the EarnPlanet Support Bot. How can I assist you today?</div>
+          </div>
+          <div class="chat-input-row">
+            <input type="text" id="chatInput" placeholder="Type your question..." style="margin-bottom:0;" onkeypress="if(event.key==='Enter') sendChatMessage()">
+            <button class="btn" onclick="sendChatMessage()">Send</button>
+          </div>
+        </div>
       </div>
 
       <!-- SETTINGS TAB -->
@@ -288,24 +310,26 @@
         <div class="section-title">⚙️ Pending Payment Approvals</div>
         <div id="adminPendingApprovalsList"></div>
 
-        <div class="section-title" style="margin-top:30px;">⚙️ Manage Social Media Tasks</div>
+        <div class="section-title" style="margin-top:30px;">⚙️ Payment Gateways (Add / Edit / Delete)</div>
         <div class="stat-card" style="text-align:left; margin-bottom:15px;">
-          <h4 style="margin-bottom:10px;">Add New Social Task</h4>
-          <input type="text" id="adminSocialTaskTitle" placeholder="Task Title (e.g. Follow Telegram)">
-          <input type="text" id="adminSocialTaskUrl" placeholder="Target Link URL">
-          <textarea id="adminSocialTaskDesc" placeholder="Instructions"></textarea>
-          <button class="btn" onclick="addAdminSocialTask()">+ Add Task</button>
-        </div>
-        <div id="adminSocialTasksList"></div>
-
-        <div class="section-title" style="margin-top:30px;">⚙️ Payment Gateway Setup</div>
-        <div class="stat-card" style="text-align:left; margin-bottom:15px;">
-          <input type="text" id="newPayBank" placeholder="Bank Name">
+          <h4 style="margin-bottom:10px;" id="adminPayFormTitle">Add New Bank Payment Gateway</h4>
+          <input type="hidden" id="editPayId">
+          <input type="text" id="newPayBank" placeholder="Bank Name (e.g. OPay)">
           <input type="text" id="newPayAccount" placeholder="Account Number">
           <input type="text" id="newPayName" placeholder="Account Holder Name">
-          <button class="btn" onclick="addPaymentMethod()">+ Save Account</button>
+          <button class="btn" id="savePayBtn" onclick="savePaymentMethod()">+ Save Account</button>
         </div>
         <div id="adminPaymentList"></div>
+
+        <div class="section-title" style="margin-top:30px;">⚙️ Chatbot FAQ Manager</div>
+        <div class="stat-card" style="text-align:left; margin-bottom:15px;">
+          <h4 style="margin-bottom:10px;" id="adminFaqFormTitle">Add New Chatbot FAQ</h4>
+          <input type="hidden" id="editFaqId">
+          <input type="text" id="newFaqQuery" placeholder="User Question / Keyword (e.g., cashout, bonus)">
+          <textarea id="newFaqAnswer" placeholder="Bot Answer Response"></textarea>
+          <button class="btn" id="saveFaqBtn" onclick="saveFaqItem()">+ Save FAQ</button>
+        </div>
+        <div id="adminFaqList"></div>
       </div>
 
     </div>
@@ -314,8 +338,8 @@
   <!-- PLAN SELECTION MODAL -->
   <div class="modal-overlay" id="plansModal">
     <div class="modal">
-      <h3>Select Membership Tier</h3>
-      <p style="font-size:12px; color:var(--text-muted); margin-bottom:15px;" id="modalPlanSubtitle">Upgrading deducts your current tier balance and adds ₦5,000 surcharge.</p>
+      <h3 id="planModalHeaderTitle">Select Subscription Plan</h3>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:15px;" id="modalPlanSubtitle"></p>
 
       <select id="selectedPlanDropdown" onchange="updatePlanPaymentView()">
         <option value="">-- Choose Package Tier --</option>
@@ -389,18 +413,17 @@
     let usersDb = JSON.parse(localStorage.getItem('earnplanet_users') || '[]');
     let activeSessionEmail = localStorage.getItem('earnplanet_session');
     let isAdminAuthenticated = false;
+    let currentModalMode = 'subscribe'; // 'subscribe' or 'upgrade'
 
     let paymentMethods = JSON.parse(localStorage.getItem('earnplanet_banks') || '[{"id":1,"bank":"OPay Digital Bank","account":"8012345678","name":"EarnPlanet Official"}]');
     let pendingPaymentProofs = JSON.parse(localStorage.getItem('earnplanet_pending_payments') || '[]');
-    let socialTasksList = JSON.parse(localStorage.getItem('earnplanet_social_tasks') || '[{"id":1,"title":"Follow Official Instagram","url":"https://instagram.com","desc":"Follow page for 10s","reward":300}]');
-    let completedSocialTasksToday = JSON.parse(localStorage.getItem('earnplanet_completed_social') || '{}');
+    let chatbotFaqs = JSON.parse(localStorage.getItem('earnplanet_faqs') || '[{"id":1,"keywords":"cashout withdraw fee","answer":"Minimum cashout is ₦100,000 with 5 active referrals. A 15% charge applies."},{"id":2,"keywords":"bonus cashback","answer":"You receive an instant 40% cashback bonus credited to your wallet upon plan payment approval!"}]');
 
     function saveState() {
       localStorage.setItem('earnplanet_users', JSON.stringify(usersDb));
       localStorage.setItem('earnplanet_banks', JSON.stringify(paymentMethods));
       localStorage.setItem('earnplanet_pending_payments', JSON.stringify(pendingPaymentProofs));
-      localStorage.setItem('earnplanet_social_tasks', JSON.stringify(socialTasksList));
-      localStorage.setItem('earnplanet_completed_social', JSON.stringify(completedSocialTasksToday));
+      localStorage.setItem('earnplanet_faqs', JSON.stringify(chatbotFaqs));
       if (currentUser) {
         localStorage.setItem('earnplanet_session', currentUser.email);
       } else {
@@ -408,7 +431,6 @@
       }
     }
 
-    // Auto Session Restorer on Refresh
     if (activeSessionEmail) {
       const found = usersDb.find(u => u.email === activeSessionEmail);
       if (found) {
@@ -418,7 +440,6 @@
       }
     }
 
-    // Auth Views
     function switchAuthView(view) {
       document.getElementById('loginView').style.display = view === 'login' ? 'block' : 'none';
       document.getElementById('registerView').style.display = view === 'register' ? 'block' : 'none';
@@ -431,7 +452,7 @@
       const pin = document.getElementById('regPin').value;
 
       if (!email || !password || pin.length !== 4) {
-        alert("Please fill all fields and ensure your withdrawal PIN is exactly 4 digits.");
+        alert("Please fill all fields and ensure your PIN is exactly 4 digits.");
         return;
       }
 
@@ -460,10 +481,7 @@
       const password = document.getElementById('loginPassword').value;
 
       const user = usersDb.find(u => u.email === email && u.password === password);
-      if (!user) {
-        alert("Invalid email or password!");
-        return;
-      }
+      if (!user) { alert("Invalid email or password!"); return; }
 
       currentUser = user;
       saveState();
@@ -482,10 +500,8 @@
     function handlePasswordReset() {
       const email = document.getElementById('forgotEmail').value.trim();
       const newPass = document.getElementById('forgotNewPassword').value;
-
       const user = usersDb.find(u => u.email === email);
       if (!user) { alert("Email not found!"); return; }
-
       user.password = newPass;
       saveState();
       alert("Password reset successful! Please login.");
@@ -502,28 +518,387 @@
       const rText = currentUser.taskReward > 0 ? `Reward: +₦${currentUser.taskReward} per trip` : "Reward: Select plan to unlock";
       document.getElementById('drivingRewardText').innerText = rText;
 
-      renderUserSocialTasks();
       renderAdminPaymentList();
       renderPendingApprovals();
-      renderAdminSocialTasks();
+      renderAdminFaqs();
     }
 
     function switchTab(tab) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      if (tab === 'user') {
-        document.querySelectorAll('.tab-btn')[0].classList.add('active');
-        document.getElementById('userTab').style.display = 'block';
-        document.getElementById('settingsTab').style.display = 'none';
-        document.getElementById('adminTab').style.display = 'none';
-      } else if (tab === 'settings') {
-        document.querySelectorAll('.tab-btn')[1].classList.add('active');
-        document.getElementById('userTab').style.display = 'none';
-        document.getElementById('settingsTab').style.display = 'block';
-        document.getElementById('adminTab').style.display = 'none';
+      document.getElementById('userTab').style.display = tab === 'user' ? 'block' : 'none';
+      document.getElementById('supportTab').style.display = tab === 'support' ? 'block' : 'none';
+      document.getElementById('settingsTab').style.display = tab === 'settings' ? 'block' : 'none';
+      document.getElementById('adminTab').style.display = tab === 'admin' ? 'block' : 'none';
+
+      if (tab === 'user') document.querySelectorAll('.tab-btn')[0].classList.add('active');
+      if (tab === 'support') document.querySelectorAll('.tab-btn')[1].classList.add('active');
+      if (tab === 'settings') document.querySelectorAll('.tab-btn')[2].classList.add('active');
+    }
+
+    // Chatbot Engine
+    function sendChatMessage() {
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim().toLowerCase();
+      if (!text) return;
+
+      const list = document.getElementById('chatMessagesList');
+      list.innerHTML += `<div class="msg msg-user">${input.value}</div>`;
+      input.value = '';
+
+      let reply = "I'm sorry, I couldn't find an answer for that. Please contact our support team or check back later.";
+
+      for (let faq of chatbotFaqs) {
+        let keys = faq.keywords.toLowerCase().split(' ');
+        if (keys.some(k => k && text.includes(k))) {
+          reply = faq.answer;
+          break;
+        }
+      }
+
+      setTimeout(() => {
+        list.innerHTML += `<div class="msg msg-bot">${reply}</div>`;
+        list.scrollTop = list.scrollHeight;
+      }, 400);
+    }
+
+    // Modal Control for Subscribe vs Upgrade
+    function openPlansModal(mode) {
+      currentModalMode = mode;
+      document.getElementById('plansModal').style.display = 'flex';
+      document.getElementById('selectedPlanDropdown').value = '';
+      document.getElementById('planPaymentDetailsContainer').style.display = 'none';
+
+      if (mode === 'subscribe') {
+        document.getElementById('planModalHeaderTitle').innerText = "Subscribe to Plan";
+        document.getElementById('modalPlanSubtitle').innerText = "Select a plan tier to make a direct subscription.";
+      } else {
+        document.getElementById('planModalHeaderTitle').innerText = "Upgrade Plan Tier";
+        document.getElementById('modalPlanSubtitle').innerText = "Upgrading deducts your current tier and adds a ₦5,000 surcharge.";
       }
     }
 
-    // Settings
+    function closePlansModal() { document.getElementById('plansModal').style.display = 'none'; }
+
+    function updatePlanPaymentView() {
+      const targetPrice = parseInt(document.getElementById('selectedPlanDropdown').value);
+      const container = document.getElementById('planPaymentDetailsContainer');
+      const calcText = document.getElementById('paymentCalculationText');
+      const bankDisplay = document.getElementById('activeBankInfoDisplay');
+
+      if (!targetPrice) { container.style.display = 'none'; return; }
+
+      let tierPrices = { "None": 0, "Starter": 15000, "Silver": 30000, "Gold": 50000, "Platinum": 100000 };
+      let currentTierPrice = tierPrices[currentUser.tier] || 0;
+
+      if (currentModalMode === 'upgrade' && currentTierPrice === 0) {
+        alert("You do not have an active plan yet! Please use 'Subscribe Plan' instead.");
+        document.getElementById('selectedPlanDropdown').value = '';
+        container.style.display = 'none';
+        return;
+      }
+
+      if (targetPrice <= currentTierPrice) {
+        alert("You are already on this plan or a higher tier!");
+        document.getElementById('selectedPlanDropdown').value = "";
+        container.style.display = 'none';
+        return;
+      }
+
+      let priceDifference = targetPrice - currentTierPrice;
+      let surcharge = (currentModalMode === 'upgrade' && currentTierPrice > 0) ? 5000 : 0;
+      let totalPayable = priceDifference + surcharge;
+
+      if (currentModalMode === 'upgrade' && currentTierPrice > 0) {
+        calcText.innerHTML = `Upgrading from ${currentUser.tier} (₦${currentTierPrice.toLocaleString()}) -> Difference: ₦${priceDifference.toLocaleString()} + ₦5k Surcharge = <span style="color:#00e676;">Total Payable: ₦${totalPayable.toLocaleString()}</span>`;
+      } else {
+        calcText.innerHTML = `Direct Subscription -> <span style="color:#00e676;">Total Payable: ₦${totalPayable.toLocaleString()}</span>`;
+      }
+
+      const activeBank = paymentMethods[0] || { bank: "OPay", account: "8012345678", name: "EarnPlanet" };
+      bankDisplay.innerHTML = `<b>Bank:</b> ${activeBank.bank}<br><b>Account Number:</b> ${activeBank.account}<br><b>Account Name:</b> ${activeBank.name}`;
+      container.style.display = 'block';
+    }
+
+    function submitPlanPaymentProof() {
+      const targetPrice = parseInt(document.getElementById('selectedPlanDropdown').value);
+      const sender = document.getElementById('userSenderNameInput').value;
+      if (!targetPrice || !sender) { alert("Fill all details!"); return; }
+
+      let tierPrices = { "None": 0, "Starter": 15000, "Silver": 30000, "Gold": 50000, "Platinum": 100000 };
+      let currentTierPrice = tierPrices[currentUser.tier] || 0;
+
+      let tierMeta = {
+        15000: { name: "Starter", reward: 300, bonus: 6000 },
+        30000: { name: "Silver", reward: 600, bonus: 12000 },
+        50000: { name: "Gold", reward: 1000, bonus: 20000 },
+        100000: { name: "Platinum", reward: 1500, bonus: 40000 }
+      };
+      let meta = tierMeta[targetPrice];
+
+      let priceDifference = targetPrice - currentTierPrice;
+      let surcharge = (currentModalMode === 'upgrade' && currentTierPrice > 0) ? 5000 : 0;
+      let totalPayable = priceDifference + surcharge;
+
+      pendingPaymentProofs.push({
+        id: Date.now(),
+        userEmail: currentUser.email,
+        sender,
+        amount: totalPayable,
+        planName: meta.name,
+        reward: meta.reward,
+        bonus: meta.bonus
+      });
+
+      saveState();
+      closePlansModal();
+      alert(`Payment submitted for ${meta.name} Plan (₦${totalPayable.toLocaleString()}). Pending admin approval.`);
+      updateUI();
+    }
+
+    // Admin Pending Approvals
+    function renderPendingApprovals() {
+      const container = document.getElementById('adminPendingApprovalsList');
+      if (pendingPaymentProofs.length === 0) { container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No pending payments.</p>`; return; }
+      container.innerHTML = pendingPaymentProofs.map(item => `
+        <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center;">
+          <div>
+            <b>${item.planName} Plan (₦${item.amount.toLocaleString()})</b><br>
+            <span style="font-size:12px;">User: ${item.userEmail} | Sender: ${item.sender}</span>
+          </div>
+          <button class="btn" style="padding:6px 12px; font-size:12px;" onclick="approveUserPayment(${item.id})">Approve</button>
+        </div>
+      `).join('');
+    }
+
+    function approveUserPayment(id) {
+      const item = pendingPaymentProofs.find(p => p.id === id);
+      if (!item) return;
+      const targetUser = usersDb.find(u => u.email === item.userEmail);
+      if (targetUser) {
+        targetUser.tier = item.planName;
+        targetUser.taskReward = item.reward;
+        targetUser.balance += item.bonus;
+      }
+      pendingPaymentProofs = pendingPaymentProofs.filter(p => p.id !== id);
+      saveState();
+      updateUI();
+      alert("Payment approved and bonus credited!");
+    }
+
+    // Admin Payment Methods (Add / Edit / Delete)
+    function renderAdminPaymentList() {
+      const container = document.getElementById('adminPaymentList');
+      container.innerHTML = paymentMethods.map(item => `
+        <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center;">
+          <div><b>${item.bank}</b><br><span style="font-size:12px;">${item.account} (${item.name})</span></div>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-secondary" style="padding:4px 8px; font-size:11px;" onclick="editPaymentMethod(${item.id})">Edit</button>
+            <button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="deletePaymentMethod(${item.id})">Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function savePaymentMethod() {
+      const id = document.getElementById('editPayId').value;
+      const bank = document.getElementById('newPayBank').value.trim();
+      const account = document.getElementById('newPayAccount').value.trim();
+      const name = document.getElementById('newPayName').value.trim();
+
+      if (!bank || !account || !name) return;
+
+      if (id) {
+        let item = paymentMethods.find(p => p.id == id);
+        if (item) { item.bank = bank; item.account = account; item.name = name; }
+      } else {
+        paymentMethods.push({ id: Date.now(), bank, account, name });
+      }
+
+      saveState();
+      document.getElementById('editPayId').value = '';
+      document.getElementById('newPayBank').value = '';
+      document.getElementById('newPayAccount').value = '';
+      document.getElementById('newPayName').value = '';
+      document.getElementById('adminPayFormTitle').innerText = "Add New Bank Payment Gateway";
+      renderAdminPaymentList();
+    }
+
+    function editPaymentMethod(id) {
+      let item = paymentMethods.find(p => p.id == id);
+      if (!item) return;
+      document.getElementById('editPayId').value = item.id;
+      document.getElementById('newPayBank').value = item.bank;
+      document.getElementById('newPayAccount').value = item.account;
+      document.getElementById('newPayName').value = item.name;
+      document.getElementById('adminPayFormTitle').innerText = "Edit Payment Gateway";
+    }
+
+    function deletePaymentMethod(id) {
+      paymentMethods = paymentMethods.filter(p => p.id != id);
+      saveState();
+      renderAdminPaymentList();
+    }
+
+    // Admin Chatbot FAQs (Add / Edit / Delete)
+    function renderAdminFaqs() {
+      const container = document.getElementById('adminFaqList');
+      container.innerHTML = chatbotFaqs.map(f => `
+        <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center;">
+          <div><b>Keywords: ${f.keywords}</b><br><span style="font-size:12px; color:var(--text-muted);">${f.answer}</span></div>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-secondary" style="padding:4px 8px; font-size:11px;" onclick="editFaqItem(${f.id})">Edit</button>
+            <button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="deleteFaqItem(${f.id})">Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function saveFaqItem() {
+      const id = document.getElementById('editFaqId').value;
+      const keywords = document.getElementById('newFaqQuery').value.trim();
+      const answer = document.getElementById('newFaqAnswer').value.trim();
+
+      if (!keywords || !answer) return;
+
+      if (id) {
+        let faq = chatbotFaqs.find(f => f.id == id);
+        if (faq) { faq.keywords = keywords; faq.answer = answer; }
+      } else {
+        chatbotFaqs.push({ id: Date.now(), keywords, answer });
+      }
+
+      saveState();
+      document.getElementById('editFaqId').value = '';
+      document.getElementById('newFaqQuery').value = '';
+      document.getElementById('newFaqAnswer').value = '';
+      document.getElementById('adminFaqFormTitle').innerText = "Add New Chatbot FAQ";
+      renderAdminFaqs();
+    }
+
+    function editFaqItem(id) {
+      let faq = chatbotFaqs.find(f => f.id == id);
+      if (!faq) return;
+      document.getElementById('editFaqId').value = faq.id;
+      document.getElementById('newFaqQuery').value = faq.keywords;
+      document.getElementById('newFaqAnswer').value = faq.answer;
+      document.getElementById('adminFaqFormTitle').innerText = "Edit Chatbot FAQ";
+    }
+
+    function deleteFaqItem(id) {
+      chatbotFaqs = chatbotFaqs.filter(f => f.id != id);
+      saveState();
+      renderAdminFaqs();
+    }
+
+    // Admin Auth
+    function openAdminAuthModal() { document.getElementById('adminAuthModal').style.display = 'flex'; }
+    function closeAdminAuthModal() { document.getElementById('adminAuthModal').style.display = 'none'; }
+    function loginAdmin() {
+      const u = document.getElementById('adminUsername').value;
+      const p = document.getElementById('adminPassword').value;
+      if (u === "Admin" && p === "Femifresh43211") {
+        isAdminAuthenticated = true;
+        closeAdminAuthModal();
+        switchTab('admin');
+        alert("Management access granted.");
+      } else { alert("Invalid credentials."); }
+    }
+
+    // Driving Game
+    let gameInterval = null, carX = 150, progress = 0, trafficCars = [];
+    function openDrivingGameModal() {
+      if (currentUser.taskReward === 0) { alert("Select a plan first!"); return; }
+      if (currentUser.dailyDrives >= 4) { alert("Daily limit reached (4/4)."); return; }
+      document.getElementById('drivingModal').style.display = 'flex';
+      startDrivingCanvas();
+    }
+    function closeDrivingModal() { document.getElementById('drivingModal').style.display = 'none'; if (gameInterval) clearInterval(gameInterval); }
+    function moveCar(amt) { carX = Math.max(45, Math.min(255, carX + amt)); }
+    function startDrivingCanvas() {
+      const canvas = document.getElementById('gameCanvas');
+      const ctx = canvas.getContext('2d');
+      carX = 150; progress = 0;
+      trafficCars = [{ x: 70, y: -50, speed: 3.5, color: '#ef4444' }, { x: 150, y: -180, speed: 4.5, color: '#2563eb' }, { x: 230, y: -100, speed: 3.0, color: '#fbbf24' }];
+      if (gameInterval) clearInterval(gameInterval);
+      gameInterval = setInterval(() => {
+        progress += 1;
+        if (progress > 100) progress = 100;
+        document.getElementById('gameStatus').innerText = `Progress: ${progress}%`;
+        ctx.fillStyle = "#064e3b"; ctx.fillRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "#27272a"; ctx.fillRect(35, 0, 270, canvas.height);
+        ctx.fillStyle = "#ffffff"; ctx.fillRect(35, 0, 5, canvas.height); ctx.fillRect(300, 0, 5, canvas.height);
+        ctx.strokeStyle = "#ffffff"; ctx.lineWidth = 3; ctx.setLineDash([18, 18]); ctx.lineDashOffset = -progress * 6;
+        ctx.beginPath(); ctx.moveTo(125, 0); ctx.lineTo(125, canvas.height); ctx.stroke();
+        ctx.beginPath(); ctx.moveTo(215, 0); ctx.lineTo(215, canvas.height); ctx.stroke();
+
+        trafficCars.forEach(tc => {
+          tc.y += tc.speed;
+          if (tc.y > canvas.height) { tc.y = -70; tc.x = [70, 150, 230][Math.floor(Math.random() * 3)]; }
+          ctx.fillStyle = tc.color; ctx.fillRect(tc.x, tc.y, 36, 58);
+          ctx.fillStyle = "#09090b"; ctx.fillRect(tc.x + 5, tc.y + 14, 26, 14);
+        });
+
+        const py = canvas.height - 75;
+        ctx.fillStyle = "#00e676"; ctx.fillRect(carX, py, 38, 60);
+        ctx.fillStyle = "#0f172a"; ctx.fillRect(carX + 6, py + 16, 26, 18);
+
+        if (progress >= 100) {
+          clearInterval(gameInterval);
+          currentUser.dailyDrives++;
+          currentUser.balance += currentUser.taskReward;
+          saveState();
+          updateUI();
+          alert(`Finished! Earned ₦${currentUser.taskReward.toLocaleString()}.`);
+          closeDrivingModal();
+        }
+      }, 100);
+    }
+
+    // Direct Link Task
+    let directLinkVerified = false;
+    function handleDirectLinkTask(url) {
+      if (directLinkVerified) { alert("Sponsor offer already claimed today!"); return; }
+      const btn = document.getElementById('directLinkBtn');
+      btn.innerText = "Verifying Offer (15s)...";
+      window.open(url, '_blank');
+      let seconds = 15;
+      const timer = setInterval(() => {
+        seconds--;
+        if (seconds > 0) btn.innerText = `Verifying (${seconds}s)...`;
+        else {
+          clearInterval(timer);
+          currentUser.balance += 100;
+          directLinkVerified = true;
+          saveState();
+          updateUI();
+          btn.innerText = "Claimed ✓";
+          alert("Sponsor visit verified! ₦100 credited.");
+        }
+      }, 1000);
+    }
+
+    // Withdrawal
+    function openWithdrawModal() { document.getElementById('withdrawModal').style.display = 'flex'; }
+    function closeWithdrawModal() { document.getElementById('withdrawModal').style.display = 'none'; }
+    function submitWithdrawal() {
+      const amt = parseFloat(document.getElementById('wdAmount').value);
+      const pin = document.getElementById('wdPinInput').value;
+      if (!amt || amt < 100000) { alert("Minimum cashout is ₦100,000."); return; }
+      if (currentUser.activeReferrals < 5) { alert("5 active referrals required."); return; }
+      if (pin !== currentUser.pin) { alert("Incorrect withdrawal PIN!"); return; }
+
+      let charge = amt * 0.15;
+      let totalDeduction = amt + charge;
+      if (totalDeduction > currentUser.balance) { alert(`Insufficient balance.`); return; }
+
+      currentUser.balance -= totalDeduction;
+      saveState();
+      updateUI();
+      closeWithdrawModal();
+      alert(`Cashout of ₦${amt.toLocaleString()} requested!`);
+    }
+
+    // Settings Updaters
     function updateUserEmail() {
       const newEmail = document.getElementById('settingsNewEmail').value.trim();
       if (!newEmail) return;
@@ -554,386 +929,6 @@
       alert("Withdrawal PIN updated successfully.");
       document.getElementById('settingsOldPin').value = '';
       document.getElementById('settingsNewPin').value = '';
-    }
-
-    // Tier Upgrade with Dynamic Difference Calculation
-    function openPlansModal() { document.getElementById('plansModal').style.display = 'flex'; }
-    function closePlansModal() { document.getElementById('plansModal').style.display = 'none'; }
-
-    function updatePlanPaymentView() {
-      const targetPrice = parseInt(document.getElementById('selectedPlanDropdown').value);
-      const container = document.getElementById('planPaymentDetailsContainer');
-      const calcText = document.getElementById('paymentCalculationText');
-      const bankDisplay = document.getElementById('activeBankInfoDisplay');
-
-      if (!targetPrice) { container.style.display = 'none'; return; }
-
-      let tierPrices = { "None": 0, "Starter": 15000, "Silver": 30000, "Gold": 50000, "Platinum": 100000 };
-      let currentTierPrice = tierPrices[currentUser.tier] || 0;
-
-      if (targetPrice <= currentTierPrice) {
-        alert("You are already on this plan or a higher tier!");
-        document.getElementById('selectedPlanDropdown').value = "";
-        container.style.display = 'none';
-        return;
-      }
-
-      let priceDifference = targetPrice - currentTierPrice;
-      let surcharge = (currentTierPrice > 0) ? 5000 : 0; // 5k upgrade fee if upgrading from an active plan
-      let totalPayable = priceDifference + surcharge;
-
-      if (currentTierPrice > 0) {
-        calcText.innerHTML = `Upgrading from ${currentUser.tier} (₦${currentTierPrice.toLocaleString()}) -> Difference: ₦${priceDifference.toLocaleString()} + ₦5,000 Fee = <span style="color:#00e676;">Total Payable: ₦${totalPayable.toLocaleString()}</span>`;
-      } else {
-        calcText.innerHTML = `Direct Subscription -> <span style="color:#00e676;">Total Payable: ₦${totalPayable.toLocaleString()}</span>`;
-      }
-
-      const activeBank = paymentMethods[0] || { bank: "OPay", account: "8012345678", name: "EarnPlanet" };
-      bankDisplay.innerHTML = `<b>Bank:</b> ${activeBank.bank}<br><b>Account Number:</b> ${activeBank.account}<br><b>Account Name:</b> ${activeBank.name}`;
-      container.style.display = 'block';
-    }
-
-    function submitPlanPaymentProof() {
-      const targetPrice = parseInt(document.getElementById('selectedPlanDropdown').value);
-      const sender = document.getElementById('userSenderNameInput').value;
-      if (!targetPrice || !sender) { alert("Fill all details!"); return; }
-
-      let tierPrices = { "None": 0, "Starter": 15000, "Silver": 30000, "Gold": 50000, "Platinum": 100000 };
-      let currentTierPrice = tierPrices[currentUser.tier] || 0;
-
-      let tierMeta = {
-        15000: { name: "Starter", reward: 300, bonus: 6000 },
-        30000: { name: "Silver", reward: 600, bonus: 12000 },
-        50000: { name: "Gold", reward: 1000, bonus: 20000 },
-        100000: { name: "Platinum", reward: 1500, bonus: 40000 }
-      };
-      let meta = tierMeta[targetPrice];
-
-      let priceDifference = targetPrice - currentTierPrice;
-      let surcharge = (currentTierPrice > 0) ? 5000 : 0;
-      let totalPayable = priceDifference + surcharge;
-
-      pendingPaymentProofs.push({
-        id: Date.now(),
-        userEmail: currentUser.email,
-        sender,
-        amount: totalPayable,
-        planName: meta.name,
-        reward: meta.reward,
-        bonus: meta.bonus
-      });
-
-      saveState();
-      closePlansModal();
-      alert(`Payment submitted for ${meta.name} Plan (₦${totalPayable.toLocaleString()}). Pending admin approval.`);
-      updateUI();
-    }
-
-    // Admin Approvals
-    function renderPendingApprovals() {
-      const container = document.getElementById('adminPendingApprovalsList');
-      if (pendingPaymentProofs.length === 0) { container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No pending payments.</p>`; return; }
-      container.innerHTML = pendingPaymentProofs.map(item => `
-        <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center;">
-          <div>
-            <b>${item.planName} Plan (₦${item.amount.toLocaleString()})</b><br>
-            <span style="font-size:12px;">User: ${item.userEmail} | Sender: ${item.sender}</span>
-          </div>
-          <button class="btn" style="padding:6px 12px; font-size:12px;" onclick="approveUserPayment(${item.id})">Approve</button>
-        </div>
-      `).join('');
-    }
-
-    function approveUserPayment(id) {
-      const item = pendingPaymentProofs.find(p => p.id === id);
-      if (!item) return;
-      const targetUser = usersDb.find(u => u.email === item.userEmail);
-      if (targetUser) {
-        targetUser.tier = item.planName;
-        targetUser.taskReward = item.reward;
-        targetUser.balance += item.bonus;
-      }
-      pendingPaymentProofs = pendingPaymentProofs.filter(p => p.id !== id);
-      saveState();
-      updateUI();
-      alert("Payment approved and bonus credited!");
-    }
-
-    // Multi-Social Task Engine
-    function renderUserSocialTasks() {
-      const container = document.getElementById('userSocialTasksContainer');
-      let todayStr = new Date().toDateString();
-      if (!completedSocialTasksToday[currentUser.email]) completedSocialTasksToday[currentUser.email] = { date: todayStr, count: 0, completedIds: [] };
-      let userRecord = completedSocialTasksToday[currentUser.email];
-
-      if (socialTasksList.length === 0) {
-        container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No social tasks available.</p>`;
-        return;
-      }
-
-      container.innerHTML = socialTasksList.slice(0, 5).map(task => {
-        let isDone = userRecord.completedIds.includes(task.id);
-        return `
-          <div class="task-card">
-            <div class="task-info">
-              <h4>${task.title}</h4>
-              <p>${task.desc}</p>
-              <div class="task-reward">Reward: +₦${currentUser.taskReward > 0 ? currentUser.taskReward : 300}</div>
-            </div>
-            <button class="btn ${isDone ? 'btn-disabled' : ''}" ${isDone ? 'disabled' : ''} onclick="handleSocialTask(${task.id})">${isDone ? 'Completed ✓' : 'Perform Task'}</button>
-          </div>
-        `;
-      }).join('');
-    }
-
-    function handleSocialTask(taskId) {
-      if (currentUser.taskReward === 0) { alert("Select a plan first!"); return; }
-      let userRecord = completedSocialTasksToday[currentUser.email];
-      if (userRecord.count >= 5) { alert("Maximum of 5 social tasks reached for today!"); return; }
-
-      const task = socialTasksList.find(t => t.id === taskId);
-      window.open(task.url, '_blank');
-
-      setTimeout(() => {
-        currentUser.balance += currentUser.taskReward;
-        userRecord.count++;
-        userRecord.completedIds.push(taskId);
-        saveState();
-        updateUI();
-        alert(`Task verified! ₦${currentUser.taskReward} credited.`);
-      }, 5000);
-    }
-
-    function renderAdminSocialTasks() {
-      const container = document.getElementById('adminSocialTasksList');
-      container.innerHTML = socialTasksList.map(t => `
-        <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center;">
-          <div><b>${t.title}</b><br><span style="font-size:12px; color:var(--text-muted);">${t.url}</span></div>
-          <button class="btn btn-danger" style="padding:4px 10px; font-size:12px;" onclick="deleteAdminSocialTask(${t.id})">Delete</button>
-        </div>
-      `).join('');
-    }
-
-    function addAdminSocialTask() {
-      const title = document.getElementById('adminSocialTaskTitle').value;
-      const url = document.getElementById('adminSocialTaskUrl').value;
-      const desc = document.getElementById('adminSocialTaskDesc').value;
-      if (!title || !url) return;
-      socialTasksList.push({ id: Date.now(), title, url, desc });
-      saveState();
-      document.getElementById('adminSocialTaskTitle').value = '';
-      document.getElementById('adminSocialTaskUrl').value = '';
-      document.getElementById('adminSocialTaskDesc').value = '';
-      renderAdminSocialTasks();
-      renderUserSocialTasks();
-    }
-
-    function deleteAdminSocialTask(id) {
-      socialTasksList = socialTasksList.filter(t => t.id !== id);
-      saveState();
-      renderAdminSocialTasks();
-      renderUserSocialTasks();
-    }
-
-    // Admin Auth
-    function openAdminAuthModal() { document.getElementById('adminAuthModal').style.display = 'flex'; }
-    function closeAdminAuthModal() { document.getElementById('adminAuthModal').style.display = 'none'; }
-    function loginAdmin() {
-      const u = document.getElementById('adminUsername').value;
-      const p = document.getElementById('adminPassword').value;
-      if (u === "Admin" && p === "Femifresh43211") {
-        isAdminAuthenticated = true;
-        closeAdminAuthModal();
-        switchTab('admin');
-        document.getElementById('mainAppContainer').style.display = 'block';
-        document.getElementById('userTab').style.display = 'none';
-        document.getElementById('settingsTab').style.display = 'none';
-        document.getElementById('adminTab').style.display = 'block';
-        alert("Management access granted.");
-      } else { alert("Invalid credentials."); }
-    }
-
-    // --- REALTIME HTML5 DRIVING CANVAS (COMPATIBLE ACROSS ALL BROWSERS) ---
-    let gameInterval = null, carX = 150, progress = 0;
-    let trafficCars = [];
-
-    function openDrivingGameModal() {
-      if (currentUser.taskReward === 0) { alert("Select a plan first!"); return; }
-      if (currentUser.dailyDrives >= 4) { alert("Daily limit reached (4/4)."); return; }
-      document.getElementById('drivingModal').style.display = 'flex';
-      startDrivingCanvas();
-    }
-
-    function closeDrivingModal() {
-      document.getElementById('drivingModal').style.display = 'none';
-      if (gameInterval) clearInterval(gameInterval);
-    }
-
-    function moveCar(amt) {
-      carX = Math.max(45, Math.min(255, carX + amt));
-    }
-
-    function startDrivingCanvas() {
-      const canvas = document.getElementById('gameCanvas');
-      const ctx = canvas.getContext('2d');
-      carX = 150; progress = 0;
-
-      trafficCars = [
-        { x: 70, y: -50, speed: 3.5, color: '#ef4444' },
-        { x: 150, y: -180, speed: 4.5, color: '#2563eb' },
-        { x: 230, y: -100, speed: 3.0, color: '#fbbf24' }
-      ];
-
-      if (gameInterval) clearInterval(gameInterval);
-
-      gameInterval = setInterval(() => {
-        progress += 1;
-        if (progress > 100) progress = 100;
-
-        document.getElementById('gameStatus').innerText = `Distance Covered: ${progress}%`;
-
-        // Grass Borders
-        ctx.fillStyle = "#064e3b";
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Asphalt Road
-        ctx.fillStyle = "#27272a";
-        ctx.fillRect(35, 0, 270, canvas.height);
-
-        // Outer White Lines
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(35, 0, 5, canvas.height);
-        ctx.fillRect(300, 0, 5, canvas.height);
-
-        // Animated Lane Dividers
-        ctx.strokeStyle = "#ffffff";
-        ctx.lineWidth = 3;
-        ctx.setLineDash([18, 18]);
-        ctx.lineDashOffset = -progress * 6;
-
-        ctx.beginPath(); ctx.moveTo(125, 0); ctx.lineTo(125, canvas.height); ctx.stroke();
-        ctx.beginPath(); ctx.moveTo(215, 0); ctx.lineTo(215, canvas.height); ctx.stroke();
-
-        // Render Traffic Cars
-        trafficCars.forEach(tc => {
-          tc.y += tc.speed;
-          if (tc.y > canvas.height) {
-            tc.y = -70;
-            tc.x = [70, 150, 230][Math.floor(Math.random() * 3)];
-          }
-
-          // Traffic Vehicle Body
-          ctx.fillStyle = tc.color;
-          ctx.fillRect(tc.x, tc.y, 36, 58);
-
-          // Cabin
-          ctx.fillStyle = "#09090b";
-          ctx.fillRect(tc.x + 5, tc.y + 14, 26, 14);
-
-          // Headlights
-          ctx.fillStyle = "#fef08a";
-          ctx.fillRect(tc.x + 4, tc.y + 54, 8, 3);
-          ctx.fillRect(tc.x + 24, tc.y + 54, 8, 3);
-        });
-
-        // Render Player Vehicle
-        const py = canvas.height - 75;
-
-        // Shadow
-        ctx.fillStyle = "rgba(0,0,0,0.5)";
-        ctx.fillRect(carX + 2, py + 2, 38, 62);
-
-        // Green Car Body
-        ctx.fillStyle = "#00e676";
-        ctx.fillRect(carX, py, 38, 60);
-
-        // Windshield Glass
-        ctx.fillStyle = "#0f172a";
-        ctx.fillRect(carX + 6, py + 16, 26, 18);
-
-        // Front Headlights
-        ctx.fillStyle = "#ffffff";
-        ctx.fillRect(carX + 4, py + 2, 8, 4);
-        ctx.fillRect(carX + 26, py + 2, 8, 4);
-
-        // Rear Brake Lights
-        ctx.fillStyle = "#ef4444";
-        ctx.fillRect(carX + 4, py + 54, 8, 4);
-        ctx.fillRect(carX + 26, py + 54, 8, 4);
-
-        if (progress >= 100) {
-          clearInterval(gameInterval);
-          currentUser.dailyDrives++;
-          currentUser.balance += currentUser.taskReward;
-          saveState();
-          updateUI();
-          alert(`🏁 FINISH LINE REACHED!\n\nYou finished the driving run and earned ₦${currentUser.taskReward.toLocaleString()}!`);
-          closeDrivingModal();
-        }
-      }, 100);
-    }
-
-    // Direct Link Anti-Fake Click Task
-    let directLinkVerified = false;
-    function handleDirectLinkTask(url) {
-      if (directLinkVerified) { alert("Sponsor offer already claimed today!"); return; }
-      const btn = document.getElementById('directLinkBtn');
-      btn.innerText = "Verifying Offer (15s)...";
-      window.open(url, '_blank');
-
-      let seconds = 15;
-      const timer = setInterval(() => {
-        seconds--;
-        if (seconds > 0) {
-          btn.innerText = `Verifying (${seconds}s)...`;
-        } else {
-          clearInterval(timer);
-          currentUser.balance += 100;
-          directLinkVerified = true;
-          saveState();
-          updateUI();
-          btn.innerText = "Claimed ✓";
-          alert("Sponsor visit verified! ₦100 credited.");
-        }
-      }, 1000);
-    }
-
-    // Withdrawal (15% Fee)
-    function openWithdrawModal() { document.getElementById('withdrawModal').style.display = 'flex'; }
-    function closeWithdrawModal() { document.getElementById('withdrawModal').style.display = 'none'; }
-    function submitWithdrawal() {
-      const amt = parseFloat(document.getElementById('wdAmount').value);
-      const pin = document.getElementById('wdPinInput').value;
-      if (!amt || amt < 100000) { alert("Minimum cashout is ₦100,000."); return; }
-      if (currentUser.activeReferrals < 5) { alert("5 active referrals required."); return; }
-      if (pin !== currentUser.pin) { alert("Incorrect withdrawal PIN!"); return; }
-
-      let charge = amt * 0.15;
-      let totalDeduction = amt + charge;
-      if (totalDeduction > currentUser.balance) { alert(`Insufficient balance. Total deduction including 15% charge (₦${charge.toLocaleString()}) is ₦${totalDeduction.toLocaleString()}.`); return; }
-
-      currentUser.balance -= totalDeduction;
-      saveState();
-      updateUI();
-      closeWithdrawModal();
-      alert(`Cashout of ₦${amt.toLocaleString()} requested successfully! 15% fee (₦${charge.toLocaleString()}) applied.`);
-    }
-
-    function renderAdminPaymentList() {
-      const container = document.getElementById('adminPaymentList');
-      container.innerHTML = paymentMethods.map(item => `
-        <div class="payment-account-card"><b>${item.bank}</b><br><span style="font-size:12px;">${item.account} (${item.name})</span></div>
-      `).join('');
-    }
-
-    function addPaymentMethod() {
-      const bank = document.getElementById('newPayBank').value;
-      const account = document.getElementById('newPayAccount').value;
-      const name = document.getElementById('newPayName').value;
-      if (!bank || !account || !name) return;
-      paymentMethods.push({ id: Date.now(), bank, account, name });
-      saveState();
-      renderAdminPaymentList();
     }
 
     if (currentUser) updateUI();
