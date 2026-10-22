@@ -477,6 +477,16 @@
         <div class="section-title">⚙️ Pending Payment & Deposit Approvals</div>
         <div id="adminPendingApprovalsList"></div>
 
+        <div class="section-title" style="margin-top:30px;">⚙️ Payment Methods & Account Details Manager</div>
+        <div class="stat-card" style="text-align:left; margin-bottom:15px;">
+          <h4 style="margin-bottom:10px;" id="adminPayMethodFormTitle">Add / Edit Payment Method</h4>
+          <input type="hidden" id="editPayMethodId">
+          <input type="text" id="newPayMethodName" placeholder="Method Name (e.g. OPay Transfer or USDT TRC20)">
+          <textarea id="newPayMethodDetails" placeholder="Account Details / Address / Step-by-Step Instructions"></textarea>
+          <button class="btn" onclick="saveAdminPaymentMethod()">+ Save Payment Method</button>
+        </div>
+        <div id="adminPaymentMethodsList"></div>
+
         <div class="section-title" style="margin-top:30px;">⚙️ Active Users Count Manager</div>
         <div class="stat-card" style="text-align:left; margin-bottom:15px;">
           <h4 style="margin-bottom:10px;">Add Users to Existing Total</h4>
@@ -573,7 +583,7 @@
     </div>
   </div>
 
-  <!-- DEPOSIT MODAL -->
+  <!-- DEPOSIT MODAL (MATCHED WITH MAIN MENU INSTRUCTIONS) -->
   <div class="modal-overlay" id="depositModal">
     <div class="modal">
       <h3>Deposit to Buy Higher Products to Resell</h3>
@@ -591,15 +601,18 @@
       <div id="depositGiftcardInstructions" class="payment-instruction-box">
         <b>HOW TO BUY APPLE GIFTCARD ON PALMPAY, OPAY OR KUDA:</b><br>
         1. Open your <b>PalmPay, OPay, or Kuda</b> app.<br>
-        2. Purchase Apple Gift Card corresponding to your deposit amount.<br>
-        3. Paste code below and attach screenshot receipt.
+        2. Tap on <b>More</b> or <b>Services</b>.<br>
+        3. Select <b>Apple Gift Card</b>.<br>
+        4. Purchase an Apple Gift Card matching your deposit amount.<br>
+        5. Paste the claim code received in the box below and attach receipt screenshot!
       </div>
 
       <div id="depositUsdtInstructions" class="payment-instruction-box" style="display:none;">
         <b>HOW TO PAY VIA USDT CRYPTO:</b><br>
-        1. Transfer exact USDT to address below:<br>
+        1. Open <b>Binance, Bybit, KuCoin</b>, or your crypto wallet.<br>
+        2. Transfer exact deposit USDT to address below:<br>
         <span style="color:var(--primary); font-weight:bold; word-break:break-all;">TRC20: TEP90124EarnPlanetOfficialUsdtAddr</span><br>
-        2. Paste TxID below and attach transaction screenshot.
+        3. Copy the <b>Transaction Hash (TxID)</b> and paste below.
       </div>
 
       <div class="payment-account-card">
@@ -745,11 +758,37 @@
     let lastAutoIncrementTime = parseInt(localStorage.getItem('earnplanet_last_autouser_time') || Date.now().toString());
 
     let pendingPaymentProofs = JSON.parse(localStorage.getItem('earnplanet_pending_payments') || '[]');
-    let chatbotFaqs = JSON.parse(localStorage.getItem('earnplanet_faqs') || '[{"id":1,"keywords":"cashout withdraw fee threshold","answer":"1st withdrawal: ₦180k ($120) & 7 referrals. 2nd withdrawal: ₦135k ($90) & 15 refs. 3rd: 25 refs. 4th+: 30 refs."},{"id":2,"keywords":"store flip resell product deposit","answer":"Add money from main balance or deposit. Buy merchandise on Mon, Wed, Fri, Sat to earn +20% profit in 8 days. Withdraw back to main at 5% charge."}]');
-    let storeProducts = JSON.parse(localStorage.getItem('earnplanet_products') || '[{"id":1,"title":"Luxury Leather Tote Bag","priceUsd":20,"img":"https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=400&q=80"},{"id":2,"title":"Designer Chronograph Watch","priceUsd":35,"img":"https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=400&q=80"}]');
+    
+    // Default Fallback FAQ Data
+    let defaultFaqs = [
+      {"id":1,"keywords":"cashout withdraw fee threshold","answer":"1st withdrawal: ₦180k ($120) & 7 referrals. 2nd withdrawal: ₦135k ($90) & 15 refs. 3rd: 25 refs. 4th+: 30 refs."},
+      {"id":2,"keywords":"store flip resell product deposit","answer":"Add money from main balance or deposit. Buy merchandise on Mon, Wed, Fri, Sat to earn +20% profit in 8 days. Withdraw back to main at 5% charge."}
+    ];
+    let chatbotFaqs = JSON.parse(localStorage.getItem('earnplanet_faqs') || JSON.stringify(defaultFaqs));
+
+    // Default Fallback Products
+    let defaultProducts = [
+      {"id":1,"title":"Luxury Leather Tote Bag","priceUsd":20,"img":"https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=400&q=80"},
+      {"id":2,"title":"Designer Chronograph Watch","priceUsd":35,"img":"https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=400&q=80"}
+    ];
+    let storeProducts = JSON.parse(localStorage.getItem('earnplanet_products') || JSON.stringify(defaultProducts));
+
+    // Default Fallback Social Links
+    let defaultSocialLinks = [
+      {"id":1,"platform":"Telegram Channel","url":"https://t.me/earnplanetofficial"},
+      {"id":2,"platform":"Facebook Page","url":"https://facebook.com/earnplanet"}
+    ];
+    let socialLinks = JSON.parse(localStorage.getItem('earnplanet_social_links') || JSON.stringify(defaultSocialLinks));
+
+    // Payment Methods Manager
+    let defaultPaymentMethods = [
+      {"id":1,"name":"Apple Gift Card (PalmPay / OPay / Kuda)","details":"Purchase Apple Gift Card from PalmPay/OPay/Kuda app under More -> Services -> Apple Gift Card."},
+      {"id":2,"name":"USDT Crypto (Binance / Bybit)","details":"Address: TRC20: TEP90124EarnPlanetOfficialUsdtAddr"}
+    ];
+    let paymentMethods = JSON.parse(localStorage.getItem('earnplanet_pay_methods') || JSON.stringify(defaultPaymentMethods));
+
     let activeUserFlips = JSON.parse(localStorage.getItem('earnplanet_user_flips') || '{}');
     let customPayoutNotifs = JSON.parse(localStorage.getItem('earnplanet_payout_notifs') || '[{"name":"Adeb***45","amt":"₦180,000 ($120.00)","dest":"Access Bank"},{"name":"Kehinde4","amt":"₦225,000 ($150.00)","dest":"UBA"},{"name":"Chidi_O","amt":"₦300,000 ($200.00)","dest":"TRC20 Wallet"},{"name":"Blessing99","amt":"₦180,000 ($120.00)","dest":"OPay"},{"name":"Tunde_X","amt":"₦375,000 ($250.00)","dest":"GTBank"},{"name":"Musa_B","amt":"₦180,000 ($120.00)","dest":"Kuda Bank"},{"name":"Funmi_P","amt":"₦225,000 ($150.00)","dest":"Zenith Bank"},{"name":"Emeka_33","amt":"₦300,000 ($200.00)","dest":"Moniepoint"}]');
-    let socialLinks = JSON.parse(localStorage.getItem('earnplanet_social_links') || '[{"id":1,"platform":"Telegram Channel","url":"https://t.me/earnplanetofficial"},{"id":2,"platform":"Facebook Page","url":"https://facebook.com/earnplanet"}]');
 
     let showAllPayoutNotifs = false;
 
@@ -776,6 +815,7 @@
       localStorage.setItem('earnplanet_user_flips', JSON.stringify(activeUserFlips));
       localStorage.setItem('earnplanet_payout_notifs', JSON.stringify(customPayoutNotifs));
       localStorage.setItem('earnplanet_social_links', JSON.stringify(socialLinks));
+      localStorage.setItem('earnplanet_pay_methods', JSON.stringify(paymentMethods));
 
       if (currentUser) {
         localStorage.setItem('earnplanet_session', currentUser.email);
@@ -917,6 +957,7 @@
       renderPendingApprovals();
       renderAdminFaqs();
       renderAdminSocialLinks();
+      renderAdminPaymentMethods();
     }
 
     function copyReferralLink() {
@@ -1207,6 +1248,61 @@
       alert(`Approval successful! ${item.type === 'StoreDeposit' ? '$' + item.amountUsd + ' credited to user Flip Store Balance.' : 'Plan activated & cashback awarded.'}`);
     }
 
+    // ADMIN: Payment Methods Manager
+    function renderAdminPaymentMethods() {
+      const container = document.getElementById('adminPaymentMethodsList');
+      container.innerHTML = paymentMethods.map(m => `
+        <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+          <div>
+            <b>${m.name}</b><br>
+            <span style="font-size:12px; color:var(--text-muted);">${m.details}</span>
+          </div>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-secondary" style="padding:4px 8px; font-size:11px;" onclick="editAdminPaymentMethod(${m.id})">Edit</button>
+            <button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="deleteAdminPaymentMethod(${m.id})">Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function saveAdminPaymentMethod() {
+      const id = document.getElementById('editPayMethodId').value;
+      const name = document.getElementById('newPayMethodName').value.trim();
+      const details = document.getElementById('newPayMethodDetails').value.trim();
+
+      if (!name || !details) { alert("Fill payment method name and details!"); return; }
+
+      if (id) {
+        let pm = paymentMethods.find(item => item.id == id);
+        if (pm) { pm.name = name; pm.details = details; }
+      } else {
+        paymentMethods.push({ id: Date.now(), name, details });
+      }
+
+      saveState();
+      document.getElementById('editPayMethodId').value = '';
+      document.getElementById('newPayMethodName').value = '';
+      document.getElementById('newPayMethodDetails').value = '';
+      document.getElementById('adminPayMethodFormTitle').innerText = "Add / Edit Payment Method";
+      renderAdminPaymentMethods();
+      alert("Payment method saved successfully.");
+    }
+
+    function editAdminPaymentMethod(id) {
+      let pm = paymentMethods.find(item => item.id == id);
+      if (!pm) return;
+      document.getElementById('editPayMethodId').value = pm.id;
+      document.getElementById('newPayMethodName').value = pm.name;
+      document.getElementById('newPayMethodDetails').value = pm.details;
+      document.getElementById('adminPayMethodFormTitle').innerText = "Edit Payment Method";
+    }
+
+    function deleteAdminPaymentMethod(id) {
+      paymentMethods = paymentMethods.filter(item => item.id != id);
+      saveState();
+      renderAdminPaymentMethods();
+    }
+
     // E-Commerce Store & Flip Logic
     function renderUserStoreProducts() {
       const container = document.getElementById('userStoreProductsGrid');
@@ -1326,7 +1422,7 @@
     function saveManualUserCount() {
       const val = parseInt(document.getElementById('manualUserCountInput').value);
       if (!val || isNaN(val)) { alert("Please enter a valid number!"); return; }
-      manualUserCount += val; // Adds to existing total
+      manualUserCount += val;
       saveState();
       updateUI();
       alert(`Successfully added ${val} users! New total active users: ${manualUserCount.toLocaleString()}`);
@@ -1408,7 +1504,7 @@
       renderAdminPayoutNotifList();
     }
 
-    // Admin Products Management (Supports URL or File Upload)
+    // Admin Products Management
     function renderAdminProductsList() {
       const container = document.getElementById('adminProductsList');
       container.innerHTML = storeProducts.map(p => `
