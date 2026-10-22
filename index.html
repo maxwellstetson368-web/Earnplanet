@@ -89,7 +89,7 @@
     .wallet-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
     /* Buttons */
-    .btn { background: var(--primary); color: #04100a; border: none; padding: 12px 20px; border-radius: 10px; font-weight: 900; cursor: pointer; transition: 0.2s; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; }
+    .btn { background: var(--primary); color: #04100a; border: none; padding: 12px 20px; border-radius: 10px; font-weight: 900; cursor: pointer; transition: 0.2s; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
     .btn:hover { background: var(--primary-hover); transform: translateY(-2px); }
     .btn-secondary { background: var(--card-bg); color: #fff; border: 1px solid var(--card-border); }
     .btn-secondary:hover { background: #16422b; }
@@ -103,6 +103,9 @@
     .stat-card p { font-size: 22px; font-weight: 900; margin-top: 6px; color: var(--gold); }
 
     .section-title { font-size: 18px; font-weight: 800; margin: 25px 0 15px 0; color: #fff; border-left: 4px solid var(--primary); padding-left: 10px; }
+
+    /* Social Media Grid */
+    .social-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-top: 15px; }
 
     /* Visible Membership Plans Grid */
     .plans-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px; }
@@ -391,9 +394,13 @@
           <button class="btn" onclick="switchTab('store')">Open Resell Store</button>
         </div>
 
+        <!-- OFFICIAL SOCIAL MEDIA PAGES SECTION -->
+        <div class="section-title">📢 Follow Our Official Social Media Pages</div>
+        <div class="social-grid" id="userSocialLinksGrid"></div>
+
       </div>
 
-      <!-- RESELL FLIP STORE TAB (WITH TWO-WAY TRANSFERS & DEPOSIT) -->
+      <!-- RESELL FLIP STORE TAB -->
       <div id="storeTab" style="display:none;">
         <div class="section-title">🛍️ Merchandise Flip Store</div>
         
@@ -470,12 +477,21 @@
         <div class="section-title">⚙️ Pending Payment & Deposit Approvals</div>
         <div id="adminPendingApprovalsList"></div>
 
-        <div class="section-title" style="margin-top:30px;">⚙️ Active Users Count Override</div>
+        <div class="section-title" style="margin-top:30px;">⚙️ Active Users Count Manager</div>
         <div class="stat-card" style="text-align:left; margin-bottom:15px;">
-          <h4 style="margin-bottom:10px;">Set Active Platform Users Count</h4>
-          <input type="number" id="manualUserCountInput" placeholder="Enter Total Active Users (e.g. 2500)">
-          <button class="btn" onclick="saveManualUserCount()">Update Active User Count</button>
+          <h4 style="margin-bottom:10px;">Add Users to Existing Total</h4>
+          <input type="number" id="manualUserCountInput" placeholder="Enter number to add (e.g. 50)">
+          <button class="btn" onclick="saveManualUserCount()">+ Add To Total Active Users</button>
         </div>
+
+        <div class="section-title" style="margin-top:30px;">⚙️ Manage Social Media Channels</div>
+        <div class="stat-card" style="text-align:left; margin-bottom:15px;">
+          <h4 style="margin-bottom:10px;">Add Official Social Media Link</h4>
+          <input type="text" id="newSocialPlatform" placeholder="Platform Name (e.g. Telegram Channel)">
+          <input type="text" id="newSocialUrl" placeholder="Page / Channel URL (https://...)">
+          <button class="btn" onclick="saveAdminSocialLink()">+ Add Social Link</button>
+        </div>
+        <div id="adminSocialLinksList"></div>
 
         <div class="section-title" style="margin-top:30px;">⚙️ Manage Live Payout Popups (Add / Remove)</div>
         <div class="stat-card" style="text-align:left; margin-bottom:15px;">
@@ -492,7 +508,9 @@
           <h4 style="margin-bottom:10px;" id="adminProductFormTitle">Add New Store Product</h4>
           <input type="hidden" id="editProductId">
           <input type="text" id="newProdTitle" placeholder="Product Title (e.g. Designer Leather Tote Bag)">
-          <input type="text" id="newProdImg" placeholder="Image URL (https://...)">
+          <label style="font-size:11px; color:var(--text-muted); margin-bottom:2px;">Paste Image URL OR Upload Image File below:</label>
+          <input type="text" id="newProdImgUrl" placeholder="https://images.unsplash.com/...">
+          <input type="file" id="newProdImgFile" accept="image/*" style="margin-bottom:12px;">
           <input type="number" id="newProdPrice" placeholder="Wholesale Price in USD ($)">
           <button class="btn" id="saveProdBtn" onclick="saveAdminProduct()">+ Save Product</button>
         </div>
@@ -547,7 +565,7 @@
       <label id="paymentProofLabel">Enter Apple Gift Card Claim Code</label>
       <input type="text" id="userPaymentCodeInput" placeholder="Enter Code or TxID">
 
-      <label>Upload Payment Receipt / Screenshot (Optional)</label>
+      <label>Upload Payment Receipt / Screenshot (Mandatory)</label>
       <input type="file" id="userPaymentProofFile" accept="image/*">
 
       <button class="btn" style="width:100%; margin-top:5px;" onclick="submitPlanPaymentProof()">Submit Payment for Verification</button>
@@ -555,7 +573,7 @@
     </div>
   </div>
 
-  <!-- DEPOSIT MODAL (FOR USERS REQUIRING EXTRA CAPITAL) -->
+  <!-- DEPOSIT MODAL -->
   <div class="modal-overlay" id="depositModal">
     <div class="modal">
       <h3>Deposit to Buy Higher Products to Resell</h3>
@@ -591,7 +609,7 @@
       <label id="depositProofLabel">Enter Apple Gift Card Claim Code</label>
       <input type="text" id="depositCodeInput" placeholder="Enter Code or TxID">
 
-      <label>Upload Payment Receipt / Screenshot (Optional)</label>
+      <label>Upload Payment Receipt / Screenshot (Mandatory)</label>
       <input type="file" id="depositProofFile" accept="image/*">
 
       <button class="btn" style="width:100%; margin-top:5px;" onclick="submitDepositProof()">Submit Deposit Verification</button>
@@ -599,7 +617,7 @@
     </div>
   </div>
 
-  <!-- ADD FROM MAIN BALANCE MODAL (FREE TRANSFER) -->
+  <!-- ADD FROM MAIN BALANCE MODAL -->
   <div class="modal-overlay" id="addFromMainModal">
     <div class="modal">
       <h3>Add Money From Main Balance</h3>
@@ -618,7 +636,7 @@
     </div>
   </div>
 
-  <!-- WITHDRAW TO MAIN BALANCE MODAL (FLIP STORE TO MAIN AT 5% FEE) -->
+  <!-- WITHDRAW TO MAIN BALANCE MODAL -->
   <div class="modal-overlay" id="transferModal">
     <div class="modal">
       <h3>Withdraw Earnings to Main Dashboard</h3>
@@ -730,9 +748,10 @@
     let chatbotFaqs = JSON.parse(localStorage.getItem('earnplanet_faqs') || '[{"id":1,"keywords":"cashout withdraw fee threshold","answer":"1st withdrawal: ₦180k ($120) & 7 referrals. 2nd withdrawal: ₦135k ($90) & 15 refs. 3rd: 25 refs. 4th+: 30 refs."},{"id":2,"keywords":"store flip resell product deposit","answer":"Add money from main balance or deposit. Buy merchandise on Mon, Wed, Fri, Sat to earn +20% profit in 8 days. Withdraw back to main at 5% charge."}]');
     let storeProducts = JSON.parse(localStorage.getItem('earnplanet_products') || '[{"id":1,"title":"Luxury Leather Tote Bag","priceUsd":20,"img":"https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=400&q=80"},{"id":2,"title":"Designer Chronograph Watch","priceUsd":35,"img":"https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=400&q=80"}]');
     let activeUserFlips = JSON.parse(localStorage.getItem('earnplanet_user_flips') || '{}');
-
-    // Admin Custom Payout List
     let customPayoutNotifs = JSON.parse(localStorage.getItem('earnplanet_payout_notifs') || '[{"name":"Adeb***45","amt":"₦180,000 ($120.00)","dest":"Access Bank"},{"name":"Kehinde4","amt":"₦225,000 ($150.00)","dest":"UBA"},{"name":"Chidi_O","amt":"₦300,000 ($200.00)","dest":"TRC20 Wallet"},{"name":"Blessing99","amt":"₦180,000 ($120.00)","dest":"OPay"},{"name":"Tunde_X","amt":"₦375,000 ($250.00)","dest":"GTBank"},{"name":"Musa_B","amt":"₦180,000 ($120.00)","dest":"Kuda Bank"},{"name":"Funmi_P","amt":"₦225,000 ($150.00)","dest":"Zenith Bank"},{"name":"Emeka_33","amt":"₦300,000 ($200.00)","dest":"Moniepoint"}]');
+    let socialLinks = JSON.parse(localStorage.getItem('earnplanet_social_links') || '[{"id":1,"platform":"Telegram Channel","url":"https://t.me/earnplanetofficial"},{"id":2,"platform":"Facebook Page","url":"https://facebook.com/earnplanet"}]');
+
+    let showAllPayoutNotifs = false;
 
     function checkAutoIncrementActiveUsers() {
       const eightHoursMs = 8 * 60 * 60 * 1000;
@@ -756,6 +775,7 @@
       localStorage.setItem('earnplanet_products', JSON.stringify(storeProducts));
       localStorage.setItem('earnplanet_user_flips', JSON.stringify(activeUserFlips));
       localStorage.setItem('earnplanet_payout_notifs', JSON.stringify(customPayoutNotifs));
+      localStorage.setItem('earnplanet_social_links', JSON.stringify(socialLinks));
 
       if (currentUser) {
         localStorage.setItem('earnplanet_session', currentUser.email);
@@ -802,8 +822,8 @@
       const newUser = {
         email, password, pin, refCode: refId,
         referredBy: refCode || null,
-        balanceUsd: 0.00,       // Main Dashboard Balance
-        storeBalanceUsd: 0.00,  // Flip Store Dedicated Balance
+        balanceUsd: 0.00,
+        storeBalanceUsd: 0.00,
         tier: "None",
         taskRewardUsd: 0.00,
         activeReferrals: 0,
@@ -863,13 +883,11 @@
       if (!currentUser) return;
       checkAutoIncrementActiveUsers();
 
-      // Main Dashboard Balance
       const usdBal = currentUser.balanceUsd || 0;
       const ngnBal = usdBal * NGN_RATE;
       document.getElementById('walletBalanceNgn').innerText = `₦${ngnBal.toLocaleString('en-NG', {minimumFractionDigits: 2})}`;
       document.getElementById('walletBalanceUsd').innerText = `≈ $${usdBal.toFixed(2)} USD`;
 
-      // Flip Store Dedicated Balance
       const storeUsd = currentUser.storeBalanceUsd || 0;
       const storeNgn = storeUsd * NGN_RATE;
       document.getElementById('storeBalanceNgn').innerText = `₦${storeNgn.toLocaleString('en-NG', {minimumFractionDigits: 2})}`;
@@ -893,10 +911,12 @@
 
       renderUserStoreProducts();
       renderUserActiveFlips();
+      renderUserSocialLinks();
       renderAdminProductsList();
       renderAdminPayoutNotifList();
       renderPendingApprovals();
       renderAdminFaqs();
+      renderAdminSocialLinks();
     }
 
     function copyReferralLink() {
@@ -920,6 +940,19 @@
       if (tab === 'support' && btns[2]) btns[2].classList.add('active');
       if (tab === 'settings' && btns[3]) btns[3].classList.add('active');
       if (tab === 'admin' && btns[4]) btns[4].classList.add('active');
+    }
+
+    function renderUserSocialLinks() {
+      const container = document.getElementById('userSocialLinksGrid');
+      if (socialLinks.length === 0) {
+        container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No social links configured yet.</p>`;
+        return;
+      }
+      container.innerHTML = socialLinks.map(s => `
+        <a href="${s.url}" target="_blank" class="btn btn-secondary" style="justify-content:center; text-align:center; padding:12px; font-size:13px; color:var(--gold);">
+          📢 Join ${s.platform}
+        </a>
+      `).join('');
     }
 
     // Chatbot Engine
@@ -1004,28 +1037,31 @@
       const fileInput = document.getElementById('userPaymentProofFile');
 
       if (!code) { alert("Please enter your Gift Card code or USDT TxID!"); return; }
+      if (!fileInput.files || !fileInput.files[0]) { alert("Please upload your payment screenshot/receipt!"); return; }
 
-      let hasFile = fileInput.files && fileInput.files[0] ? fileInput.files[0].name : "No file attached";
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        pendingPaymentProofs.push({
+          id: Date.now(),
+          type: 'Subscription',
+          userEmail: currentUser.email,
+          method: method === 'giftcard' ? 'Apple Giftcard' : 'USDT Crypto',
+          code,
+          proofDataUrl: e.target.result,
+          amountUsd: activeCheckoutPlan.priceUsd,
+          planName: activeCheckoutPlan.name,
+          rewardUsd: activeCheckoutPlan.rewardUsd,
+          bonusUsd: activeCheckoutPlan.bonusUsd
+        });
 
-      pendingPaymentProofs.push({
-        id: Date.now(),
-        type: 'Subscription',
-        userEmail: currentUser.email,
-        method: method === 'giftcard' ? 'Apple Giftcard' : 'USDT Crypto',
-        code,
-        proofFileName: hasFile,
-        amountUsd: activeCheckoutPlan.priceUsd,
-        planName: activeCheckoutPlan.name,
-        rewardUsd: activeCheckoutPlan.rewardUsd,
-        bonusUsd: activeCheckoutPlan.bonusUsd
-      });
-
-      saveState();
-      closeCheckoutModal();
-      document.getElementById('userPaymentCodeInput').value = '';
-      if(fileInput) fileInput.value = '';
-      alert(`Payment submitted for ${activeCheckoutPlan.name} Plan ($${activeCheckoutPlan.priceUsd}). Pending admin verification.`);
-      updateUI();
+        saveState();
+        closeCheckoutModal();
+        document.getElementById('userPaymentCodeInput').value = '';
+        fileInput.value = '';
+        alert(`Payment submitted for ${activeCheckoutPlan.name} Plan ($${activeCheckoutPlan.priceUsd}). Pending admin verification.`);
+        updateUI();
+      };
+      reader.readAsDataURL(fileInput.files[0]);
     }
 
     function submitDepositProof() {
@@ -1036,29 +1072,31 @@
 
       if (!amtUsd || amtUsd < 10) { alert("Minimum deposit amount is $10.00 USD."); return; }
       if (!code) { alert("Please enter your Gift Card code or USDT TxID!"); return; }
+      if (!fileInput.files || !fileInput.files[0]) { alert("Please upload your deposit screenshot/receipt!"); return; }
 
-      let hasFile = fileInput.files && fileInput.files[0] ? fileInput.files[0].name : "No file attached";
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        pendingPaymentProofs.push({
+          id: Date.now(),
+          type: 'StoreDeposit',
+          userEmail: currentUser.email,
+          method: method === 'giftcard' ? 'Apple Giftcard' : 'USDT Crypto',
+          code,
+          proofDataUrl: e.target.result,
+          amountUsd: amtUsd
+        });
 
-      pendingPaymentProofs.push({
-        id: Date.now(),
-        type: 'StoreDeposit',
-        userEmail: currentUser.email,
-        method: method === 'giftcard' ? 'Apple Giftcard' : 'USDT Crypto',
-        code,
-        proofFileName: hasFile,
-        amountUsd: amtUsd
-      });
-
-      saveState();
-      closeDepositModal();
-      document.getElementById('depositAmountUsd').value = '';
-      document.getElementById('depositCodeInput').value = '';
-      if(fileInput) fileInput.value = '';
-      alert(`Deposit request of $${amtUsd.toFixed(2)} submitted successfully! Funds will credit your Flip Store Balance upon admin verification.`);
-      updateUI();
+        saveState();
+        closeDepositModal();
+        document.getElementById('depositAmountUsd').value = '';
+        document.getElementById('depositCodeInput').value = '';
+        fileInput.value = '';
+        alert(`Deposit request of $${amtUsd.toFixed(2)} submitted successfully! Funds will credit your Flip Store Balance upon admin verification.`);
+        updateUI();
+      };
+      reader.readAsDataURL(fileInput.files[0]);
     }
 
-    // Modal Controls for Adding Money from Main to Flip Store (0% Fee)
     function openAddFromMainModal() {
       const mainUsd = currentUser.balanceUsd || 0;
       document.getElementById('mainAvailableForStoreDisplay').innerText = `$${mainUsd.toFixed(2)} USD (₦${(mainUsd * NGN_RATE).toLocaleString()})`;
@@ -1090,7 +1128,6 @@
       alert(`Transfer Successful!\n\n$${amt.toFixed(2)} transferred from Main Dashboard to Flip Store Balance with 0% Fee!`);
     }
 
-    // Modal Controls for Withdrawing Flip Store Earnings to Main Balance (5% Fee)
     function openTransferModal() {
       const storeUsd = currentUser.storeBalanceUsd || 0;
       document.getElementById('transferAvailableDisplay').innerText = `$${storeUsd.toFixed(2)} USD (₦${(storeUsd * NGN_RATE).toLocaleString()})`;
@@ -1109,11 +1146,11 @@
         return;
       }
 
-      let feeUsd = transferAmt * 0.05; // 5% fee
+      let feeUsd = transferAmt * 0.05;
       let creditedUsd = transferAmt - feeUsd;
 
       currentUser.storeBalanceUsd -= transferAmt;
-      currentUser.balanceUsd += creditedUsd; // Add net amount to Main Balance
+      currentUser.balanceUsd += creditedUsd;
 
       saveState();
       updateUI();
@@ -1123,19 +1160,19 @@
       alert(`Transfer Successful!\n\n$${transferAmt.toFixed(2)} transferred from Flip Store. 5% fee ($${feeUsd.toFixed(2)}) deducted. $${creditedUsd.toFixed(2)} credited to Main Dashboard Balance!`);
     }
 
-    // Admin Payment & Deposit Approvals
+    // Admin Payment & Deposit Approvals (With Screenshot Viewer)
     function renderPendingApprovals() {
       const container = document.getElementById('adminPendingApprovalsList');
       if (pendingPaymentProofs.length === 0) { container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No pending payments or deposits.</p>`; return; }
       
       container.innerHTML = pendingPaymentProofs.map(item => `
-        <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center;">
-          <div>
+        <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div style="flex:1; min-width:220px;">
             <b>${item.type === 'StoreDeposit' ? 'Flip Store Deposit' : item.planName + ' Subscription'} ($${item.amountUsd}) [${item.method}]</b><br>
             <span style="font-size:12px;">User: ${item.userEmail} | Code/TxID: <b style="color:var(--gold);">${item.code}</b></span><br>
-            <span style="font-size:11px; color:var(--text-muted);">Proof File: ${item.proofFileName || 'None'}</span>
+            ${item.proofDataUrl ? `<div style="margin-top:8px;"><a href="${item.proofDataUrl}" target="_blank"><img src="${item.proofDataUrl}" style="width:70px; height:70px; object-fit:cover; border-radius:6px; border:1px solid var(--primary);" title="Click to view full image"></a><br><span style="font-size:10px; color:var(--primary);">Click thumbnail to view screenshot</span></div>` : '<span style="font-size:11px; color:var(--text-muted);">No image attached</span>'}
           </div>
-          <button class="btn" style="padding:6px 12px; font-size:12px;" onclick="approveUserPayment(${item.id})">Approve</button>
+          <button class="btn" style="padding:8px 16px; font-size:12px;" onclick="approveUserPayment(${item.id})">Approve</button>
         </div>
       `).join('');
     }
@@ -1147,7 +1184,7 @@
       
       if (targetUser) {
         if (item.type === 'StoreDeposit') {
-          targetUser.storeBalanceUsd = (targetUser.storeBalanceUsd || 0) + item.amountUsd; // Credit Flip Store Balance
+          targetUser.storeBalanceUsd = (targetUser.storeBalanceUsd || 0) + item.amountUsd;
         } else {
           targetUser.tier = item.planName;
           targetUser.taskRewardUsd = item.rewardUsd;
@@ -1285,26 +1322,68 @@
       alert(`Profit Claimed!\n\n$${item.returnUsd.toFixed(2)} (₦${(item.returnUsd * NGN_RATE).toLocaleString()}) credited to your Flip Store Balance! Use "Withdraw to Main" to move it for cashout.`);
     }
 
-    // ADMIN: Active Users Counter Manual Override
+    // ADMIN: Active Users Counter Additive Manager
     function saveManualUserCount() {
       const val = parseInt(document.getElementById('manualUserCountInput').value);
-      if (!val || val < 1) return;
-      manualUserCount = val;
+      if (!val || isNaN(val)) { alert("Please enter a valid number!"); return; }
+      manualUserCount += val; // Adds to existing total
       saveState();
       updateUI();
-      alert("Active user count updated successfully.");
+      alert(`Successfully added ${val} users! New total active users: ${manualUserCount.toLocaleString()}`);
       document.getElementById('manualUserCountInput').value = '';
     }
 
-    // ADMIN: Custom Payout Notifications Manager
+    // ADMIN: Social Media Manager
+    function renderAdminSocialLinks() {
+      const container = document.getElementById('adminSocialLinksList');
+      container.innerHTML = socialLinks.map((s, index) => `
+        <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center;">
+          <div><b>${s.platform}</b>: <a href="${s.url}" target="_blank" style="color:var(--primary);">${s.url}</a></div>
+          <button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="deleteAdminSocialLink(${index})">Delete</button>
+        </div>
+      `).join('');
+    }
+
+    function saveAdminSocialLink() {
+      const platform = document.getElementById('newSocialPlatform').value.trim();
+      const url = document.getElementById('newSocialUrl').value.trim();
+      if (!platform || !url) { alert("Fill all social link fields!"); return; }
+      socialLinks.push({ id: Date.now(), platform, url });
+      saveState();
+      document.getElementById('newSocialPlatform').value = '';
+      document.getElementById('newSocialUrl').value = '';
+      updateUI();
+      alert("Social media link added successfully.");
+    }
+
+    function deleteAdminSocialLink(index) {
+      socialLinks.splice(index, 1);
+      saveState();
+      updateUI();
+    }
+
+    // ADMIN: Custom Payout Notifications Manager (With "See More" Pagination)
     function renderAdminPayoutNotifList() {
       const container = document.getElementById('adminPayoutNotifList');
-      container.innerHTML = customPayoutNotifs.map((item, index) => `
+      let displayList = showAllPayoutNotifs ? customPayoutNotifs : customPayoutNotifs.slice(0, 10);
+
+      let html = displayList.map((item, index) => `
         <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center;">
           <div><b>${item.name}</b> - ${item.amt} to ${item.dest}</div>
           <button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="deleteCustomPayoutNotif(${index})">Delete</button>
         </div>
       `).join('');
+
+      if (customPayoutNotifs.length > 10) {
+        html += `<button class="btn btn-secondary" style="width:100%; margin-top:10px; font-size:12px;" onclick="toggleShowAllPayouts()">${showAllPayoutNotifs ? 'Show Less' : 'See More (' + (customPayoutNotifs.length - 10) + ' more)'}</button>`;
+      }
+
+      container.innerHTML = html;
+    }
+
+    function toggleShowAllPayouts() {
+      showAllPayoutNotifs = !showAllPayoutNotifs;
+      renderAdminPayoutNotifList();
     }
 
     function addCustomPayoutNotif() {
@@ -1329,12 +1408,15 @@
       renderAdminPayoutNotifList();
     }
 
-    // Admin Products Management
+    // Admin Products Management (Supports URL or File Upload)
     function renderAdminProductsList() {
       const container = document.getElementById('adminProductsList');
       container.innerHTML = storeProducts.map(p => `
-        <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center;">
-          <div><b>${p.title}</b> - $${p.priceUsd} (₦${(p.priceUsd * NGN_RATE).toLocaleString()})</div>
+        <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+          <div style="display:flex; align-items:center; gap:10px;">
+            <img src="${p.img}" style="width:40px; height:40px; object-fit:cover; border-radius:6px;">
+            <div><b>${p.title}</b><br><span style="font-size:12px; color:var(--primary);">$${p.priceUsd} (₦${(p.priceUsd * NGN_RATE).toLocaleString()})</span></div>
+          </div>
           <div style="display:flex; gap:6px;">
             <button class="btn btn-secondary" style="padding:4px 8px; font-size:11px;" onclick="editAdminProduct(${p.id})">Edit</button>
             <button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="deleteAdminProduct(${p.id})">Delete</button>
@@ -1346,11 +1428,26 @@
     function saveAdminProduct() {
       const id = document.getElementById('editProductId').value;
       const title = document.getElementById('newProdTitle').value.trim();
-      const img = document.getElementById('newProdImg').value.trim();
+      const imgUrl = document.getElementById('newProdImgUrl').value.trim();
+      const imgFile = document.getElementById('newProdImgFile');
       const priceUsd = parseFloat(document.getElementById('newProdPrice').value);
 
-      if (!title || !img || !priceUsd) { alert("Fill all product details!"); return; }
+      if (!title || !priceUsd) { alert("Fill product title and price!"); return; }
 
+      if (imgFile.files && imgFile.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          finishSavingProduct(id, title, e.target.result, priceUsd);
+        };
+        reader.readAsDataURL(imgFile.files[0]);
+      } else if (imgUrl) {
+        finishSavingProduct(id, title, imgUrl, priceUsd);
+      } else {
+        alert("Please provide an image URL or upload an image file!");
+      }
+    }
+
+    function finishSavingProduct(id, title, img, priceUsd) {
       if (id) {
         let p = storeProducts.find(item => item.id == id);
         if (p) { p.title = title; p.img = img; p.priceUsd = priceUsd; }
@@ -1361,7 +1458,8 @@
       saveState();
       document.getElementById('editProductId').value = '';
       document.getElementById('newProdTitle').value = '';
-      document.getElementById('newProdImg').value = '';
+      document.getElementById('newProdImgUrl').value = '';
+      document.getElementById('newProdImgFile').value = '';
       document.getElementById('newProdPrice').value = '';
       document.getElementById('adminProductFormTitle').innerText = "Add New Store Product";
       updateUI();
@@ -1373,7 +1471,7 @@
       if (!p) return;
       document.getElementById('editProductId').value = p.id;
       document.getElementById('newProdTitle').value = p.title;
-      document.getElementById('newProdImg').value = p.img;
+      document.getElementById('newProdImgUrl').value = p.img.startsWith('data:') ? '' : p.img;
       document.getElementById('newProdPrice').value = p.priceUsd;
       document.getElementById('adminProductFormTitle').innerText = "Edit Store Product";
     }
