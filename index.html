@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EarnPlanet - Premium Earning Platform</title>
+  <title>EarnPlanet - Premium Earning & Resell Platform</title>
 
   <!-- PROPELLERADS MULTITAG SCRIPT -->
   <script src="https://alwingulla.com/88/tag.min.js" data-zone="YOUR_ZONE_ID" async data-cfasync="false"></script>
@@ -106,6 +106,14 @@
     .plan-price-usd { font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; }
     .plan-perks { font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 15px; }
     .plan-bonus { background: rgba(0, 230, 118, 0.15); color: var(--primary); font-size: 11px; font-weight: bold; padding: 4px 8px; border-radius: 10px; margin-bottom: 10px; display: inline-block; }
+
+    /* Store Products Grid */
+    .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px; }
+    .product-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; text-align: center; }
+    .product-img { width: 100%; height: 140px; object-fit: cover; border-radius: 10px; margin-bottom: 10px; background: #04100a; }
+    .product-title { font-size: 15px; font-weight: 800; color: #fff; margin-bottom: 4px; }
+    .product-price { font-size: 16px; font-weight: 900; color: var(--primary); }
+    .product-profit { font-size: 12px; color: var(--gold); margin: 4px 0 12px 0; font-weight: 700; }
 
     .task-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; }
     .task-info h4 { font-size: 15px; font-weight: 800; color: #fff; }
@@ -235,7 +243,8 @@
       <div class="tabs-header">
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
           <button class="tab-btn active" onclick="switchTab('user')">Dashboard</button>
-          <button class="tab-btn" onclick="switchTab('support')">💬 Support & Chatbot</button>
+          <button class="tab-btn" onclick="switchTab('store')">🛍️ Resell Flip Store</button>
+          <button class="tab-btn" onclick="switchTab('support')">💬 Support</button>
           <button class="tab-btn" onclick="switchTab('settings')">⚙️ Settings</button>
         </div>
         <button class="tab-btn" onclick="openAdminAuthModal()">Management Panel</button>
@@ -248,9 +257,7 @@
         <div class="wallet-card">
           <div class="wallet-info">
             <h3>Available Wallet Balance</h3>
-            <!-- Bold Naira Primary Display -->
             <div class="balance-ngn" id="walletBalanceNgn">₦0.00</div>
-            <!-- Equivalent USD Secondary Display -->
             <div class="balance-usd" id="walletBalanceUsd">≈ $0.00 USD</div>
           </div>
           <div class="wallet-actions">
@@ -290,9 +297,9 @@
               <div class="plan-title">Starter</div>
               <div class="plan-price-ngn">₦22,500</div>
               <div class="plan-price-usd">$15.00 USD</div>
-              <div class="plan-perks">Earn $0.50 (₦750) per drive<br>4 Drives Daily ($2.00 / ₦3,000)</div>
+              <div class="plan-perks">Earn $0.15 (₦225) per drive<br>4 Drives Daily ($0.60 / ₦900)</div>
             </div>
-            <button class="btn" onclick="openCheckoutModal('Starter', 15, 0.50, 6.00)">Subscribe (₦22.5k / $15)</button>
+            <button class="btn" onclick="openCheckoutModal('Starter', 15, 0.15, 6.00)">Subscribe (₦22.5k / $15)</button>
           </div>
 
           <div class="plan-card">
@@ -301,9 +308,9 @@
               <div class="plan-title">Silver</div>
               <div class="plan-price-ngn">₦37,500</div>
               <div class="plan-price-usd">$25.00 USD</div>
-              <div class="plan-perks">Earn $1.00 (₦1,500) per drive<br>4 Drives Daily ($4.00 / ₦6,000)</div>
+              <div class="plan-perks">Earn $0.25 (₦375) per drive<br>4 Drives Daily ($1.00 / ₦1,500)</div>
             </div>
-            <button class="btn" onclick="openCheckoutModal('Silver', 25, 1.00, 10.00)">Subscribe (₦37.5k / $25)</button>
+            <button class="btn" onclick="openCheckoutModal('Silver', 25, 0.25, 10.00)">Subscribe (₦37.5k / $25)</button>
           </div>
 
           <div class="plan-card">
@@ -312,9 +319,9 @@
               <div class="plan-title">Gold</div>
               <div class="plan-price-ngn">₦75,000</div>
               <div class="plan-price-usd">$50.00 USD</div>
-              <div class="plan-perks">Earn $2.00 (₦3,000) per drive<br>4 Drives Daily ($8.00 / ₦12,000)</div>
+              <div class="plan-perks">Earn $0.35 (₦525) per drive<br>4 Drives Daily ($1.40 / ₦2,100)</div>
             </div>
-            <button class="btn" onclick="openCheckoutModal('Gold', 50, 2.00, 20.00)">Subscribe (₦75k / $50)</button>
+            <button class="btn" onclick="openCheckoutModal('Gold', 50, 0.35, 20.00)">Subscribe (₦75k / $50)</button>
           </div>
 
           <div class="plan-card">
@@ -323,9 +330,9 @@
               <div class="plan-title">Platinum</div>
               <div class="plan-price-ngn">₦150,000</div>
               <div class="plan-price-usd">$100.00 USD</div>
-              <div class="plan-perks">Earn $4.00 (₦6,000) per drive<br>4 Drives Daily ($16.00 / ₦24,000)</div>
+              <div class="plan-perks">Earn $0.50 (₦750) per drive<br>4 Drives Daily ($2.00 / ₦3,000)</div>
             </div>
-            <button class="btn" onclick="openCheckoutModal('Platinum', 100, 4.00, 40.00)">Subscribe (₦150k / $100)</button>
+            <button class="btn" onclick="openCheckoutModal('Platinum', 100, 0.50, 40.00)">Subscribe (₦150k / $100)</button>
           </div>
 
         </div>
@@ -355,10 +362,27 @@
 
       </div>
 
+      <!-- RESELL FLIP STORE TAB -->
+      <div id="storeTab" style="display:none;">
+        <div class="section-title">🛍️ Merchandise Flip Store</div>
+        
+        <div class="payment-instruction-box">
+          <b>HOW THE RESELL FLIP STORE WORKS:</b><br>
+          1. Purchase merchandise slots using your wallet balance.<br>
+          2. Items enter an <b>8-Day Resell Lock Cycle</b> generating <b>+20% Guaranteed Profit</b>.<br>
+          3. <b>Schedule Rules:</b> Purchases are permitted <b>Once a Day</b> on <b>Mon, Wed, Fri & Sat</b>.
+        </div>
+
+        <div class="products-grid" id="userStoreProductsGrid"></div>
+
+        <div class="section-title" style="margin-top:25px;">Your Active Resell Investments</div>
+        <div id="userActiveFlipsList"></div>
+      </div>
+
       <!-- SUPPORT & CHATBOT TAB -->
       <div id="supportTab" style="display:none;">
         <div class="section-title">💬 EarnPlanet Instant Assistant</div>
-        <p style="font-size:13px; color:var(--text-muted); margin-bottom:15px;">Ask questions regarding subscriptions, cashouts, referrals, or driving tasks.</p>
+        <p style="font-size:13px; color:var(--text-muted); margin-bottom:15px;">Ask questions regarding subscriptions, cashouts, referrals, or store flips.</p>
 
         <div class="chat-container">
           <div class="chat-messages" id="chatMessagesList">
@@ -401,11 +425,22 @@
         <div class="section-title">⚙️ Pending Payment Approvals</div>
         <div id="adminPendingApprovalsList"></div>
 
+        <div class="section-title" style="margin-top:30px;">⚙️ Manage Flip Store Products (Add / Edit)</div>
+        <div class="stat-card" style="text-align:left; margin-bottom:15px;">
+          <h4 style="margin-bottom:10px;" id="adminProductFormTitle">Add New Store Product</h4>
+          <input type="hidden" id="editProductId">
+          <input type="text" id="newProdTitle" placeholder="Product Title (e.g. Designer Leather Tote Bag)">
+          <input type="text" id="newProdImg" placeholder="Image URL (https://...)">
+          <input type="number" id="newProdPrice" placeholder="Wholesale Price in USD ($)">
+          <button class="btn" id="saveProdBtn" onclick="saveAdminProduct()">+ Save Product</button>
+        </div>
+        <div id="adminProductsList"></div>
+
         <div class="section-title" style="margin-top:30px;">⚙️ Chatbot FAQ Manager</div>
         <div class="stat-card" style="text-align:left; margin-bottom:15px;">
           <h4 style="margin-bottom:10px;" id="adminFaqFormTitle">Add New Chatbot FAQ</h4>
           <input type="hidden" id="editFaqId">
-          <input type="text" id="newFaqQuery" placeholder="User Question / Keyword (e.g., cashout, giftcard)">
+          <input type="text" id="newFaqQuery" placeholder="User Question / Keyword (e.g., store, flip)">
           <textarea id="newFaqAnswer" placeholder="Bot Answer Response"></textarea>
           <button class="btn" id="saveFaqBtn" onclick="saveFaqItem()">+ Save FAQ</button>
         </div>
@@ -415,7 +450,7 @@
     </div>
   </div>
 
-  <!-- GIFTCARD & USDT CHECKOUT MODAL -->
+  <!-- CHECKOUT MODAL -->
   <div class="modal-overlay" id="checkoutModal">
     <div class="modal">
       <h3 id="checkoutTitle">Subscribe Plan</h3>
@@ -535,10 +570,8 @@
   </div>
 
   <script>
-    // System Constants
-    const NGN_RATE = 1500; // 1 USD = 1500 NGN exchange rate
+    const NGN_RATE = 1500;
 
-    // State & Persistent Storage
     let currentUser = null;
     let usersDb = JSON.parse(localStorage.getItem('earnplanet_users') || '[]');
     let activeSessionEmail = localStorage.getItem('earnplanet_session');
@@ -546,12 +579,16 @@
     let activeCheckoutPlan = null;
 
     let pendingPaymentProofs = JSON.parse(localStorage.getItem('earnplanet_pending_payments') || '[]');
-    let chatbotFaqs = JSON.parse(localStorage.getItem('earnplanet_faqs') || '[{"id":1,"keywords":"cashout withdraw fee threshold","answer":"Minimum cashout is ₦180,000 ($120 USD). 1st withdrawal requires 7 referrals; subsequent cashouts require 5."},{"id":2,"keywords":"giftcard usdt deposit","answer":"Subscribe via Apple Giftcards from PalmPay/OPay/Kuda or USDT Crypto via Binance/Bybit."}]');
+    let chatbotFaqs = JSON.parse(localStorage.getItem('earnplanet_faqs') || '[{"id":1,"keywords":"cashout withdraw fee threshold","answer":"Minimum cashout is ₦180,000 ($120 USD). 1st withdrawal requires 7 referrals; subsequent cashouts require 5."},{"id":2,"keywords":"store flip resell product","answer":"Buy merchandise on Mon, Wed, Fri, Sat. Earn 20% profit after an 8-day lock cycle."}]');
+    let storeProducts = JSON.parse(localStorage.getItem('earnplanet_products') || '[{"id":1,"title":"Luxury Leather Tote Bag","priceUsd":20,"img":"https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=400&q=80"},{"id":2,"title":"Designer Chronograph Watch","priceUsd":35,"img":"https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=400&q=80"}]');
+    let activeUserFlips = JSON.parse(localStorage.getItem('earnplanet_user_flips') || '{}');
 
     function saveState() {
       localStorage.setItem('earnplanet_users', JSON.stringify(usersDb));
       localStorage.setItem('earnplanet_pending_payments', JSON.stringify(pendingPaymentProofs));
       localStorage.setItem('earnplanet_faqs', JSON.stringify(chatbotFaqs));
+      localStorage.setItem('earnplanet_products', JSON.stringify(storeProducts));
+      localStorage.setItem('earnplanet_user_flips', JSON.stringify(activeUserFlips));
       if (currentUser) {
         localStorage.setItem('earnplanet_session', currentUser.email);
       } else {
@@ -600,7 +637,8 @@
         taskRewardUsd: 0.00,
         activeReferrals: 0,
         withdrawalsCount: 0,
-        dailyDrives: 0
+        dailyDrives: 0,
+        lastFlipDate: null
       };
 
       usersDb.push(newUser);
@@ -662,6 +700,9 @@
 
       document.getElementById('refLinkInput').value = `https://earnplanet.com.ng/?ref=${currentUser.refCode}`;
 
+      renderUserStoreProducts();
+      renderUserActiveFlips();
+      renderAdminProductsList();
       renderPendingApprovals();
       renderAdminFaqs();
     }
@@ -676,13 +717,15 @@
     function switchTab(tab) {
       document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
       document.getElementById('userTab').style.display = tab === 'user' ? 'block' : 'none';
+      document.getElementById('storeTab').style.display = tab === 'store' ? 'block' : 'none';
       document.getElementById('supportTab').style.display = tab === 'support' ? 'block' : 'none';
       document.getElementById('settingsTab').style.display = tab === 'settings' ? 'block' : 'none';
       document.getElementById('adminTab').style.display = tab === 'admin' ? 'block' : 'none';
 
       if (tab === 'user') document.querySelectorAll('.tab-btn')[0].classList.add('active');
-      if (tab === 'support') document.querySelectorAll('.tab-btn')[1].classList.add('active');
-      if (tab === 'settings') document.querySelectorAll('.tab-btn')[2].classList.add('active');
+      if (tab === 'store') document.querySelectorAll('.tab-btn')[1].classList.add('active');
+      if (tab === 'support') document.querySelectorAll('.tab-btn')[2].classList.add('active');
+      if (tab === 'settings') document.querySelectorAll('.tab-btn')[3].classList.add('active');
     }
 
     // Chatbot Engine
@@ -695,7 +738,7 @@
       list.innerHTML += `<div class="msg msg-user">${input.value}</div>`;
       input.value = '';
 
-      let reply = "I couldn't find an exact answer for that. Ask about Gift Cards, USDT, or cashout rules!";
+      let reply = "I couldn't find an exact answer for that. Ask about Gift Cards, USDT, or store flips!";
 
       for (let faq of chatbotFaqs) {
         let keys = faq.keywords.toLowerCase().split(' ');
@@ -799,7 +842,7 @@
           if (referrer) {
             let refCommission = item.amountUsd * 0.10; // 10% referral bonus
             referrer.balanceUsd += refCommission;
-            referrer.activeReferrals += 1; // Increment paying referrals count
+            referrer.activeReferrals += 1;
           }
         }
       }
@@ -808,6 +851,177 @@
       saveState();
       updateUI();
       alert("Payment approved! 40% cashback credited to user and 10% awarded to referrer.");
+    }
+
+    // E-COMMERCE STORE & FLIP LOGIC (Mon, Wed, Fri, Sat rules + 8-Day Lockup)
+    function renderUserStoreProducts() {
+      const container = document.getElementById('userStoreProductsGrid');
+      if (storeProducts.length === 0) {
+        container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No merchandise products available.</p>`;
+        return;
+      }
+
+      container.innerHTML = storeProducts.map(p => {
+        let returnUsd = p.priceUsd * 1.20; // 20% return
+        let returnNgn = returnUsd * NGN_RATE;
+        let priceNgn = p.priceUsd * NGN_RATE;
+
+        return `
+          <div class="product-card">
+            <img src="${p.img}" class="product-img" alt="${p.title}">
+            <div class="product-title">${p.title}</div>
+            <div class="product-price">₦${priceNgn.toLocaleString()} ($${p.priceUsd})</div>
+            <div class="product-profit">Return: ₦${returnNgn.toLocaleString()} ($${returnUsd.toFixed(2)}) [+20%]</div>
+            <button class="btn" onclick="purchaseStoreProduct(${p.id})">Flip Product</button>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function purchaseStoreProduct(prodId) {
+      if (!currentUser) return;
+
+      // Rule Check 1: Day of Week Check (0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat)
+      const day = new Date().getDay();
+      const validDays = [1, 3, 5, 6]; // Monday, Wednesday, Friday, Saturday
+      if (!validDays.includes(day)) {
+        alert("Store Purchases are strictly open on Monday, Wednesday, Friday, and Saturday only!");
+        return;
+      }
+
+      // Rule Check 2: Once a Day Purchase Limit
+      const todayStr = new Date().toDateString();
+      if (currentUser.lastFlipDate === todayStr) {
+        alert("Purchase Limit Reached! You can only buy 1 product per day.");
+        return;
+      }
+
+      const prod = storeProducts.find(p => p.id === prodId);
+      if (!prod) return;
+
+      if (currentUser.balanceUsd < prod.priceUsd) {
+        alert(`Insufficient balance! You need $${prod.priceUsd}.00 (₦${(prod.priceUsd * NGN_RATE).toLocaleString()}) in your wallet balance.`);
+        return;
+      }
+
+      // Execute Flip Purchase
+      currentUser.balanceUsd -= prod.priceUsd;
+      currentUser.lastFlipDate = todayStr;
+
+      let flipsList = activeUserFlips[currentUser.email] || [];
+      const unlockDate = new Date();
+      unlockDate.setDate(unlockDate.getDate() + 8); // 8-Day Lockup Cycle
+
+      flipsList.push({
+        id: Date.now(),
+        title: prod.title,
+        investedUsd: prod.priceUsd,
+        returnUsd: prod.priceUsd * 1.20,
+        unlockTime: unlockDate.getTime(),
+        claimed: false
+      });
+
+      activeUserFlips[currentUser.email] = flipsList;
+      saveState();
+      updateUI();
+      alert(`Merchandise Flip Active!\n\n${prod.title} purchased for $${prod.priceUsd}. $${(prod.priceUsd * 1.20).toFixed(2)} (+20% profit) will unlock in 8 days.`);
+    }
+
+    function renderUserActiveFlips() {
+      const container = document.getElementById('userActiveFlipsList');
+      let flipsList = activeUserFlips[currentUser.email] || [];
+
+      if (flipsList.length === 0) {
+        container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No active resell flips.</p>`;
+        return;
+      }
+
+      const now = Date.now();
+
+      container.innerHTML = flipsList.map(f => {
+        let isReady = now >= f.unlockTime;
+        let daysLeft = Math.ceil((f.unlockTime - now) / (1000 * 60 * 60 * 24));
+
+        return `
+          <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center;">
+            <div>
+              <b>${f.title}</b><br>
+              <span style="font-size:12px;">Return: <b style="color:var(--primary);">$${f.returnUsd.toFixed(2)} (₦${(f.returnUsd * NGN_RATE).toLocaleString()})</b></span><br>
+              <span style="font-size:11px; color:var(--gold);">${f.claimed ? 'Claimed ✓' : (isReady ? 'Ready for Payout!' : `Unlocks in ${daysLeft} day(s)`)}</span>
+            </div>
+            ${(!f.claimed && isReady) ? `<button class="btn" style="padding:6px 12px; font-size:12px;" onclick="claimFlipProfit(${f.id})">Claim Profit</button>` : ''}
+          </div>
+        `;
+      }).join('');
+    }
+
+    function claimFlipProfit(flipId) {
+      let flipsList = activeUserFlips[currentUser.email] || [];
+      let item = flipsList.find(f => f.id === flipId);
+
+      if (!item || item.claimed) return;
+
+      item.claimed = true;
+      currentUser.balanceUsd += item.returnUsd; // Credit profit + principal
+
+      saveState();
+      updateUI();
+      alert(`Profit Claimed!\n\n$${item.returnUsd.toFixed(2)} (₦${(item.returnUsd * NGN_RATE).toLocaleString()}) credited to your main wallet balance!`);
+    }
+
+    // Admin Products Management (Add / Edit)
+    function renderAdminProductsList() {
+      const container = document.getElementById('adminProductsList');
+      container.innerHTML = storeProducts.map(p => `
+        <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center;">
+          <div><b>${p.title}</b> - $${p.priceUsd} (₦${(p.priceUsd * NGN_RATE).toLocaleString()})</div>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-secondary" style="padding:4px 8px; font-size:11px;" onclick="editAdminProduct(${p.id})">Edit</button>
+            <button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="deleteAdminProduct(${p.id})">Delete</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function saveAdminProduct() {
+      const id = document.getElementById('editProductId').value;
+      const title = document.getElementById('newProdTitle').value.trim();
+      const img = document.getElementById('newProdImg').value.trim();
+      const priceUsd = parseFloat(document.getElementById('newProdPrice').value);
+
+      if (!title || !img || !priceUsd) { alert("Fill all product details!"); return; }
+
+      if (id) {
+        let p = storeProducts.find(item => item.id == id);
+        if (p) { p.title = title; p.img = img; p.priceUsd = priceUsd; }
+      } else {
+        storeProducts.push({ id: Date.now(), title, img, priceUsd });
+      }
+
+      saveState();
+      document.getElementById('editProductId').value = '';
+      document.getElementById('newProdTitle').value = '';
+      document.getElementById('newProdImg').value = '';
+      document.getElementById('newProdPrice').value = '';
+      document.getElementById('adminProductFormTitle').innerText = "Add New Store Product";
+      updateUI();
+      alert("Product saved successfully.");
+    }
+
+    function editAdminProduct(id) {
+      let p = storeProducts.find(item => item.id == id);
+      if (!p) return;
+      document.getElementById('editProductId').value = p.id;
+      document.getElementById('newProdTitle').value = p.title;
+      document.getElementById('newProdImg').value = p.img;
+      document.getElementById('newProdPrice').value = p.priceUsd;
+      document.getElementById('adminProductFormTitle').innerText = "Edit Store Product";
+    }
+
+    function deleteAdminProduct(id) {
+      storeProducts = storeProducts.filter(p => p.id != id);
+      saveState();
+      updateUI();
     }
 
     // Admin Chatbot FAQs
@@ -971,7 +1185,6 @@
 
     function closeWithdrawModal() { document.getElementById('withdrawModal').style.display = 'none'; }
 
-    // Withdrawal Logic (Enforces Referral Rollover + $120 Min Threshold + 15% Charge)
     function submitWithdrawal() {
       const amtInput = parseFloat(document.getElementById('wdAmountInput').value);
       const pin = document.getElementById('wdPinInput').value;
@@ -979,7 +1192,6 @@
 
       if (!amtInput) { alert("Please enter a valid cashout amount!"); return; }
 
-      // Convert input to USD equivalent for threshold check
       let requestedAmtUsd = amtInput;
       if (destType === 'bank' && amtInput > 1000) {
         requestedAmtUsd = amtInput / NGN_RATE;
@@ -990,7 +1202,6 @@
         return;
       }
 
-      // Check required referrals (7 for 1st withdrawal, 5 for subsequent withdrawals)
       const requiredRefs = currentUser.withdrawalsCount === 0 ? 7 : 5;
 
       if (currentUser.activeReferrals < requiredRefs) {
@@ -1011,10 +1222,9 @@
         return;
       }
 
-      // Execute Withdrawal & Apply Referral Rollover
       currentUser.balanceUsd -= totalDeductionUsd;
-      currentUser.activeReferrals -= requiredRefs; // Subtract required referrals, rolling over any surplus!
-      currentUser.withdrawalsCount += 1; // Increment completed withdrawal count
+      currentUser.activeReferrals -= requiredRefs;
+      currentUser.withdrawalsCount += 1;
 
       saveState();
       updateUI();
@@ -1086,7 +1296,7 @@
       }, 3500);
     }
 
-    setInterval(triggerLiveNotification, 6000); // Pops up every 6 seconds
+    setInterval(triggerLiveNotification, 6000);
 
     if (currentUser) updateUI();
   </script>
