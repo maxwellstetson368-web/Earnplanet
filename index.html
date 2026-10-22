@@ -120,27 +120,28 @@
     .task-info p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
     .task-reward { color: var(--primary); font-weight: 800; font-size: 13px; margin-top: 5px; }
 
-    /* Live Withdrawal Popup Notification */
-    .live-notification {
+    /* TOP LIVE WITHDRAWAL NOTIFICATION BANNER */
+    .live-notification-top {
       position: fixed;
-      bottom: 20px;
-      left: 20px;
+      top: 65px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-150%);
       background: #04100a;
       border: 1px solid var(--primary);
-      border-radius: 12px;
-      padding: 12px 18px;
+      border-radius: 30px;
+      padding: 10px 22px;
       display: flex;
       align-items: center;
       gap: 12px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.8);
-      z-index: 99;
-      transform: translateY(150%);
+      box-shadow: 0 10px 30px rgba(0,230,118,0.25);
+      z-index: 999;
       transition: transform 0.4s ease;
-      max-width: 340px;
+      width: 90%;
+      max-width: 440px;
     }
-    .live-notification.show { transform: translateY(0); }
-    .live-icon { font-size: 22px; }
-    .live-text { font-size: 12px; color: #fff; line-height: 1.3; }
+    .live-notification-top.show { transform: translateX(-50%) translateY(0); }
+    .live-icon { font-size: 20px; }
+    .live-text { font-size: 12px; color: #fff; line-height: 1.3; text-align: left; }
     .live-text b { color: var(--primary); }
 
     /* Chatbot Box */
@@ -152,7 +153,7 @@
     .chat-input-row { display: flex; gap: 10px; }
 
     /* Modals */
-    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(6px); display: none; justify-content: center; align-items: center; z-index: 100; }
+    .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(6px); display: none; justify-content: center; align-items: center; z-index: 1000; }
     .modal { background: #071f12; border: 1px solid var(--primary); border-radius: 20px; padding: 25px; width: 92%; max-width: 480px; box-shadow: 0 25px 50px rgba(0,0,0,0.8); max-height: 90vh; overflow-y: auto; }
     .modal h3 { margin-bottom: 12px; font-size: 20px; color: var(--primary); }
     .modal input, .modal select, .modal textarea { width: 100%; padding: 12px; background: #04100a; border: 1px solid var(--card-border); border-radius: 10px; color: #fff; margin-bottom: 12px; font-size: 14px; }
@@ -167,8 +168,8 @@
 </head>
 <body>
 
-  <!-- LIVE POPUP WITHDRAWAL NOTIFICATION -->
-  <div class="live-notification" id="payoutNotification">
+  <!-- TOP LIVE WITHDRAWAL POPUP NOTIFICATION (MEMBERS ONLY) -->
+  <div class="live-notification-top" id="payoutNotification">
     <div class="live-icon">💸</div>
     <div class="live-text" id="payoutNotifText">
       User <b>Adeb***45</b> withdrew <b>₦180,000 ($120.00)</b> to Access Bank
@@ -225,6 +226,11 @@
         </div>
       </div>
 
+      <!-- FOOTER SECRET ADMIN LINK -->
+      <div style="text-align:center; margin-top:25px; border-top:1px solid var(--card-border); padding-top:10px;">
+        <a href="#" style="font-size:11px; color:#16422b; text-decoration:none;" onclick="openAdminAuthModal()">🔒 Management Portal</a>
+      </div>
+
     </div>
   </div>
 
@@ -240,14 +246,14 @@
 
     <div class="container">
       
+      <!-- Public User Tabs (Admin Panel Removed From Header) -->
       <div class="tabs-header">
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+        <div style="display:flex; gap:10px; flex-wrap:wrap;" id="navTabsContainer">
           <button class="tab-btn active" onclick="switchTab('user')">Dashboard</button>
           <button class="tab-btn" onclick="switchTab('store')">🛍️ Resell Flip Store</button>
           <button class="tab-btn" onclick="switchTab('support')">💬 Support</button>
           <button class="tab-btn" onclick="switchTab('settings')">⚙️ Settings</button>
         </div>
-        <button class="tab-btn" onclick="openAdminAuthModal()">Management Panel</button>
       </div>
 
       <!-- USER DASHBOARD TAB -->
@@ -265,8 +271,13 @@
           </div>
         </div>
 
-        <!-- Stats Grid & Referral Rollover Tracker -->
+        <!-- Stats Grid & Referral Tracker & Active Users Counter -->
         <div class="stats-grid">
+          <div class="stat-card">
+            <h4>Active Platform Users</h4>
+            <p id="activeUsersDisplay" style="color:var(--primary);">1,280</p>
+            <span style="font-size:11px; color:var(--text-muted);">Verified Earners</span>
+          </div>
           <div class="stat-card">
             <h4>Paying Referrals Progress</h4>
             <p id="refCountDisplay">0 / 7</p>
@@ -338,7 +349,7 @@
         </div>
 
         <!-- Daily Tasks Module -->
-        <div class="section-title">Daily Earning Tasks</div>
+        <div class="section-title">Earning Modules</div>
 
         <!-- Driving Game Task -->
         <div class="task-card">
@@ -350,14 +361,14 @@
           <button class="btn" onclick="openDrivingGameModal()">Start Drive</button>
         </div>
 
-        <!-- Direct Link SmartLink Task -->
-        <div class="task-card">
+        <!-- Resell Store Direct Button (Replaced Sponsorship) -->
+        <div class="task-card" style="border-color: var(--gold);">
           <div class="task-info">
-            <h4>🔗 Partner Sponsor Direct Link</h4>
-            <p>Visit sponsor link for 15 seconds. Anti-cheat countdown enabled.</p>
-            <div class="task-reward">Reward: +₦300 ($0.20) per click</div>
+            <h4>🛍️ Resell Flip Store (+20% Profit)</h4>
+            <p>Purchase merchandise slots and earn 20% guaranteed return in an 8-day lock cycle.</p>
+            <div class="task-reward" style="color:var(--gold);">Available Mon, Wed, Fri & Sat</div>
           </div>
-          <button class="btn" id="directLinkBtn" onclick="handleDirectLinkTask('https://your-propeller-direct-link-url.com')">Visit Sponsor Link</button>
+          <button class="btn" onclick="switchTab('store')">Open Resell Store</button>
         </div>
 
       </div>
@@ -420,10 +431,27 @@
         </div>
       </div>
 
-      <!-- ADMIN MANAGEMENT TAB (LOCKED) -->
+      <!-- ADMIN MANAGEMENT TAB (SECRET) -->
       <div id="adminTab" style="display:none;">
         <div class="section-title">⚙️ Pending Payment Approvals</div>
         <div id="adminPendingApprovalsList"></div>
+
+        <div class="section-title" style="margin-top:30px;">⚙️ Active Users Count Override</div>
+        <div class="stat-card" style="text-align:left; margin-bottom:15px;">
+          <h4 style="margin-bottom:10px;">Set Active Platform Users Count</h4>
+          <input type="number" id="manualUserCountInput" placeholder="Enter Total Active Users (e.g. 2500)">
+          <button class="btn" onclick="saveManualUserCount()">Update Active User Count</button>
+        </div>
+
+        <div class="section-title" style="margin-top:30px;">⚙️ Manage Live Payout Popups (Add / Remove)</div>
+        <div class="stat-card" style="text-align:left; margin-bottom:15px;">
+          <h4 style="margin-bottom:10px;">Upload Custom Cashout Notification</h4>
+          <input type="text" id="newNotifName" placeholder="User Name (e.g. Adeb***45 or Kehinde4)">
+          <input type="text" id="newNotifAmt" placeholder="Amount (e.g. ₦180,000 ($120.00))">
+          <input type="text" id="newNotifDest" placeholder="Destination (e.g. Access Bank or TRC20 Wallet)">
+          <button class="btn" onclick="addCustomPayoutNotif()">+ Add To Popup Queue</button>
+        </div>
+        <div id="adminPayoutNotifList"></div>
 
         <div class="section-title" style="margin-top:30px;">⚙️ Manage Flip Store Products (Add / Edit)</div>
         <div class="stat-card" style="text-align:left; margin-bottom:15px;">
@@ -440,7 +468,7 @@
         <div class="stat-card" style="text-align:left; margin-bottom:15px;">
           <h4 style="margin-bottom:10px;" id="adminFaqFormTitle">Add New Chatbot FAQ</h4>
           <input type="hidden" id="editFaqId">
-          <input type="text" id="newFaqQuery" placeholder="User Question / Keyword (e.g., store, flip)">
+          <input type="text" id="newFaqQuery" placeholder="User Question / Keyword">
           <textarea id="newFaqAnswer" placeholder="Bot Answer Response"></textarea>
           <button class="btn" id="saveFaqBtn" onclick="saveFaqItem()">+ Save FAQ</button>
         </div>
@@ -490,7 +518,7 @@
     </div>
   </div>
 
-  <!-- ADMIN AUTH MODAL -->
+  <!-- SECRET ADMIN AUTH MODAL -->
   <div class="modal-overlay" id="adminAuthModal">
     <div class="modal" style="max-width:380px;">
       <h3>🔒 Management Access</h3>
@@ -537,7 +565,6 @@
         <span style="font-size:13px; color:var(--gold); font-weight:bold; margin-left:8px;" id="wdAvailableDisplayUsd">($0.00 USD)</span>
       </div>
 
-      <!-- BANK FIELDS -->
       <div id="wdBankFields">
         <label>Bank Name (OPay, GTB, Kuda, Zenith, etc.)</label>
         <input type="text" id="wdBankName" placeholder="e.g. OPay / Access Bank">
@@ -545,7 +572,6 @@
         <input type="text" id="wdAccountNum" placeholder="10-Digit Account Number">
       </div>
 
-      <!-- USDT FIELDS -->
       <div id="wdUsdtFields" style="display:none;">
         <label>Network Type</label>
         <select id="wdUsdtNetwork">
@@ -578,17 +604,24 @@
     let isAdminAuthenticated = false;
     let activeCheckoutPlan = null;
 
+    let manualUserCount = parseInt(localStorage.getItem('earnplanet_manual_users') || '1280');
     let pendingPaymentProofs = JSON.parse(localStorage.getItem('earnplanet_pending_payments') || '[]');
     let chatbotFaqs = JSON.parse(localStorage.getItem('earnplanet_faqs') || '[{"id":1,"keywords":"cashout withdraw fee threshold","answer":"Minimum cashout is ₦180,000 ($120 USD). 1st withdrawal requires 7 referrals; subsequent cashouts require 5."},{"id":2,"keywords":"store flip resell product","answer":"Buy merchandise on Mon, Wed, Fri, Sat. Earn 20% profit after an 8-day lock cycle."}]');
     let storeProducts = JSON.parse(localStorage.getItem('earnplanet_products') || '[{"id":1,"title":"Luxury Leather Tote Bag","priceUsd":20,"img":"https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=400&q=80"},{"id":2,"title":"Designer Chronograph Watch","priceUsd":35,"img":"https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=400&q=80"}]');
     let activeUserFlips = JSON.parse(localStorage.getItem('earnplanet_user_flips') || '{}');
 
+    // Admin Custom Payout List
+    let customPayoutNotifs = JSON.parse(localStorage.getItem('earnplanet_payout_notifs') || '[{"name":"Adeb***45","amt":"₦180,000 ($120.00)","dest":"Access Bank"},{"name":"Kehinde4","amt":"₦225,000 ($150.00)","dest":"UBA"},{"name":"Chidi_O","amt":"₦300,000 ($200.00)","dest":"TRC20 Wallet"},{"name":"Blessing99","amt":"₦180,000 ($120.00)","dest":"OPay"},{"name":"Tunde_X","amt":"₦375,000 ($250.00)","dest":"GTBank"},{"name":"Musa_B","amt":"₦180,000 ($120.00)","dest":"Kuda Bank"},{"name":"Funmi_P","amt":"₦225,000 ($150.00)","dest":"Zenith Bank"},{"name":"Emeka_33","amt":"₦300,000 ($200.00)","dest":"Moniepoint"}]');
+
     function saveState() {
       localStorage.setItem('earnplanet_users', JSON.stringify(usersDb));
+      localStorage.setItem('earnplanet_manual_users', manualUserCount.toString());
       localStorage.setItem('earnplanet_pending_payments', JSON.stringify(pendingPaymentProofs));
       localStorage.setItem('earnplanet_faqs', JSON.stringify(chatbotFaqs));
       localStorage.setItem('earnplanet_products', JSON.stringify(storeProducts));
       localStorage.setItem('earnplanet_user_flips', JSON.stringify(activeUserFlips));
+      localStorage.setItem('earnplanet_payout_notifs', JSON.stringify(customPayoutNotifs));
+
       if (currentUser) {
         localStorage.setItem('earnplanet_session', currentUser.email);
       } else {
@@ -642,6 +675,7 @@
       };
 
       usersDb.push(newUser);
+      manualUserCount++; // Increment active count automatically
       saveState();
       alert("Registration successful! Please login.");
       switchAuthView('login');
@@ -666,6 +700,7 @@
       saveState();
       document.getElementById('mainAppContainer').style.display = 'none';
       document.getElementById('authContainer').style.display = 'block';
+      document.getElementById('payoutNotification').classList.remove('show');
     }
 
     function handlePasswordReset() {
@@ -687,6 +722,8 @@
       document.getElementById('walletBalanceNgn').innerText = `₦${ngnBal.toLocaleString('en-NG', {minimumFractionDigits: 2})}`;
       document.getElementById('walletBalanceUsd').innerText = `≈ $${usdBal.toFixed(2)} USD`;
 
+      document.getElementById('activeUsersDisplay').innerText = manualUserCount.toLocaleString();
+
       const requiredForNext = currentUser.withdrawalsCount === 0 ? 7 : 5;
       document.getElementById('refCountDisplay').innerText = `${currentUser.activeReferrals} / ${requiredForNext}`;
       document.getElementById('refRequirementText').innerText = `${requiredForNext} required for ${currentUser.withdrawalsCount === 0 ? '1st' : 'Next'} Cashout`;
@@ -703,6 +740,7 @@
       renderUserStoreProducts();
       renderUserActiveFlips();
       renderAdminProductsList();
+      renderAdminPayoutNotifList();
       renderPendingApprovals();
       renderAdminFaqs();
     }
@@ -722,10 +760,12 @@
       document.getElementById('settingsTab').style.display = tab === 'settings' ? 'block' : 'none';
       document.getElementById('adminTab').style.display = tab === 'admin' ? 'block' : 'none';
 
-      if (tab === 'user') document.querySelectorAll('.tab-btn')[0].classList.add('active');
-      if (tab === 'store') document.querySelectorAll('.tab-btn')[1].classList.add('active');
-      if (tab === 'support') document.querySelectorAll('.tab-btn')[2].classList.add('active');
-      if (tab === 'settings') document.querySelectorAll('.tab-btn')[3].classList.add('active');
+      const btns = document.querySelectorAll('.tab-btn');
+      if (tab === 'user' && btns[0]) btns[0].classList.add('active');
+      if (tab === 'store' && btns[1]) btns[1].classList.add('active');
+      if (tab === 'support' && btns[2]) btns[2].classList.add('active');
+      if (tab === 'settings' && btns[3]) btns[3].classList.add('active');
+      if (tab === 'admin' && btns[4]) btns[4].classList.add('active');
     }
 
     // Chatbot Engine
@@ -835,12 +875,12 @@
       if (targetUser) {
         targetUser.tier = item.planName;
         targetUser.taskRewardUsd = item.rewardUsd;
-        targetUser.balanceUsd += item.bonusUsd; // 40% cashback
+        targetUser.balanceUsd += item.bonusUsd;
 
         if (targetUser.referredBy) {
           const referrer = usersDb.find(u => u.refCode === targetUser.referredBy);
           if (referrer) {
-            let refCommission = item.amountUsd * 0.10; // 10% referral bonus
+            let refCommission = item.amountUsd * 0.10;
             referrer.balanceUsd += refCommission;
             referrer.activeReferrals += 1;
           }
@@ -853,7 +893,7 @@
       alert("Payment approved! 40% cashback credited to user and 10% awarded to referrer.");
     }
 
-    // E-COMMERCE STORE & FLIP LOGIC (Mon, Wed, Fri, Sat rules + 8-Day Lockup)
+    // E-Commerce Store & Flip Logic
     function renderUserStoreProducts() {
       const container = document.getElementById('userStoreProductsGrid');
       if (storeProducts.length === 0) {
@@ -862,7 +902,7 @@
       }
 
       container.innerHTML = storeProducts.map(p => {
-        let returnUsd = p.priceUsd * 1.20; // 20% return
+        let returnUsd = p.priceUsd * 1.20;
         let returnNgn = returnUsd * NGN_RATE;
         let priceNgn = p.priceUsd * NGN_RATE;
 
@@ -881,15 +921,13 @@
     function purchaseStoreProduct(prodId) {
       if (!currentUser) return;
 
-      // Rule Check 1: Day of Week Check (0=Sun, 1=Mon, 2=Tue, 3=Wed, 4=Thu, 5=Fri, 6=Sat)
       const day = new Date().getDay();
-      const validDays = [1, 3, 5, 6]; // Monday, Wednesday, Friday, Saturday
+      const validDays = [1, 3, 5, 6];
       if (!validDays.includes(day)) {
         alert("Store Purchases are strictly open on Monday, Wednesday, Friday, and Saturday only!");
         return;
       }
 
-      // Rule Check 2: Once a Day Purchase Limit
       const todayStr = new Date().toDateString();
       if (currentUser.lastFlipDate === todayStr) {
         alert("Purchase Limit Reached! You can only buy 1 product per day.");
@@ -904,13 +942,12 @@
         return;
       }
 
-      // Execute Flip Purchase
       currentUser.balanceUsd -= prod.priceUsd;
       currentUser.lastFlipDate = todayStr;
 
       let flipsList = activeUserFlips[currentUser.email] || [];
       const unlockDate = new Date();
-      unlockDate.setDate(unlockDate.getDate() + 8); // 8-Day Lockup Cycle
+      unlockDate.setDate(unlockDate.getDate() + 8);
 
       flipsList.push({
         id: Date.now(),
@@ -962,14 +999,58 @@
       if (!item || item.claimed) return;
 
       item.claimed = true;
-      currentUser.balanceUsd += item.returnUsd; // Credit profit + principal
+      currentUser.balanceUsd += item.returnUsd;
 
       saveState();
       updateUI();
       alert(`Profit Claimed!\n\n$${item.returnUsd.toFixed(2)} (₦${(item.returnUsd * NGN_RATE).toLocaleString()}) credited to your main wallet balance!`);
     }
 
-    // Admin Products Management (Add / Edit)
+    // ADMIN: Active Users Counter Manual Override
+    function saveManualUserCount() {
+      const val = parseInt(document.getElementById('manualUserCountInput').value);
+      if (!val || val < 1) return;
+      manualUserCount = val;
+      saveState();
+      updateUI();
+      alert("Active user count updated successfully.");
+      document.getElementById('manualUserCountInput').value = '';
+    }
+
+    // ADMIN: Custom Payout Notifications Manager
+    function renderAdminPayoutNotifList() {
+      const container = document.getElementById('adminPayoutNotifList');
+      container.innerHTML = customPayoutNotifs.map((item, index) => `
+        <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center;">
+          <div><b>${item.name}</b> - ${item.amt} to ${item.dest}</div>
+          <button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="deleteCustomPayoutNotif(${index})">Delete</button>
+        </div>
+      `).join('');
+    }
+
+    function addCustomPayoutNotif() {
+      const name = document.getElementById('newNotifName').value.trim();
+      const amt = document.getElementById('newNotifAmt').value.trim();
+      const dest = document.getElementById('newNotifDest').value.trim();
+
+      if (!name || !amt || !dest) { alert("Fill all notification fields!"); return; }
+
+      customPayoutNotifs.push({ name, amt, dest });
+      saveState();
+      document.getElementById('newNotifName').value = '';
+      document.getElementById('newNotifAmt').value = '';
+      document.getElementById('newNotifDest').value = '';
+      renderAdminPayoutNotifList();
+      alert("Cashout notification added to queue.");
+    }
+
+    function deleteCustomPayoutNotif(index) {
+      customPayoutNotifs.splice(index, 1);
+      saveState();
+      renderAdminPayoutNotifList();
+    }
+
+    // Admin Products Management
     function renderAdminProductsList() {
       const container = document.getElementById('adminProductsList');
       container.innerHTML = storeProducts.map(p => `
@@ -1075,21 +1156,29 @@
       renderAdminFaqs();
     }
 
-    // Admin Auth
+    // Secret Admin Auth (Femifresh43221)
     function openAdminAuthModal() { document.getElementById('adminAuthModal').style.display = 'flex'; }
     function closeAdminAuthModal() { document.getElementById('adminAuthModal').style.display = 'none'; }
     function loginAdmin() {
       const u = document.getElementById('adminUsername').value;
       const p = document.getElementById('adminPassword').value;
-      if (u === "Admin" && p === "Femifresh43211") {
+      
+      if (u === "Admin" && p === "Femifresh43221") {
         isAdminAuthenticated = true;
         closeAdminAuthModal();
+        
+        // Dynamically add secret Management button to header if not already present
+        if (!document.getElementById('adminTabBtn')) {
+          const container = document.getElementById('navTabsContainer');
+          container.innerHTML += `<button class="tab-btn" id="adminTabBtn" onclick="switchTab('admin')">⚙️ Management</button>`;
+        }
+        
         switchTab('admin');
         alert("Management access granted.");
       } else { alert("Invalid credentials."); }
     }
 
-    // Driving Game
+    // Driving Game Engine
     let gameInterval = null, carX = 150, progress = 0, trafficCars = [];
     function openDrivingGameModal() {
       if ((currentUser.taskRewardUsd || 0) === 0) { alert("Select a plan first!"); return; }
@@ -1139,30 +1228,7 @@
       }, 100);
     }
 
-    // Direct Link Task
-    let directLinkVerified = false;
-    function handleDirectLinkTask(url) {
-      if (directLinkVerified) { alert("Sponsor offer already claimed today!"); return; }
-      const btn = document.getElementById('directLinkBtn');
-      btn.innerText = "Verifying Offer (15s)...";
-      window.open(url, '_blank');
-      let seconds = 15;
-      const timer = setInterval(() => {
-        seconds--;
-        if (seconds > 0) btn.innerText = `Verifying (${seconds}s)...`;
-        else {
-          clearInterval(timer);
-          currentUser.balanceUsd += 0.20;
-          directLinkVerified = true;
-          saveState();
-          updateUI();
-          btn.innerText = "Claimed ✓";
-          alert("Sponsor visit verified! $0.20 (₦300) credited.");
-        }
-      }, 1000);
-    }
-
-    // Withdrawal View Toggle
+    // Withdrawal View Toggle & Execution
     function toggleWithdrawDestinationView() {
       const type = document.getElementById('wdDestinationType').value;
       if (type === 'bank') {
@@ -1267,36 +1333,38 @@
       document.getElementById('settingsNewPin').value = '';
     }
 
-    // Dynamic Non-Repeating Live Cashout Notification
-    const namesPool = ["Adeb***45", "Kehinde4", "Chidi_O", "Blessing99", "Tunde_X", "Musa_B", "Funmi_P", "Emeka_33", "NaijaFlexer", "KoboKing99", "Zainab_01", "Solomon_V", "Dapo_R", "Chisom_M", "Femi_K"];
-    const banksPool = ["Access Bank", "UBA", "OPay", "Kuda Bank", "Zenith Bank", "GTBank", "Moniepoint", "TRC20 Wallet"];
-    const amountsPool = ["₦180,000 ($120.00)", "₦225,000 ($150.00)", "₦300,000 ($200.00)", "₦375,000 ($250.00)"];
+    // SEQUENTIAL NON-REPEATING TOP PAYOUT NOTIFICATIONS ENGINE
+    let currentPayoutIndex = 0;
 
-    let lastUsedIndex = -1;
+    function triggerSequentialPayoutNotif() {
+      // ONLY show for logged-in users
+      if (!currentUser) {
+        document.getElementById('payoutNotification').classList.remove('show');
+        return;
+      }
 
-    function triggerLiveNotification() {
+      if (customPayoutNotifs.length === 0) return;
+
+      // Loop sequentially from top to bottom
+      if (currentPayoutIndex >= customPayoutNotifs.length) {
+        currentPayoutIndex = 0; // Restart loop from index 0
+      }
+
+      const item = customPayoutNotifs[currentPayoutIndex];
       const notifEl = document.getElementById('payoutNotification');
       const textEl = document.getElementById('payoutNotifText');
 
-      let idx;
-      do {
-        idx = Math.floor(Math.random() * namesPool.length);
-      } while (idx === lastUsedIndex);
-      lastUsedIndex = idx;
-
-      const name = namesPool[idx];
-      const bank = banksPool[Math.floor(Math.random() * banksPool.length)];
-      const amt = amountsPool[Math.floor(Math.random() * amountsPool.length)];
-
-      textEl.innerHTML = `User <b>${name}</b> withdrew <b>${amt}</b> to ${bank}`;
+      textEl.innerHTML = `User <b>${item.name}</b> withdrew <b>${item.amt}</b> to ${item.dest}`;
       notifEl.classList.add('show');
+
+      currentPayoutIndex++; // Move to next item in list for next cycle
 
       setTimeout(() => {
         notifEl.classList.remove('show');
       }, 3500);
     }
 
-    setInterval(triggerLiveNotification, 6000);
+    setInterval(triggerSequentialPayoutNotif, 7000); // Pops up every 7 seconds sequentially
 
     if (currentUser) updateUI();
   </script>
