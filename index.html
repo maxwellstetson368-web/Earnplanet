@@ -279,16 +279,15 @@
       <!-- USER DASHBOARD TAB -->
       <div id="userTab">
         
-        <!-- Dual Currency Wallet Card -->
+        <!-- Main Wallet Card -->
         <div class="wallet-card">
           <div class="wallet-info">
-            <h3>Available Wallet Balance</h3>
+            <h3>Main Available Balance</h3>
             <div class="balance-ngn" id="walletBalanceNgn">₦0.00</div>
             <div class="balance-usd" id="walletBalanceUsd">≈ $0.00 USD</div>
           </div>
           <div class="wallet-actions">
             <button class="btn btn-secondary" onclick="openWithdrawModal()">Cashout</button>
-            <button class="btn" style="background:var(--gold); color:#04100a;" onclick="openDepositModal()">+ Deposit</button>
           </div>
         </div>
 
@@ -394,19 +393,29 @@
 
       </div>
 
-      <!-- RESELL FLIP STORE TAB -->
+      <!-- RESELL FLIP STORE TAB (WITH TWO-WAY TRANSFERS & DEPOSIT) -->
       <div id="storeTab" style="display:none;">
-        <div class="section-title" style="display:flex; justify-content:space-between; align-items:center;">
-          <span>🛍️ Merchandise Flip Store</span>
-          <button class="btn" style="padding:6px 14px; font-size:12px; background:var(--gold); color:#04100a;" onclick="openDepositModal()">+ Deposit Funds</button>
-        </div>
+        <div class="section-title">🛍️ Merchandise Flip Store</div>
         
+        <!-- Flip Store Dedicated Wallet Dashboard -->
+        <div class="wallet-card" style="border-color:var(--gold); margin-bottom:20px;">
+          <div class="wallet-info">
+            <h3 style="color:var(--gold);">Flip Store Balance</h3>
+            <div class="balance-ngn" id="storeBalanceNgn">₦0.00</div>
+            <div class="balance-usd" id="storeBalanceUsd">≈ $0.00 USD</div>
+          </div>
+          <div class="wallet-actions" style="gap:8px;">
+            <button class="btn" style="background:var(--gold); color:#04100a; font-size:12px; padding:8px 12px;" onclick="openDepositModal()">+ Deposit</button>
+            <button class="btn btn-secondary" style="font-size:12px; padding:8px 12px;" onclick="openAddFromMainModal()">+ Add From Main</button>
+            <button class="btn btn-secondary" style="font-size:12px; padding:8px 12px;" onclick="openTransferModal()">Withdraw to Main (5%)</button>
+          </div>
+        </div>
+
         <div class="payment-instruction-box">
           <b>HOW THE RESELL FLIP STORE WORKS:</b><br>
-          1. Need capital to flip? Use the <b>+ Deposit</b> button to fund your balance via Apple Gift Card or USDT.<br>
-          2. Purchase merchandise slots using your merged wallet balance.<br>
-          3. Items enter an <b>8-Day Resell Lock Cycle</b> generating <b>+20% Guaranteed Profit</b>.<br>
-          4. <b>Schedule Rules:</b> Purchases permitted <b>Once a Day</b> on <b>Mon, Wed, Fri & Sat</b>.
+          1. <b>Funding Flips:</b> Transfer funds directly from your <b>Main Balance</b> (Free) or use <b>+ Deposit</b> if you need extra capital to flip higher items.<br>
+          2. <b>20% Returns:</b> Items stay in an <b>8-Day Lock Cycle</b> generating <b>+20% Guaranteed Return</b>.<br>
+          3. <b>Withdrawing Back:</b> Transfer matured earnings back to your Main Dashboard balance at a <b>5% Charge</b> to cash out to your bank account!
         </div>
 
         <div class="products-grid" id="userStoreProductsGrid"></div>
@@ -546,11 +555,11 @@
     </div>
   </div>
 
-  <!-- DEPOSIT MODAL (TOP UP BALANCE FOR STORE / WALLET) -->
+  <!-- DEPOSIT MODAL (FOR USERS REQUIRING EXTRA CAPITAL) -->
   <div class="modal-overlay" id="depositModal">
     <div class="modal">
-      <h3>Deposit / Top Up Wallet</h3>
-      <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Fund your wallet balance via Apple Giftcard or USDT to purchase Resell Flip Store products.</p>
+      <h3>Deposit to Buy Higher Products to Resell</h3>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Need extra money to purchase higher items? Top up your Flip Store balance directly.</p>
       
       <label>Enter Deposit Amount in USD ($)</label>
       <input type="number" id="depositAmountUsd" placeholder="e.g. 20 (Min $10)" oninput="updateDepositPayableText()">
@@ -587,6 +596,44 @@
 
       <button class="btn" style="width:100%; margin-top:5px;" onclick="submitDepositProof()">Submit Deposit Verification</button>
       <button class="btn btn-secondary" style="width:100%; margin-top:10px;" onclick="closeDepositModal()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ADD FROM MAIN BALANCE MODAL (FREE TRANSFER) -->
+  <div class="modal-overlay" id="addFromMainModal">
+    <div class="modal">
+      <h3>Add Money From Main Balance</h3>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Move funds from your Main Dashboard Balance to your Flip Store Balance instantly with <b>0% Fee</b>.</p>
+
+      <div class="payment-account-card">
+        <span style="font-size:11px; color:var(--text-muted);">Available Main Dashboard Balance:</span><br>
+        <b style="font-size:18px; color:var(--primary);" id="mainAvailableForStoreDisplay">$0.00 USD</b>
+      </div>
+
+      <label>Enter Amount to Transfer to Flip Store ($)</label>
+      <input type="number" id="addFromMainAmountUsd" placeholder="e.g. 20">
+
+      <button class="btn" style="width:100%; margin-top:5px;" onclick="submitAddFromMain()">Transfer to Flip Store (0% Fee)</button>
+      <button class="btn btn-secondary" style="width:100%; margin-top:10px;" onclick="closeAddFromMainModal()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- WITHDRAW TO MAIN BALANCE MODAL (FLIP STORE TO MAIN AT 5% FEE) -->
+  <div class="modal-overlay" id="transferModal">
+    <div class="modal">
+      <h3>Withdraw Earnings to Main Dashboard</h3>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Move profits earned from flipping merchandise back to your Main Dashboard for cashout. <b>5% Service Charge Applies</b>.</p>
+
+      <div class="payment-account-card">
+        <span style="font-size:11px; color:var(--text-muted);">Available Flip Store Balance:</span><br>
+        <b style="font-size:18px; color:var(--gold);" id="transferAvailableDisplay">$0.00 USD</b>
+      </div>
+
+      <label>Enter Transfer Amount in USD ($)</label>
+      <input type="number" id="transferAmountUsd" placeholder="e.g. 50">
+
+      <button class="btn" style="width:100%; margin-top:5px;" onclick="submitInternalTransfer()">Withdraw to Main (5% Fee)</button>
+      <button class="btn btn-secondary" style="width:100%; margin-top:10px;" onclick="closeTransferModal()">Cancel</button>
     </div>
   </div>
 
@@ -680,14 +727,13 @@
     let lastAutoIncrementTime = parseInt(localStorage.getItem('earnplanet_last_autouser_time') || Date.now().toString());
 
     let pendingPaymentProofs = JSON.parse(localStorage.getItem('earnplanet_pending_payments') || '[]');
-    let chatbotFaqs = JSON.parse(localStorage.getItem('earnplanet_faqs') || '[{"id":1,"keywords":"cashout withdraw fee threshold","answer":"1st withdrawal: ₦180k ($120) & 7 referrals. 2nd withdrawal: ₦135k ($90) & 15 refs. 3rd: 25 refs. 4th+: 30 refs."},{"id":2,"keywords":"store flip resell product deposit","answer":"Top up wallet via + Deposit. Buy merchandise on Mon, Wed, Fri, Sat to earn +20% profit in 8 days."}]');
+    let chatbotFaqs = JSON.parse(localStorage.getItem('earnplanet_faqs') || '[{"id":1,"keywords":"cashout withdraw fee threshold","answer":"1st withdrawal: ₦180k ($120) & 7 referrals. 2nd withdrawal: ₦135k ($90) & 15 refs. 3rd: 25 refs. 4th+: 30 refs."},{"id":2,"keywords":"store flip resell product deposit","answer":"Add money from main balance or deposit. Buy merchandise on Mon, Wed, Fri, Sat to earn +20% profit in 8 days. Withdraw back to main at 5% charge."}]');
     let storeProducts = JSON.parse(localStorage.getItem('earnplanet_products') || '[{"id":1,"title":"Luxury Leather Tote Bag","priceUsd":20,"img":"https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=400&q=80"},{"id":2,"title":"Designer Chronograph Watch","priceUsd":35,"img":"https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=400&q=80"}]');
     let activeUserFlips = JSON.parse(localStorage.getItem('earnplanet_user_flips') || '{}');
 
     // Admin Custom Payout List
     let customPayoutNotifs = JSON.parse(localStorage.getItem('earnplanet_payout_notifs') || '[{"name":"Adeb***45","amt":"₦180,000 ($120.00)","dest":"Access Bank"},{"name":"Kehinde4","amt":"₦225,000 ($150.00)","dest":"UBA"},{"name":"Chidi_O","amt":"₦300,000 ($200.00)","dest":"TRC20 Wallet"},{"name":"Blessing99","amt":"₦180,000 ($120.00)","dest":"OPay"},{"name":"Tunde_X","amt":"₦375,000 ($250.00)","dest":"GTBank"},{"name":"Musa_B","amt":"₦180,000 ($120.00)","dest":"Kuda Bank"},{"name":"Funmi_P","amt":"₦225,000 ($150.00)","dest":"Zenith Bank"},{"name":"Emeka_33","amt":"₦300,000 ($200.00)","dest":"Moniepoint"}]');
 
-    // AUTO-INCREMENT ACTIVE PLATFORM USERS (+15 every 8 hours)
     function checkAutoIncrementActiveUsers() {
       const eightHoursMs = 8 * 60 * 60 * 1000;
       const now = Date.now();
@@ -756,7 +802,8 @@
       const newUser = {
         email, password, pin, refCode: refId,
         referredBy: refCode || null,
-        balanceUsd: 0.00,
+        balanceUsd: 0.00,       // Main Dashboard Balance
+        storeBalanceUsd: 0.00,  // Flip Store Dedicated Balance
         tier: "None",
         taskRewardUsd: 0.00,
         activeReferrals: 0,
@@ -766,7 +813,7 @@
       };
 
       usersDb.push(newUser);
-      manualUserCount++; // Automatically increment active user count
+      manualUserCount++;
       saveState();
       alert("Registration successful! Welcome Planetian! Please login.");
       switchAuthView('login');
@@ -816,11 +863,17 @@
       if (!currentUser) return;
       checkAutoIncrementActiveUsers();
 
+      // Main Dashboard Balance
       const usdBal = currentUser.balanceUsd || 0;
       const ngnBal = usdBal * NGN_RATE;
-
       document.getElementById('walletBalanceNgn').innerText = `₦${ngnBal.toLocaleString('en-NG', {minimumFractionDigits: 2})}`;
       document.getElementById('walletBalanceUsd').innerText = `≈ $${usdBal.toFixed(2)} USD`;
+
+      // Flip Store Dedicated Balance
+      const storeUsd = currentUser.storeBalanceUsd || 0;
+      const storeNgn = storeUsd * NGN_RATE;
+      document.getElementById('storeBalanceNgn').innerText = `₦${storeNgn.toLocaleString('en-NG', {minimumFractionDigits: 2})}`;
+      document.getElementById('storeBalanceUsd').innerText = `≈ $${storeUsd.toFixed(2)} USD`;
 
       document.getElementById('activeUsersDisplay').innerText = manualUserCount.toLocaleString();
 
@@ -988,7 +1041,7 @@
 
       pendingPaymentProofs.push({
         id: Date.now(),
-        type: 'Deposit',
+        type: 'StoreDeposit',
         userEmail: currentUser.email,
         method: method === 'giftcard' ? 'Apple Giftcard' : 'USDT Crypto',
         code,
@@ -1001,8 +1054,73 @@
       document.getElementById('depositAmountUsd').value = '';
       document.getElementById('depositCodeInput').value = '';
       if(fileInput) fileInput.value = '';
-      alert(`Deposit request of $${amtUsd.toFixed(2)} submitted successfully! Funds will credit your wallet upon admin verification.`);
+      alert(`Deposit request of $${amtUsd.toFixed(2)} submitted successfully! Funds will credit your Flip Store Balance upon admin verification.`);
       updateUI();
+    }
+
+    // Modal Controls for Adding Money from Main to Flip Store (0% Fee)
+    function openAddFromMainModal() {
+      const mainUsd = currentUser.balanceUsd || 0;
+      document.getElementById('mainAvailableForStoreDisplay').innerText = `$${mainUsd.toFixed(2)} USD (₦${(mainUsd * NGN_RATE).toLocaleString()})`;
+      document.getElementById('addFromMainModal').style.display = 'flex';
+    }
+
+    function closeAddFromMainModal() {
+      document.getElementById('addFromMainModal').style.display = 'none';
+    }
+
+    function submitAddFromMain() {
+      const amt = parseFloat(document.getElementById('addFromMainAmountUsd').value);
+
+      if (!amt || amt <= 0) { alert("Please enter a valid transfer amount!"); return; }
+
+      if (amt > (currentUser.balanceUsd || 0)) {
+        alert("Insufficient Main Dashboard balance!");
+        return;
+      }
+
+      currentUser.balanceUsd -= amt;
+      currentUser.storeBalanceUsd = (currentUser.storeBalanceUsd || 0) + amt;
+
+      saveState();
+      updateUI();
+      closeAddFromMainModal();
+
+      document.getElementById('addFromMainAmountUsd').value = '';
+      alert(`Transfer Successful!\n\n$${amt.toFixed(2)} transferred from Main Dashboard to Flip Store Balance with 0% Fee!`);
+    }
+
+    // Modal Controls for Withdrawing Flip Store Earnings to Main Balance (5% Fee)
+    function openTransferModal() {
+      const storeUsd = currentUser.storeBalanceUsd || 0;
+      document.getElementById('transferAvailableDisplay').innerText = `$${storeUsd.toFixed(2)} USD (₦${(storeUsd * NGN_RATE).toLocaleString()})`;
+      document.getElementById('transferModal').style.display = 'flex';
+    }
+
+    function closeTransferModal() { document.getElementById('transferModal').style.display = 'none'; }
+
+    function submitInternalTransfer() {
+      const transferAmt = parseFloat(document.getElementById('transferAmountUsd').value);
+
+      if (!transferAmt || transferAmt <= 0) { alert("Please enter a valid transfer amount!"); return; }
+
+      if (transferAmt > (currentUser.storeBalanceUsd || 0)) {
+        alert("Insufficient Flip Store balance!");
+        return;
+      }
+
+      let feeUsd = transferAmt * 0.05; // 5% fee
+      let creditedUsd = transferAmt - feeUsd;
+
+      currentUser.storeBalanceUsd -= transferAmt;
+      currentUser.balanceUsd += creditedUsd; // Add net amount to Main Balance
+
+      saveState();
+      updateUI();
+      closeTransferModal();
+
+      document.getElementById('transferAmountUsd').value = '';
+      alert(`Transfer Successful!\n\n$${transferAmt.toFixed(2)} transferred from Flip Store. 5% fee ($${feeUsd.toFixed(2)}) deducted. $${creditedUsd.toFixed(2)} credited to Main Dashboard Balance!`);
     }
 
     // Admin Payment & Deposit Approvals
@@ -1013,7 +1131,7 @@
       container.innerHTML = pendingPaymentProofs.map(item => `
         <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center;">
           <div>
-            <b>${item.type === 'Deposit' ? 'Wallet Deposit' : item.planName + ' Subscription'} ($${item.amountUsd}) [${item.method}]</b><br>
+            <b>${item.type === 'StoreDeposit' ? 'Flip Store Deposit' : item.planName + ' Subscription'} ($${item.amountUsd}) [${item.method}]</b><br>
             <span style="font-size:12px;">User: ${item.userEmail} | Code/TxID: <b style="color:var(--gold);">${item.code}</b></span><br>
             <span style="font-size:11px; color:var(--text-muted);">Proof File: ${item.proofFileName || 'None'}</span>
           </div>
@@ -1028,12 +1146,12 @@
       const targetUser = usersDb.find(u => u.email === item.userEmail);
       
       if (targetUser) {
-        if (item.type === 'Deposit') {
-          targetUser.balanceUsd += item.amountUsd; // Direct top-up credit
+        if (item.type === 'StoreDeposit') {
+          targetUser.storeBalanceUsd = (targetUser.storeBalanceUsd || 0) + item.amountUsd; // Credit Flip Store Balance
         } else {
           targetUser.tier = item.planName;
           targetUser.taskRewardUsd = item.rewardUsd;
-          targetUser.balanceUsd += item.bonusUsd; // Plan cashback
+          targetUser.balanceUsd += item.bonusUsd;
 
           if (targetUser.referredBy) {
             const referrer = usersDb.find(u => u.refCode === targetUser.referredBy);
@@ -1049,7 +1167,7 @@
       pendingPaymentProofs = pendingPaymentProofs.filter(p => p.id !== id);
       saveState();
       updateUI();
-      alert(`Approval successful! ${item.type === 'Deposit' ? '$' + item.amountUsd + ' credited to user balance.' : 'Plan activated & cashback awarded.'}`);
+      alert(`Approval successful! ${item.type === 'StoreDeposit' ? '$' + item.amountUsd + ' credited to user Flip Store Balance.' : 'Plan activated & cashback awarded.'}`);
     }
 
     // E-Commerce Store & Flip Logic
@@ -1096,12 +1214,14 @@
       const prod = storeProducts.find(p => p.id === prodId);
       if (!prod) return;
 
-      if (currentUser.balanceUsd < prod.priceUsd) {
-        alert(`Insufficient balance! You need $${prod.priceUsd}.00 (₦${(prod.priceUsd * NGN_RATE).toLocaleString()}) in your wallet balance. Tap "+ Deposit" to top up!`);
+      const availableStoreBal = currentUser.storeBalanceUsd || 0;
+
+      if (availableStoreBal < prod.priceUsd) {
+        alert(`Insufficient Flip Store balance! You need $${prod.priceUsd}.00 (₦${(prod.priceUsd * NGN_RATE).toLocaleString()}) in your Flip Store balance. Use "+ Add From Main" or "+ Deposit" to add funds!`);
         return;
       }
 
-      currentUser.balanceUsd -= prod.priceUsd;
+      currentUser.storeBalanceUsd -= prod.priceUsd;
       currentUser.lastFlipDate = todayStr;
 
       let flipsList = activeUserFlips[currentUser.email] || [];
@@ -1158,14 +1278,14 @@
       if (!item || item.claimed) return;
 
       item.claimed = true;
-      currentUser.balanceUsd += item.returnUsd;
+      currentUser.storeBalanceUsd = (currentUser.storeBalanceUsd || 0) + item.returnUsd;
 
       saveState();
       updateUI();
-      alert(`Profit Claimed!\n\n$${item.returnUsd.toFixed(2)} (₦${(item.returnUsd * NGN_RATE).toLocaleString()}) credited to your main wallet balance!`);
+      alert(`Profit Claimed!\n\n$${item.returnUsd.toFixed(2)} (₦${(item.returnUsd * NGN_RATE).toLocaleString()}) credited to your Flip Store Balance! Use "Withdraw to Main" to move it for cashout.`);
     }
 
-    // ADMIN: Active Users Counter Manual Override (Preserves Existing Count)
+    // ADMIN: Active Users Counter Manual Override
     function saveManualUserCount() {
       const val = parseInt(document.getElementById('manualUserCountInput').value);
       if (!val || val < 1) return;
