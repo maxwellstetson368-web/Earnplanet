@@ -361,7 +361,7 @@
           <button class="btn" onclick="openDrivingGameModal()">Start Drive</button>
         </div>
 
-        <!-- Resell Store Direct Button (Replaced Sponsorship) -->
+        <!-- Resell Store Direct Button -->
         <div class="task-card" style="border-color: var(--gold);">
           <div class="task-info">
             <h4>🛍️ Resell Flip Store (+20% Profit)</h4>
@@ -675,7 +675,7 @@
       };
 
       usersDb.push(newUser);
-      manualUserCount++; // Increment active count automatically
+      manualUserCount++;
       saveState();
       alert("Registration successful! Please login.");
       switchAuthView('login');
@@ -1156,26 +1156,33 @@
       renderAdminFaqs();
     }
 
-    // Secret Admin Auth (Femifresh43221)
+    // Secret Admin Auth (Fixed & Fully Integrated)
     function openAdminAuthModal() { document.getElementById('adminAuthModal').style.display = 'flex'; }
     function closeAdminAuthModal() { document.getElementById('adminAuthModal').style.display = 'none'; }
+    
     function loginAdmin() {
-      const u = document.getElementById('adminUsername').value;
-      const p = document.getElementById('adminPassword').value;
+      const u = document.getElementById('adminUsername').value.trim();
+      const p = document.getElementById('adminPassword').value.trim();
       
       if (u === "Admin" && p === "Femifresh43221") {
         isAdminAuthenticated = true;
         closeAdminAuthModal();
         
+        // Ensure main app container displays properly & hides authentication screen
+        document.getElementById('authContainer').style.display = 'none';
+        document.getElementById('mainAppContainer').style.display = 'block';
+
         // Dynamically add secret Management button to header if not already present
-        if (!document.getElementById('adminTabBtn')) {
-          const container = document.getElementById('navTabsContainer');
+        const container = document.getElementById('navTabsContainer');
+        if (container && !document.getElementById('adminTabBtn')) {
           container.innerHTML += `<button class="tab-btn" id="adminTabBtn" onclick="switchTab('admin')">⚙️ Management</button>`;
         }
         
         switchTab('admin');
         alert("Management access granted.");
-      } else { alert("Invalid credentials."); }
+      } else { 
+        alert("Invalid credentials. Please check capitalization."); 
+      }
     }
 
     // Driving Game Engine
@@ -1337,7 +1344,6 @@
     let currentPayoutIndex = 0;
 
     function triggerSequentialPayoutNotif() {
-      // ONLY show for logged-in users
       if (!currentUser) {
         document.getElementById('payoutNotification').classList.remove('show');
         return;
@@ -1345,9 +1351,8 @@
 
       if (customPayoutNotifs.length === 0) return;
 
-      // Loop sequentially from top to bottom
       if (currentPayoutIndex >= customPayoutNotifs.length) {
-        currentPayoutIndex = 0; // Restart loop from index 0
+        currentPayoutIndex = 0;
       }
 
       const item = customPayoutNotifs[currentPayoutIndex];
@@ -1357,14 +1362,14 @@
       textEl.innerHTML = `User <b>${item.name}</b> withdrew <b>${item.amt}</b> to ${item.dest}`;
       notifEl.classList.add('show');
 
-      currentPayoutIndex++; // Move to next item in list for next cycle
+      currentPayoutIndex++;
 
       setTimeout(() => {
         notifEl.classList.remove('show');
       }, 3500);
     }
 
-    setInterval(triggerSequentialPayoutNotif, 7000); // Pops up every 7 seconds sequentially
+    setInterval(triggerSequentialPayoutNotif, 7000);
 
     if (currentUser) updateUI();
   </script>
