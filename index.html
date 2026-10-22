@@ -50,6 +50,21 @@
 
     .container { max-width: 850px; margin: 20px auto; padding: 0 15px; }
 
+    /* Planetians Banner */
+    .planetians-welcome {
+      background: linear-gradient(90deg, #16422b, #0d281a);
+      border: 1px solid var(--primary);
+      border-radius: 12px;
+      padding: 12px 20px;
+      margin-bottom: 15px;
+      font-size: 18px;
+      font-weight: 900;
+      color: var(--primary);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
     /* Tabs Header */
     .tabs-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--card-border); padding-bottom: 10px; flex-wrap: wrap; gap: 10px; }
     .tab-btn { background: var(--card-bg); color: var(--text-muted); border: 1px solid var(--card-border); padding: 10px 16px; font-size: 13px; font-weight: 700; cursor: pointer; border-radius: 8px; }
@@ -246,7 +261,12 @@
 
     <div class="container">
       
-      <!-- Public User Tabs (Admin Panel Removed From Header) -->
+      <!-- PERMANENT PLANETIANS WELCOME BANNER -->
+      <div class="planetians-welcome">
+        🪐 Welcome Planetians
+      </div>
+
+      <!-- Public User Tabs -->
       <div class="tabs-header">
         <div style="display:flex; gap:10px; flex-wrap:wrap;" id="navTabsContainer">
           <button class="tab-btn active" onclick="switchTab('user')">Dashboard</button>
@@ -268,6 +288,7 @@
           </div>
           <div class="wallet-actions">
             <button class="btn btn-secondary" onclick="openWithdrawModal()">Cashout</button>
+            <button class="btn" style="background:var(--gold); color:#04100a;" onclick="openDepositModal()">+ Deposit</button>
           </div>
         </div>
 
@@ -375,13 +396,17 @@
 
       <!-- RESELL FLIP STORE TAB -->
       <div id="storeTab" style="display:none;">
-        <div class="section-title">🛍️ Merchandise Flip Store</div>
+        <div class="section-title" style="display:flex; justify-content:space-between; align-items:center;">
+          <span>🛍️ Merchandise Flip Store</span>
+          <button class="btn" style="padding:6px 14px; font-size:12px; background:var(--gold); color:#04100a;" onclick="openDepositModal()">+ Deposit Funds</button>
+        </div>
         
         <div class="payment-instruction-box">
           <b>HOW THE RESELL FLIP STORE WORKS:</b><br>
-          1. Purchase merchandise slots using your wallet balance.<br>
-          2. Items enter an <b>8-Day Resell Lock Cycle</b> generating <b>+20% Guaranteed Profit</b>.<br>
-          3. <b>Schedule Rules:</b> Purchases are permitted <b>Once a Day</b> on <b>Mon, Wed, Fri & Sat</b>.
+          1. Need capital to flip? Use the <b>+ Deposit</b> button to fund your balance via Apple Gift Card or USDT.<br>
+          2. Purchase merchandise slots using your merged wallet balance.<br>
+          3. Items enter an <b>8-Day Resell Lock Cycle</b> generating <b>+20% Guaranteed Profit</b>.<br>
+          4. <b>Schedule Rules:</b> Purchases permitted <b>Once a Day</b> on <b>Mon, Wed, Fri & Sat</b>.
         </div>
 
         <div class="products-grid" id="userStoreProductsGrid"></div>
@@ -397,7 +422,7 @@
 
         <div class="chat-container">
           <div class="chat-messages" id="chatMessagesList">
-            <div class="msg msg-bot">Hello! I am the EarnPlanet Support Bot. How can I assist you today?</div>
+            <div class="msg msg-bot">Hello Planetian! I am the EarnPlanet Support Bot. How can I assist you today?</div>
           </div>
           <div class="chat-input-row">
             <input type="text" id="chatInput" placeholder="Type your question..." style="margin-bottom:0;" onkeypress="if(event.key==='Enter') sendChatMessage()">
@@ -433,7 +458,7 @@
 
       <!-- ADMIN MANAGEMENT TAB (SECRET) -->
       <div id="adminTab" style="display:none;">
-        <div class="section-title">⚙️ Pending Payment Approvals</div>
+        <div class="section-title">⚙️ Pending Payment & Deposit Approvals</div>
         <div id="adminPendingApprovalsList"></div>
 
         <div class="section-title" style="margin-top:30px;">⚙️ Active Users Count Override</div>
@@ -478,13 +503,13 @@
     </div>
   </div>
 
-  <!-- CHECKOUT MODAL -->
+  <!-- CHECKOUT MODAL (SUBSCRIPTION) -->
   <div class="modal-overlay" id="checkoutModal">
     <div class="modal">
       <h3 id="checkoutTitle">Subscribe Plan</h3>
       
       <label>Choose Payment Method</label>
-      <select id="checkoutMethodSelect" onchange="togglePaymentInstructions()">
+      <select id="checkoutMethodSelect" onchange="togglePaymentInstructions('checkout')">
         <option value="giftcard">Apple Gift Card (PalmPay / OPay / Kuda)</option>
         <option value="usdt">USDT Crypto (Binance / Bybit / KuCoin)</option>
       </select>
@@ -513,8 +538,55 @@
       <label id="paymentProofLabel">Enter Apple Gift Card Claim Code</label>
       <input type="text" id="userPaymentCodeInput" placeholder="Enter Code or TxID">
 
-      <button class="btn" style="width:100%;" onclick="submitPlanPaymentProof()">Submit Payment for Verification</button>
+      <label>Upload Payment Receipt / Screenshot (Optional)</label>
+      <input type="file" id="userPaymentProofFile" accept="image/*">
+
+      <button class="btn" style="width:100%; margin-top:5px;" onclick="submitPlanPaymentProof()">Submit Payment for Verification</button>
       <button class="btn btn-secondary" style="width:100%; margin-top:10px;" onclick="closeCheckoutModal()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- DEPOSIT MODAL (TOP UP BALANCE FOR STORE / WALLET) -->
+  <div class="modal-overlay" id="depositModal">
+    <div class="modal">
+      <h3>Deposit / Top Up Wallet</h3>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Fund your wallet balance via Apple Giftcard or USDT to purchase Resell Flip Store products.</p>
+      
+      <label>Enter Deposit Amount in USD ($)</label>
+      <input type="number" id="depositAmountUsd" placeholder="e.g. 20 (Min $10)" oninput="updateDepositPayableText()">
+
+      <label>Choose Payment Method</label>
+      <select id="depositMethodSelect" onchange="togglePaymentInstructions('deposit')">
+        <option value="giftcard">Apple Gift Card (PalmPay / OPay / Kuda)</option>
+        <option value="usdt">USDT Crypto (Binance / Bybit / KuCoin)</option>
+      </select>
+
+      <div id="depositGiftcardInstructions" class="payment-instruction-box">
+        <b>HOW TO BUY APPLE GIFTCARD ON PALMPAY, OPAY OR KUDA:</b><br>
+        1. Open your <b>PalmPay, OPay, or Kuda</b> app.<br>
+        2. Purchase Apple Gift Card corresponding to your deposit amount.<br>
+        3. Paste code below and attach screenshot receipt.
+      </div>
+
+      <div id="depositUsdtInstructions" class="payment-instruction-box" style="display:none;">
+        <b>HOW TO PAY VIA USDT CRYPTO:</b><br>
+        1. Transfer exact USDT to address below:<br>
+        <span style="color:var(--primary); font-weight:bold; word-break:break-all;">TRC20: TEP90124EarnPlanetOfficialUsdtAddr</span><br>
+        2. Paste TxID below and attach transaction screenshot.
+      </div>
+
+      <div class="payment-account-card">
+        <p style="font-size:12px; color:var(--gold); font-weight:bold;" id="depositPayableText">Payable Amount: ₦0.00 ($0.00 USD)</p>
+      </div>
+
+      <label id="depositProofLabel">Enter Apple Gift Card Claim Code</label>
+      <input type="text" id="depositCodeInput" placeholder="Enter Code or TxID">
+
+      <label>Upload Payment Receipt / Screenshot (Optional)</label>
+      <input type="file" id="depositProofFile" accept="image/*">
+
+      <button class="btn" style="width:100%; margin-top:5px;" onclick="submitDepositProof()">Submit Deposit Verification</button>
+      <button class="btn btn-secondary" style="width:100%; margin-top:10px;" onclick="closeDepositModal()">Cancel</button>
     </div>
   </div>
 
@@ -549,7 +621,7 @@
   <div class="modal-overlay" id="withdrawModal">
     <div class="modal">
       <h3>Request Cashout</h3>
-      <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;" id="withdrawRuleNotice">
         Min threshold: <b>₦180,000 ($120.00 USD)</b> | <b>15% Charge Applied</b>
       </p>
 
@@ -583,7 +655,7 @@
       </div>
 
       <label>Withdrawal Amount</label>
-      <input type="number" id="wdAmountInput" placeholder="Min ₦180,000 or $120.00">
+      <input type="number" id="wdAmountInput" placeholder="Enter Cashout Amount">
 
       <label>4-Digit Withdrawal PIN</label>
       <input type="password" id="wdPinInput" maxlength="4" placeholder="••••">
@@ -605,17 +677,34 @@
     let activeCheckoutPlan = null;
 
     let manualUserCount = parseInt(localStorage.getItem('earnplanet_manual_users') || '1280');
+    let lastAutoIncrementTime = parseInt(localStorage.getItem('earnplanet_last_autouser_time') || Date.now().toString());
+
     let pendingPaymentProofs = JSON.parse(localStorage.getItem('earnplanet_pending_payments') || '[]');
-    let chatbotFaqs = JSON.parse(localStorage.getItem('earnplanet_faqs') || '[{"id":1,"keywords":"cashout withdraw fee threshold","answer":"Minimum cashout is ₦180,000 ($120 USD). 1st withdrawal requires 7 referrals; subsequent cashouts require 5."},{"id":2,"keywords":"store flip resell product","answer":"Buy merchandise on Mon, Wed, Fri, Sat. Earn 20% profit after an 8-day lock cycle."}]');
+    let chatbotFaqs = JSON.parse(localStorage.getItem('earnplanet_faqs') || '[{"id":1,"keywords":"cashout withdraw fee threshold","answer":"1st withdrawal: ₦180k ($120) & 7 referrals. 2nd withdrawal: ₦135k ($90) & 15 refs. 3rd: 25 refs. 4th+: 30 refs."},{"id":2,"keywords":"store flip resell product deposit","answer":"Top up wallet via + Deposit. Buy merchandise on Mon, Wed, Fri, Sat to earn +20% profit in 8 days."}]');
     let storeProducts = JSON.parse(localStorage.getItem('earnplanet_products') || '[{"id":1,"title":"Luxury Leather Tote Bag","priceUsd":20,"img":"https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=400&q=80"},{"id":2,"title":"Designer Chronograph Watch","priceUsd":35,"img":"https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=400&q=80"}]');
     let activeUserFlips = JSON.parse(localStorage.getItem('earnplanet_user_flips') || '{}');
 
     // Admin Custom Payout List
     let customPayoutNotifs = JSON.parse(localStorage.getItem('earnplanet_payout_notifs') || '[{"name":"Adeb***45","amt":"₦180,000 ($120.00)","dest":"Access Bank"},{"name":"Kehinde4","amt":"₦225,000 ($150.00)","dest":"UBA"},{"name":"Chidi_O","amt":"₦300,000 ($200.00)","dest":"TRC20 Wallet"},{"name":"Blessing99","amt":"₦180,000 ($120.00)","dest":"OPay"},{"name":"Tunde_X","amt":"₦375,000 ($250.00)","dest":"GTBank"},{"name":"Musa_B","amt":"₦180,000 ($120.00)","dest":"Kuda Bank"},{"name":"Funmi_P","amt":"₦225,000 ($150.00)","dest":"Zenith Bank"},{"name":"Emeka_33","amt":"₦300,000 ($200.00)","dest":"Moniepoint"}]');
 
+    // AUTO-INCREMENT ACTIVE PLATFORM USERS (+15 every 8 hours)
+    function checkAutoIncrementActiveUsers() {
+      const eightHoursMs = 8 * 60 * 60 * 1000;
+      const now = Date.now();
+      const elapsed = now - lastAutoIncrementTime;
+
+      if (elapsed >= eightHoursMs) {
+        const cycles = Math.floor(elapsed / eightHoursMs);
+        manualUserCount += (cycles * 15);
+        lastAutoIncrementTime = now;
+        saveState();
+      }
+    }
+
     function saveState() {
       localStorage.setItem('earnplanet_users', JSON.stringify(usersDb));
       localStorage.setItem('earnplanet_manual_users', manualUserCount.toString());
+      localStorage.setItem('earnplanet_last_autouser_time', lastAutoIncrementTime.toString());
       localStorage.setItem('earnplanet_pending_payments', JSON.stringify(pendingPaymentProofs));
       localStorage.setItem('earnplanet_faqs', JSON.stringify(chatbotFaqs));
       localStorage.setItem('earnplanet_products', JSON.stringify(storeProducts));
@@ -628,6 +717,8 @@
         localStorage.removeItem('earnplanet_session');
       }
     }
+
+    checkAutoIncrementActiveUsers();
 
     if (activeSessionEmail) {
       const found = usersDb.find(u => u.email === activeSessionEmail);
@@ -675,9 +766,9 @@
       };
 
       usersDb.push(newUser);
-      manualUserCount++;
+      manualUserCount++; // Automatically increment active user count
       saveState();
-      alert("Registration successful! Please login.");
+      alert("Registration successful! Welcome Planetian! Please login.");
       switchAuthView('login');
     }
 
@@ -714,8 +805,17 @@
       switchAuthView('login');
     }
 
+    function getWithdrawalRequirements(count) {
+      if (count === 0) return { minUsd: 120, minNgn: 180000, reqRefs: 7, ordinal: '1st' };
+      if (count === 1) return { minUsd: 90, minNgn: 135000, reqRefs: 15, ordinal: '2nd' };
+      if (count === 2) return { minUsd: 90, minNgn: 135000, reqRefs: 25, ordinal: '3rd' };
+      return { minUsd: 90, minNgn: 135000, reqRefs: 30, ordinal: `${count + 1}th` };
+    }
+
     function updateUI() {
       if (!currentUser) return;
+      checkAutoIncrementActiveUsers();
+
       const usdBal = currentUser.balanceUsd || 0;
       const ngnBal = usdBal * NGN_RATE;
 
@@ -724,9 +824,10 @@
 
       document.getElementById('activeUsersDisplay').innerText = manualUserCount.toLocaleString();
 
-      const requiredForNext = currentUser.withdrawalsCount === 0 ? 7 : 5;
-      document.getElementById('refCountDisplay').innerText = `${currentUser.activeReferrals} / ${requiredForNext}`;
-      document.getElementById('refRequirementText').innerText = `${requiredForNext} required for ${currentUser.withdrawalsCount === 0 ? '1st' : 'Next'} Cashout`;
+      const reqs = getWithdrawalRequirements(currentUser.withdrawalsCount || 0);
+
+      document.getElementById('refCountDisplay').innerText = `${currentUser.activeReferrals} / ${reqs.reqRefs}`;
+      document.getElementById('refRequirementText').innerText = `${reqs.reqRefs} required for ${reqs.ordinal} Cashout (Min ₦${reqs.minNgn.toLocaleString()})`;
       document.getElementById('drivesDisplay').innerText = `${currentUser.dailyDrives} / 4 Sessions`;
       document.getElementById('headerTier').innerText = currentUser.tier === "None" ? "No Active Plan" : `${currentUser.tier} Plan`;
       
@@ -778,7 +879,7 @@
       list.innerHTML += `<div class="msg msg-user">${input.value}</div>`;
       input.value = '';
 
-      let reply = "I couldn't find an exact answer for that. Ask about Gift Cards, USDT, or store flips!";
+      let reply = "I couldn't find an exact answer for that. Ask about Gift Cards, USDT, deposits, or store flips!";
 
       for (let faq of chatbotFaqs) {
         let keys = faq.keywords.toLowerCase().split(' ');
@@ -794,7 +895,7 @@
       }, 400);
     }
 
-    // Checkout Modal Setup
+    // Checkout & Deposit Modals
     function openCheckoutModal(name, priceUsd, rewardUsd, bonusUsd) {
       let tierPrices = { "None": 0, "Starter": 15, "Silver": 25, "Gold": 50, "Platinum": 100 };
       let currentTierPrice = tierPrices[currentUser.tier] || 0;
@@ -811,19 +912,34 @@
       document.getElementById('checkoutPayableText').innerHTML = `Payable Amount: <span style="color:#00e676;">₦${priceNgn.toLocaleString()} ($${priceUsd}.00 USD)</span>`;
 
       document.getElementById('checkoutModal').style.display = 'flex';
-      togglePaymentInstructions();
+      togglePaymentInstructions('checkout');
     }
 
-    function togglePaymentInstructions() {
-      const method = document.getElementById('checkoutMethodSelect').value;
-      if (method === 'giftcard') {
-        document.getElementById('giftcardInstructions').style.display = 'block';
-        document.getElementById('usdtInstructions').style.display = 'none';
-        document.getElementById('paymentProofLabel').innerText = "Enter Apple Gift Card Claim Code";
+    function openDepositModal() {
+      document.getElementById('depositModal').style.display = 'flex';
+      updateDepositPayableText();
+      togglePaymentInstructions('deposit');
+    }
+
+    function closeDepositModal() { document.getElementById('depositModal').style.display = 'none'; }
+
+    function updateDepositPayableText() {
+      const val = parseFloat(document.getElementById('depositAmountUsd').value) || 0;
+      const ngn = val * NGN_RATE;
+      document.getElementById('depositPayableText').innerHTML = `Payable Amount: <span style="color:#00e676;">₦${ngn.toLocaleString()} ($${val.toFixed(2)} USD)</span>`;
+    }
+
+    function togglePaymentInstructions(type) {
+      if (type === 'checkout') {
+        const method = document.getElementById('checkoutMethodSelect').value;
+        document.getElementById('giftcardInstructions').style.display = method === 'giftcard' ? 'block' : 'none';
+        document.getElementById('usdtInstructions').style.display = method === 'usdt' ? 'block' : 'none';
+        document.getElementById('paymentProofLabel').innerText = method === 'giftcard' ? "Enter Apple Gift Card Claim Code" : "Enter USDT TxID";
       } else {
-        document.getElementById('giftcardInstructions').style.display = 'none';
-        document.getElementById('usdtInstructions').style.display = 'block';
-        document.getElementById('paymentProofLabel').innerText = "Enter USDT Transaction Hash (TxID)";
+        const method = document.getElementById('depositMethodSelect').value;
+        document.getElementById('depositGiftcardInstructions').style.display = method === 'giftcard' ? 'block' : 'none';
+        document.getElementById('depositUsdtInstructions').style.display = method === 'usdt' ? 'block' : 'none';
+        document.getElementById('depositProofLabel').innerText = method === 'giftcard' ? "Enter Apple Gift Card Claim Code" : "Enter USDT TxID";
       }
     }
 
@@ -832,14 +948,19 @@
     function submitPlanPaymentProof() {
       const code = document.getElementById('userPaymentCodeInput').value.trim();
       const method = document.getElementById('checkoutMethodSelect').value;
+      const fileInput = document.getElementById('userPaymentProofFile');
 
       if (!code) { alert("Please enter your Gift Card code or USDT TxID!"); return; }
 
+      let hasFile = fileInput.files && fileInput.files[0] ? fileInput.files[0].name : "No file attached";
+
       pendingPaymentProofs.push({
         id: Date.now(),
+        type: 'Subscription',
         userEmail: currentUser.email,
         method: method === 'giftcard' ? 'Apple Giftcard' : 'USDT Crypto',
         code,
+        proofFileName: hasFile,
         amountUsd: activeCheckoutPlan.priceUsd,
         planName: activeCheckoutPlan.name,
         rewardUsd: activeCheckoutPlan.rewardUsd,
@@ -849,19 +970,52 @@
       saveState();
       closeCheckoutModal();
       document.getElementById('userPaymentCodeInput').value = '';
+      if(fileInput) fileInput.value = '';
       alert(`Payment submitted for ${activeCheckoutPlan.name} Plan ($${activeCheckoutPlan.priceUsd}). Pending admin verification.`);
       updateUI();
     }
 
-    // Admin Approvals
+    function submitDepositProof() {
+      const amtUsd = parseFloat(document.getElementById('depositAmountUsd').value);
+      const code = document.getElementById('depositCodeInput').value.trim();
+      const method = document.getElementById('depositMethodSelect').value;
+      const fileInput = document.getElementById('depositProofFile');
+
+      if (!amtUsd || amtUsd < 10) { alert("Minimum deposit amount is $10.00 USD."); return; }
+      if (!code) { alert("Please enter your Gift Card code or USDT TxID!"); return; }
+
+      let hasFile = fileInput.files && fileInput.files[0] ? fileInput.files[0].name : "No file attached";
+
+      pendingPaymentProofs.push({
+        id: Date.now(),
+        type: 'Deposit',
+        userEmail: currentUser.email,
+        method: method === 'giftcard' ? 'Apple Giftcard' : 'USDT Crypto',
+        code,
+        proofFileName: hasFile,
+        amountUsd: amtUsd
+      });
+
+      saveState();
+      closeDepositModal();
+      document.getElementById('depositAmountUsd').value = '';
+      document.getElementById('depositCodeInput').value = '';
+      if(fileInput) fileInput.value = '';
+      alert(`Deposit request of $${amtUsd.toFixed(2)} submitted successfully! Funds will credit your wallet upon admin verification.`);
+      updateUI();
+    }
+
+    // Admin Payment & Deposit Approvals
     function renderPendingApprovals() {
       const container = document.getElementById('adminPendingApprovalsList');
-      if (pendingPaymentProofs.length === 0) { container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No pending payments.</p>`; return; }
+      if (pendingPaymentProofs.length === 0) { container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No pending payments or deposits.</p>`; return; }
+      
       container.innerHTML = pendingPaymentProofs.map(item => `
         <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center;">
           <div>
-            <b>${item.planName} Plan ($${item.amountUsd}) [${item.method}]</b><br>
-            <span style="font-size:12px;">User: ${item.userEmail} | Code/TxID: <b style="color:var(--gold);">${item.code}</b></span>
+            <b>${item.type === 'Deposit' ? 'Wallet Deposit' : item.planName + ' Subscription'} ($${item.amountUsd}) [${item.method}]</b><br>
+            <span style="font-size:12px;">User: ${item.userEmail} | Code/TxID: <b style="color:var(--gold);">${item.code}</b></span><br>
+            <span style="font-size:11px; color:var(--text-muted);">Proof File: ${item.proofFileName || 'None'}</span>
           </div>
           <button class="btn" style="padding:6px 12px; font-size:12px;" onclick="approveUserPayment(${item.id})">Approve</button>
         </div>
@@ -872,17 +1026,22 @@
       const item = pendingPaymentProofs.find(p => p.id === id);
       if (!item) return;
       const targetUser = usersDb.find(u => u.email === item.userEmail);
+      
       if (targetUser) {
-        targetUser.tier = item.planName;
-        targetUser.taskRewardUsd = item.rewardUsd;
-        targetUser.balanceUsd += item.bonusUsd;
+        if (item.type === 'Deposit') {
+          targetUser.balanceUsd += item.amountUsd; // Direct top-up credit
+        } else {
+          targetUser.tier = item.planName;
+          targetUser.taskRewardUsd = item.rewardUsd;
+          targetUser.balanceUsd += item.bonusUsd; // Plan cashback
 
-        if (targetUser.referredBy) {
-          const referrer = usersDb.find(u => u.refCode === targetUser.referredBy);
-          if (referrer) {
-            let refCommission = item.amountUsd * 0.10;
-            referrer.balanceUsd += refCommission;
-            referrer.activeReferrals += 1;
+          if (targetUser.referredBy) {
+            const referrer = usersDb.find(u => u.refCode === targetUser.referredBy);
+            if (referrer) {
+              let refCommission = item.amountUsd * 0.10;
+              referrer.balanceUsd += refCommission;
+              referrer.activeReferrals += 1;
+            }
           }
         }
       }
@@ -890,7 +1049,7 @@
       pendingPaymentProofs = pendingPaymentProofs.filter(p => p.id !== id);
       saveState();
       updateUI();
-      alert("Payment approved! 40% cashback credited to user and 10% awarded to referrer.");
+      alert(`Approval successful! ${item.type === 'Deposit' ? '$' + item.amountUsd + ' credited to user balance.' : 'Plan activated & cashback awarded.'}`);
     }
 
     // E-Commerce Store & Flip Logic
@@ -938,7 +1097,7 @@
       if (!prod) return;
 
       if (currentUser.balanceUsd < prod.priceUsd) {
-        alert(`Insufficient balance! You need $${prod.priceUsd}.00 (₦${(prod.priceUsd * NGN_RATE).toLocaleString()}) in your wallet balance.`);
+        alert(`Insufficient balance! You need $${prod.priceUsd}.00 (₦${(prod.priceUsd * NGN_RATE).toLocaleString()}) in your wallet balance. Tap "+ Deposit" to top up!`);
         return;
       }
 
@@ -1006,7 +1165,7 @@
       alert(`Profit Claimed!\n\n$${item.returnUsd.toFixed(2)} (₦${(item.returnUsd * NGN_RATE).toLocaleString()}) credited to your main wallet balance!`);
     }
 
-    // ADMIN: Active Users Counter Manual Override
+    // ADMIN: Active Users Counter Manual Override (Preserves Existing Count)
     function saveManualUserCount() {
       const val = parseInt(document.getElementById('manualUserCountInput').value);
       if (!val || val < 1) return;
@@ -1156,7 +1315,7 @@
       renderAdminFaqs();
     }
 
-    // Secret Admin Auth (Fixed & Fully Integrated)
+    // Secret Admin Auth
     function openAdminAuthModal() { document.getElementById('adminAuthModal').style.display = 'flex'; }
     function closeAdminAuthModal() { document.getElementById('adminAuthModal').style.display = 'none'; }
     
@@ -1168,11 +1327,9 @@
         isAdminAuthenticated = true;
         closeAdminAuthModal();
         
-        // Ensure main app container displays properly & hides authentication screen
         document.getElementById('authContainer').style.display = 'none';
         document.getElementById('mainAppContainer').style.display = 'block';
 
-        // Dynamically add secret Management button to header if not already present
         const container = document.getElementById('navTabsContainer');
         if (container && !document.getElementById('adminTabBtn')) {
           container.innerHTML += `<button class="tab-btn" id="adminTabBtn" onclick="switchTab('admin')">⚙️ Management</button>`;
@@ -1235,7 +1392,7 @@
       }, 100);
     }
 
-    // Withdrawal View Toggle & Execution
+    // Withdrawal View Toggle & Dynamic Rules
     function toggleWithdrawDestinationView() {
       const type = document.getElementById('wdDestinationType').value;
       if (type === 'bank') {
@@ -1250,8 +1407,12 @@
     function openWithdrawModal() {
       const usdBal = currentUser.balanceUsd || 0;
       const ngnBal = usdBal * NGN_RATE;
+      const reqs = getWithdrawalRequirements(currentUser.withdrawalsCount || 0);
+
       document.getElementById('wdAvailableDisplayNgn').innerText = `₦${ngnBal.toLocaleString('en-NG', {minimumFractionDigits: 2})}`;
       document.getElementById('wdAvailableDisplayUsd').innerText = `($${usdBal.toFixed(2)} USD)`;
+      document.getElementById('withdrawRuleNotice').innerHTML = `Min threshold: <b>₦${reqs.minNgn.toLocaleString()} ($${reqs.minUsd}.00 USD)</b> | Required Referrals: <b>${reqs.reqRefs}</b> (${reqs.ordinal} Cashout)`;
+
       document.getElementById('withdrawModal').style.display = 'flex';
       toggleWithdrawDestinationView();
     }
@@ -1270,15 +1431,15 @@
         requestedAmtUsd = amtInput / NGN_RATE;
       }
 
-      if (requestedAmtUsd < 120) {
-        alert("Minimum cashout threshold is ₦180,000 ($120.00 USD).");
+      const reqs = getWithdrawalRequirements(currentUser.withdrawalsCount || 0);
+
+      if (requestedAmtUsd < reqs.minUsd) {
+        alert(`Minimum cashout threshold for your ${reqs.ordinal} withdrawal is ₦${reqs.minNgn.toLocaleString()} ($${reqs.minUsd}.00 USD).`);
         return;
       }
 
-      const requiredRefs = currentUser.withdrawalsCount === 0 ? 7 : 5;
-
-      if (currentUser.activeReferrals < requiredRefs) {
-        alert(`Withdrawal locked! You have ${currentUser.activeReferrals}/${requiredRefs} paying referrals. You need ${requiredRefs} active subscribers for this cashout.`);
+      if (currentUser.activeReferrals < reqs.reqRefs) {
+        alert(`Withdrawal locked! You have ${currentUser.activeReferrals}/${reqs.reqRefs} paying referrals. You need ${reqs.reqRefs} active subscribers for your ${reqs.ordinal} cashout.`);
         return;
       }
 
@@ -1296,7 +1457,7 @@
       }
 
       currentUser.balanceUsd -= totalDeductionUsd;
-      currentUser.activeReferrals -= requiredRefs;
+      currentUser.activeReferrals -= reqs.reqRefs;
       currentUser.withdrawalsCount += 1;
 
       saveState();
