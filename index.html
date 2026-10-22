@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>EarnPlanet - Premium Earning & Gaming Platform</title>
+  <title>EarnPlanet - Premium Earning Platform</title>
 
   <!-- PROPELLERADS MULTITAG SCRIPT -->
   <script src="https://alwingulla.com/88/tag.min.js" data-zone="YOUR_ZONE_ID" async data-cfasync="false"></script>
@@ -84,7 +84,7 @@
     .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin: 20px 0; }
     .stat-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 18px; text-align: center; }
     .stat-card h4 { font-size: 12px; color: var(--text-muted); text-transform: uppercase; }
-    .stat-card p { font-size: 20px; font-weight: 900; margin-top: 6px; color: var(--gold); }
+    .stat-card p { font-size: 22px; font-weight: 900; margin-top: 6px; color: var(--gold); }
 
     .section-title { font-size: 18px; font-weight: 800; margin: 25px 0 15px 0; color: #fff; border-left: 4px solid var(--primary); padding-left: 10px; }
 
@@ -96,14 +96,12 @@
       border-radius: 16px;
       padding: 20px;
       text-align: center;
-      position: relative;
       display: flex;
       flex-direction: column;
       justify-content: space-between;
     }
-    .plan-card.active-plan { border-color: var(--primary); box-shadow: 0 0 15px rgba(0, 230, 118, 0.2); }
     .plan-title { font-size: 18px; font-weight: 900; color: var(--gold); }
-    .plan-price { font-size: 22px; font-weight: 900; color: #fff; margin: 8px 0; }
+    .plan-price { font-size: 24px; font-weight: 900; color: #fff; margin: 8px 0; }
     .plan-perks { font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 15px; }
     .plan-bonus { background: rgba(0, 230, 118, 0.15); color: var(--primary); font-size: 11px; font-weight: bold; padding: 4px 8px; border-radius: 10px; margin-bottom: 10px; display: inline-block; }
 
@@ -127,8 +125,8 @@
       box-shadow: 0 10px 25px rgba(0,0,0,0.8);
       z-index: 99;
       transform: translateY(150%);
-      transition: transform 0.5s ease;
-      max-width: 320px;
+      transition: transform 0.4s ease;
+      max-width: 330px;
     }
     .live-notification.show { transform: translateY(0); }
     .live-icon { font-size: 22px; }
@@ -150,7 +148,10 @@
     .modal input, .modal select, .modal textarea { width: 100%; padding: 12px; background: #04100a; border: 1px solid var(--card-border); border-radius: 10px; color: #fff; margin-bottom: 12px; font-size: 14px; }
     .modal label { font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px; }
 
+    .payment-instruction-box { background: #04100a; border: 1px solid var(--card-border); border-radius: 12px; padding: 15px; margin-bottom: 15px; font-size: 12px; line-height: 1.6; color: var(--text-muted); }
+    .payment-instruction-box b { color: var(--gold); }
     .payment-account-card { background: #04100a; border: 1px solid var(--primary); border-radius: 12px; padding: 15px; margin-bottom: 15px; }
+
     #gameCanvas { background: #1f2937; border-radius: 12px; display: block; margin: 12px auto; border: 3px solid var(--primary); box-shadow: 0 0 15px rgba(0,230,118,0.2); }
   </style>
 </head>
@@ -160,7 +161,7 @@
   <div class="live-notification" id="payoutNotification">
     <div class="live-icon">💸</div>
     <div class="live-text" id="payoutNotifText">
-      User <b>Adeb***45</b> withdrew <b>₦100,000</b> to Access Bank
+      User <b>Adeb***45</b> withdrew <b>$120.00</b> to Access Bank
     </div>
   </div>
 
@@ -245,14 +246,14 @@
         <div class="wallet-card">
           <div class="wallet-info">
             <h3>Wallet Balance</h3>
-            <div class="balance" id="walletBalance">₦0.00</div>
+            <div class="balance" id="walletBalance">$0.00</div>
           </div>
           <div class="wallet-actions">
             <button class="btn btn-secondary" onclick="openWithdrawModal()">Cashout</button>
           </div>
         </div>
 
-        <!-- Stats Grid & Referral Code -->
+        <!-- Stats Grid & Referral Link -->
         <div class="stats-grid">
           <div class="stat-card">
             <h4>Paying Referrals</h4>
@@ -266,7 +267,6 @@
           </div>
         </div>
 
-        <!-- Copyable Referral Link Box -->
         <div class="stat-card" style="text-align:left; margin-bottom:20px;">
           <h4 style="margin-bottom:6px;">Your Referral Link (Earn 10% on Subscriber Plans)</h4>
           <div style="display:flex; gap:10px;">
@@ -279,44 +279,44 @@
         <div class="section-title">Select Membership Plan</div>
         <div class="plans-grid">
           
-          <div class="plan-card" id="planStarter">
+          <div class="plan-card">
             <div>
-              <div class="plan-bonus">₦6,000 Cashback (40%)</div>
+              <div class="plan-bonus">$6.00 Cashback (40%)</div>
               <div class="plan-title">Starter</div>
-              <div class="plan-price">₦15,000</div>
-              <div class="plan-perks">Earn ₦300/day<br>₦300 per trip<br>10 Daily Tasks</div>
+              <div class="plan-price">$15.00</div>
+              <div class="plan-perks">Earn $0.50 per drive<br>4 Drives Daily ($2.00/day)</div>
             </div>
-            <button class="btn" onclick="selectPlanPayment('Starter', 15000, 300, 6000)">Subscribe (₦15k)</button>
+            <button class="btn" onclick="openCheckoutModal('Starter', 15, 0.50, 6.00)">Subscribe ($15)</button>
           </div>
 
-          <div class="plan-card" id="planSilver">
+          <div class="plan-card">
             <div>
-              <div class="plan-bonus">₦12,000 Cashback (40%)</div>
+              <div class="plan-bonus">$10.00 Cashback (40%)</div>
               <div class="plan-title">Silver</div>
-              <div class="plan-price">₦30,000</div>
-              <div class="plan-perks">Earn ₦600/day<br>₦600 per trip<br>10 Daily Tasks</div>
+              <div class="plan-price">$25.00</div>
+              <div class="plan-perks">Earn $1.00 per drive<br>4 Drives Daily ($4.00/day)</div>
             </div>
-            <button class="btn" onclick="selectPlanPayment('Silver', 30000, 600, 12000)">Subscribe (₦30k)</button>
+            <button class="btn" onclick="openCheckoutModal('Silver', 25, 1.00, 10.00)">Subscribe ($25)</button>
           </div>
 
-          <div class="plan-card" id="planGold">
+          <div class="plan-card">
             <div>
-              <div class="plan-bonus">₦20,000 Cashback (40%)</div>
+              <div class="plan-bonus">$20.00 Cashback (40%)</div>
               <div class="plan-title">Gold</div>
-              <div class="plan-price">₦50,000</div>
-              <div class="plan-perks">Earn ₦1,000/day<br>₦1,000 per trip<br>10 Daily Tasks</div>
+              <div class="plan-price">$50.00</div>
+              <div class="plan-perks">Earn $2.00 per drive<br>4 Drives Daily ($8.00/day)</div>
             </div>
-            <button class="btn" onclick="selectPlanPayment('Gold', 50000, 1000, 20000)">Subscribe (₦50k)</button>
+            <button class="btn" onclick="openCheckoutModal('Gold', 50, 2.00, 20.00)">Subscribe ($50)</button>
           </div>
 
-          <div class="plan-card" id="planPlatinum">
+          <div class="plan-card">
             <div>
-              <div class="plan-bonus">₦40,000 Cashback (40%)</div>
+              <div class="plan-bonus">$40.00 Cashback (40%)</div>
               <div class="plan-title">Platinum</div>
-              <div class="plan-price">₦100,000</div>
-              <div class="plan-perks">Earn ₦1,500/day<br>₦1,500 per trip<br>10 Daily Tasks</div>
+              <div class="plan-price">$100.00</div>
+              <div class="plan-perks">Earn $4.00 per drive<br>4 Drives Daily ($16.00/day)</div>
             </div>
-            <button class="btn" onclick="selectPlanPayment('Platinum', 100000, 1500, 40000)">Subscribe (₦100k)</button>
+            <button class="btn" onclick="openCheckoutModal('Platinum', 100, 4.00, 40.00)">Subscribe ($100)</button>
           </div>
 
         </div>
@@ -339,7 +339,7 @@
           <div class="task-info">
             <h4>🔗 Partner Sponsor Direct Link</h4>
             <p>Visit sponsor link for 15 seconds. Anti-cheat countdown enabled.</p>
-            <div class="task-reward">Reward: +₦100.00 per click</div>
+            <div class="task-reward">Reward: +$0.20 per click</div>
           </div>
           <button class="btn" id="directLinkBtn" onclick="handleDirectLinkTask('https://your-propeller-direct-link-url.com')">Visit Sponsor Link</button>
         </div>
@@ -392,22 +392,11 @@
         <div class="section-title">⚙️ Pending Payment Approvals</div>
         <div id="adminPendingApprovalsList"></div>
 
-        <div class="section-title" style="margin-top:30px;">⚙️ Payment Gateways (Add / Edit / Delete)</div>
-        <div class="stat-card" style="text-align:left; margin-bottom:15px;">
-          <h4 style="margin-bottom:10px;" id="adminPayFormTitle">Add New Bank Payment Gateway</h4>
-          <input type="hidden" id="editPayId">
-          <input type="text" id="newPayBank" placeholder="Bank Name (e.g. OPay)">
-          <input type="text" id="newPayAccount" placeholder="Account Number">
-          <input type="text" id="newPayName" placeholder="Account Holder Name">
-          <button class="btn" id="savePayBtn" onclick="savePaymentMethod()">+ Save Account</button>
-        </div>
-        <div id="adminPaymentList"></div>
-
         <div class="section-title" style="margin-top:30px;">⚙️ Chatbot FAQ Manager</div>
         <div class="stat-card" style="text-align:left; margin-bottom:15px;">
           <h4 style="margin-bottom:10px;" id="adminFaqFormTitle">Add New Chatbot FAQ</h4>
           <input type="hidden" id="editFaqId">
-          <input type="text" id="newFaqQuery" placeholder="User Question / Keyword (e.g., cashout, bonus)">
+          <input type="text" id="newFaqQuery" placeholder="User Question / Keyword (e.g., cashout, giftcard)">
           <textarea id="newFaqAnswer" placeholder="Bot Answer Response"></textarea>
           <button class="btn" id="saveFaqBtn" onclick="saveFaqItem()">+ Save FAQ</button>
         </div>
@@ -417,20 +406,44 @@
     </div>
   </div>
 
-  <!-- PLAN PAYMENT CHECKOUT MODAL -->
+  <!-- GIFTCARD & USDT CHECKOUT MODAL -->
   <div class="modal-overlay" id="checkoutModal">
     <div class="modal">
-      <h3 id="checkoutTitle">Plan Checkout</h3>
-      <p style="font-size:12px; color:var(--text-muted); margin-bottom:15px;">Transfer exact payable amount to bank details below and enter sender name.</p>
+      <h3 id="checkoutTitle">Subscribe Plan</h3>
+      
+      <label>Choose Payment Method</label>
+      <select id="checkoutMethodSelect" onchange="togglePaymentInstructions()">
+        <option value="giftcard">Apple Gift Card (PalmPay / OPay / Kuda)</option>
+        <option value="usdt">USDT Crypto (Binance / Bybit / KuCoin)</option>
+      </select>
+
+      <!-- GIFTCARD INSTRUCTIONS -->
+      <div id="giftcardInstructions" class="payment-instruction-box">
+        <b>HOW TO BUY APPLE GIFTCARD ON PALMPAY, OPAY OR KUDA:</b><br>
+        1. Open your <b>PalmPay, OPay, or Kuda</b> app.<br>
+        2. Tap on <b>More</b> or <b>Services</b>.<br>
+        3. Select <b>Apple Gift Card</b>.<br>
+        4. Purchase an Apple Gift Card matching the plan amount.<br>
+        5. Paste the claim code received in the box below to activate your plan!
+      </div>
+
+      <!-- USDT INSTRUCTIONS -->
+      <div id="usdtInstructions" class="payment-instruction-box" style="display:none;">
+        <b>HOW TO PAY VIA USDT CRYPTO:</b><br>
+        1. Open <b>Binance, Bybit, KuCoin</b>, or your crypto wallet.<br>
+        2. Transfer exact plan USDT to address below:<br>
+        <span style="color:var(--primary); font-weight:bold; word-break:break-all;">TRC20: TEP90124EarnPlanetOfficialUsdtAddr</span><br>
+        3. Copy the <b>Transaction Hash (TxID)</b> and paste below.
+      </div>
 
       <div class="payment-account-card">
         <p style="font-size:12px; color:var(--gold); font-weight:bold;" id="checkoutPayableText"></p>
-        <div id="activeBankInfoDisplay" style="margin-top:8px; font-size:13px; line-height:1.5;"></div>
       </div>
 
-      <label>Your Bank Account Name (Sender Name)</label>
-      <input type="text" id="userSenderNameInput" placeholder="Sender Name">
-      <button class="btn" style="width:100%;" onclick="submitPlanPaymentProof()">Submit Payment Proof</button>
+      <label id="paymentProofLabel">Enter Apple Gift Card Claim Code</label>
+      <input type="text" id="userPaymentCodeInput" placeholder="Enter Code or TxID">
+
+      <button class="btn" style="width:100%;" onclick="submitPlanPaymentProof()">Submit Payment for Verification</button>
       <button class="btn btn-secondary" style="width:100%; margin-top:10px;" onclick="closeCheckoutModal()">Cancel</button>
     </div>
   </div>
@@ -466,10 +479,10 @@
   <div class="modal-overlay" id="withdrawModal">
     <div class="modal">
       <h3>Request Cashout</h3>
-      <p style="font-size:12px; color:var(--text-muted); margin-bottom:15px;">Min threshold ₦100,000 | <b>5 Paying Referrals Compulsory</b> | <b>15% Fee</b>.</p>
-      <input type="number" id="wdAmount" placeholder="Amount (Min ₦100,000)">
-      <input type="text" id="wdBank" placeholder="Bank Name">
-      <input type="text" id="wdAccount" placeholder="Account Number">
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:15px;">Min threshold <b>$120.00</b> | <b>5 Paying Referrals Compulsory</b> | <b>15% Fee</b>.</p>
+      <input type="number" id="wdAmount" placeholder="Amount (Min $120.00)">
+      <input type="text" id="wdBank" placeholder="Bank Name / USDT Address">
+      <input type="text" id="wdAccount" placeholder="Account Number / Wallet Type">
       <input type="password" id="wdPinInput" maxlength="4" placeholder="4-Digit Withdrawal PIN">
       <div style="display:flex; gap:10px;">
         <button class="btn btn-secondary" style="flex:1" onclick="closeWithdrawModal()">Cancel</button>
@@ -486,13 +499,11 @@
     let isAdminAuthenticated = false;
     let activeCheckoutPlan = null;
 
-    let paymentMethods = JSON.parse(localStorage.getItem('earnplanet_banks') || '[{"id":1,"bank":"OPay Digital Bank","account":"8012345678","name":"EarnPlanet Official"}]');
     let pendingPaymentProofs = JSON.parse(localStorage.getItem('earnplanet_pending_payments') || '[]');
-    let chatbotFaqs = JSON.parse(localStorage.getItem('earnplanet_faqs') || '[{"id":1,"keywords":"cashout withdraw fee","answer":"Minimum cashout is ₦100,000 with 5 paying referrals. A 15% charge applies."},{"id":2,"keywords":"bonus cashback referral","answer":"You receive 40% instant cashback bonus on plan approval and 10% commission on referred subscriptions!"}]');
+    let chatbotFaqs = JSON.parse(localStorage.getItem('earnplanet_faqs') || '[{"id":1,"keywords":"cashout withdraw fee","answer":"Minimum cashout is $120.00 with 5 active paying referrals. A 15% charge applies."},{"id":2,"keywords":"giftcard palmpay opay kuda","answer":"Buy Apple Giftcard under More -> Apple Giftcard in PalmPay/OPay/Kuda and paste code to subscribe."}]');
 
     function saveState() {
       localStorage.setItem('earnplanet_users', JSON.stringify(usersDb));
-      localStorage.setItem('earnplanet_banks', JSON.stringify(paymentMethods));
       localStorage.setItem('earnplanet_pending_payments', JSON.stringify(pendingPaymentProofs));
       localStorage.setItem('earnplanet_faqs', JSON.stringify(chatbotFaqs));
       if (currentUser) {
@@ -538,9 +549,9 @@
       const newUser = {
         email, password, pin, refCode: refId,
         referredBy: refCode || null,
-        balance: 0,
+        balance: 0.00,
         tier: "None",
-        taskReward: 0,
+        taskReward: 0.00,
         activeReferrals: 0,
         dailyDrives: 0
       };
@@ -585,17 +596,16 @@
 
     function updateUI() {
       if (!currentUser) return;
-      document.getElementById('walletBalance').innerText = `₦${currentUser.balance.toLocaleString('en-NG', {minimumFractionDigits: 2})}`;
+      document.getElementById('walletBalance').innerText = `$${currentUser.balance.toFixed(2)}`;
       document.getElementById('refCountDisplay').innerText = `${currentUser.activeReferrals} / 5`;
       document.getElementById('drivesDisplay').innerText = `${currentUser.dailyDrives} / 4 Sessions`;
       document.getElementById('headerTier').innerText = currentUser.tier === "None" ? "No Active Plan" : `${currentUser.tier} Plan`;
       
-      const rText = currentUser.taskReward > 0 ? `Reward: +₦${currentUser.taskReward} per trip` : "Reward: Select plan to unlock";
+      const rText = currentUser.taskReward > 0 ? `Reward: +$${currentUser.taskReward.toFixed(2)} per trip` : "Reward: Select plan to unlock";
       document.getElementById('drivingRewardText').innerText = rText;
 
       document.getElementById('refLinkInput').value = `https://earnplanet.com.ng/?ref=${currentUser.refCode}`;
 
-      renderAdminPaymentList();
       renderPendingApprovals();
       renderAdminFaqs();
     }
@@ -629,7 +639,7 @@
       list.innerHTML += `<div class="msg msg-user">${input.value}</div>`;
       input.value = '';
 
-      let reply = "I couldn't find an exact answer for that. Please ask about withdrawals, plans, or driving tasks!";
+      let reply = "I couldn't find an exact answer for that. Please ask about Gift Cards, USDT, or driving tasks!";
 
       for (let faq of chatbotFaqs) {
         let keys = faq.keywords.toLowerCase().split(' ');
@@ -645,9 +655,9 @@
       }, 400);
     }
 
-    // Plan Selection Checkout
-    function selectPlanPayment(name, price, reward, bonus) {
-      let tierPrices = { "None": 0, "Starter": 15000, "Silver": 30000, "Gold": 50000, "Platinum": 100000 };
+    // Checkout Modal Setup
+    function openCheckoutModal(name, price, reward, bonus) {
+      let tierPrices = { "None": 0, "Starter": 15, "Silver": 25, "Gold": 50, "Platinum": 100 };
       let currentTierPrice = tierPrices[currentUser.tier] || 0;
 
       if (price <= currentTierPrice) {
@@ -655,58 +665,62 @@
         return;
       }
 
-      let priceDifference = price - currentTierPrice;
-      let surcharge = (currentTierPrice > 0) ? 5000 : 0; // 5k upgrade fee
-      let totalPayable = priceDifference + surcharge;
-
-      activeCheckoutPlan = { name, price: totalPayable, reward, bonus, basePrice: price };
-
-      document.getElementById('checkoutTitle').innerText = `${name} Plan Checkout`;
-      if (currentTierPrice > 0) {
-        document.getElementById('checkoutPayableText').innerHTML = `Upgrading from ${currentUser.tier} -> Difference: ₦${priceDifference.toLocaleString()} + ₦5k Surcharge = <span style="color:#00e676;">Total Payable: ₦${totalPayable.toLocaleString()}</span>`;
-      } else {
-        document.getElementById('checkoutPayableText').innerHTML = `Direct Subscription -> <span style="color:#00e676;">Total Payable: ₦${totalPayable.toLocaleString()}</span>`;
-      }
-
-      const activeBank = paymentMethods[0] || { bank: "OPay", account: "8012345678", name: "EarnPlanet" };
-      document.getElementById('activeBankInfoDisplay').innerHTML = `<b>Bank:</b> ${activeBank.bank}<br><b>Account Number:</b> ${activeBank.account}<br><b>Account Name:</b> ${activeBank.name}`;
+      activeCheckoutPlan = { name, price, reward, bonus };
+      document.getElementById('checkoutTitle').innerText = `${name} Plan Checkout ($${price})`;
+      document.getElementById('checkoutPayableText').innerHTML = `Payable Amount: <span style="color:#00e676;">$${price}.00 USD</span>`;
 
       document.getElementById('checkoutModal').style.display = 'flex';
+      togglePaymentInstructions();
+    }
+
+    function togglePaymentInstructions() {
+      const method = document.getElementById('checkoutMethodSelect').value;
+      if (method === 'giftcard') {
+        document.getElementById('giftcardInstructions').style.display = 'block';
+        document.getElementById('usdtInstructions').style.display = 'none';
+        document.getElementById('paymentProofLabel').innerText = "Enter Apple Gift Card Claim Code";
+      } else {
+        document.getElementById('giftcardInstructions').style.display = 'none';
+        document.getElementById('usdtInstructions').style.display = 'block';
+        document.getElementById('paymentProofLabel').innerText = "Enter USDT Transaction Hash (TxID)";
+      }
     }
 
     function closeCheckoutModal() { document.getElementById('checkoutModal').style.display = 'none'; }
 
     function submitPlanPaymentProof() {
-      const sender = document.getElementById('userSenderNameInput').value;
-      if (!sender) { alert("Please enter your bank sender name!"); return; }
+      const code = document.getElementById('userPaymentCodeInput').value.trim();
+      const method = document.getElementById('checkoutMethodSelect').value;
+
+      if (!code) { alert("Please enter your Gift Card code or USDT TxID!"); return; }
 
       pendingPaymentProofs.push({
         id: Date.now(),
         userEmail: currentUser.email,
-        sender,
+        method: method === 'giftcard' ? 'Apple Giftcard' : 'USDT Crypto',
+        code,
         amount: activeCheckoutPlan.price,
         planName: activeCheckoutPlan.name,
         reward: activeCheckoutPlan.reward,
-        bonus: activeCheckoutPlan.bonus,
-        basePrice: activeCheckoutPlan.basePrice
+        bonus: activeCheckoutPlan.bonus
       });
 
       saveState();
       closeCheckoutModal();
-      document.getElementById('userSenderNameInput').value = '';
-      alert(`Payment details submitted for ${activeCheckoutPlan.name} Plan (₦${activeCheckoutPlan.price.toLocaleString()}). Pending admin approval.`);
+      document.getElementById('userPaymentCodeInput').value = '';
+      alert(`Payment code submitted for ${activeCheckoutPlan.name} Plan ($${activeCheckoutPlan.price}). Pending admin verification.`);
       updateUI();
     }
 
-    // Admin Approvals (Credits 40% Cashback + 10% Referral Reward)
+    // Admin Approvals
     function renderPendingApprovals() {
       const container = document.getElementById('adminPendingApprovalsList');
       if (pendingPaymentProofs.length === 0) { container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No pending payments.</p>`; return; }
       container.innerHTML = pendingPaymentProofs.map(item => `
         <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center;">
           <div>
-            <b>${item.planName} Plan (₦${item.amount.toLocaleString()})</b><br>
-            <span style="font-size:12px;">User: ${item.userEmail} | Sender: ${item.sender}</span>
+            <b>${item.planName} Plan ($${item.amount}) [${item.method}]</b><br>
+            <span style="font-size:12px;">User: ${item.userEmail} | Code/TxID: <b style="color:var(--gold);">${item.code}</b></span>
           </div>
           <button class="btn" style="padding:6px 12px; font-size:12px;" onclick="approveUserPayment(${item.id})">Approve</button>
         </div>
@@ -722,13 +736,12 @@
         targetUser.taskReward = item.reward;
         targetUser.balance += item.bonus; // 40% cashback
 
-        // Check if user was referred by someone and award 10% commission
         if (targetUser.referredBy) {
           const referrer = usersDb.find(u => u.refCode === targetUser.referredBy);
           if (referrer) {
-            let refCommission = item.basePrice * 0.10; // 10% of base subscription amount
+            let refCommission = item.amount * 0.10; // 10% referral bonus
             referrer.balance += refCommission;
-            referrer.activeReferrals += 1; // Increment paying referral count
+            referrer.activeReferrals += 1;
           }
         }
       }
@@ -737,60 +750,6 @@
       saveState();
       updateUI();
       alert("Payment approved! 40% cashback credited to user and 10% awarded to referrer.");
-    }
-
-    // Admin Payment Methods
-    function renderAdminPaymentList() {
-      const container = document.getElementById('adminPaymentList');
-      container.innerHTML = paymentMethods.map(item => `
-        <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center;">
-          <div><b>${item.bank}</b><br><span style="font-size:12px;">${item.account} (${item.name})</span></div>
-          <div style="display:flex; gap:6px;">
-            <button class="btn btn-secondary" style="padding:4px 8px; font-size:11px;" onclick="editPaymentMethod(${item.id})">Edit</button>
-            <button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="deletePaymentMethod(${item.id})">Delete</button>
-          </div>
-        </div>
-      `).join('');
-    }
-
-    function savePaymentMethod() {
-      const id = document.getElementById('editPayId').value;
-      const bank = document.getElementById('newPayBank').value.trim();
-      const account = document.getElementById('newPayAccount').value.trim();
-      const name = document.getElementById('newPayName').value.trim();
-
-      if (!bank || !account || !name) return;
-
-      if (id) {
-        let item = paymentMethods.find(p => p.id == id);
-        if (item) { item.bank = bank; item.account = account; item.name = name; }
-      } else {
-        paymentMethods.push({ id: Date.now(), bank, account, name });
-      }
-
-      saveState();
-      document.getElementById('editPayId').value = '';
-      document.getElementById('newPayBank').value = '';
-      document.getElementById('newPayAccount').value = '';
-      document.getElementById('newPayName').value = '';
-      document.getElementById('adminPayFormTitle').innerText = "Add New Bank Payment Gateway";
-      renderAdminPaymentList();
-    }
-
-    function editPaymentMethod(id) {
-      let item = paymentMethods.find(p => p.id == id);
-      if (!item) return;
-      document.getElementById('editPayId').value = item.id;
-      document.getElementById('newPayBank').value = item.bank;
-      document.getElementById('newPayAccount').value = item.account;
-      document.getElementById('newPayName').value = item.name;
-      document.getElementById('adminPayFormTitle').innerText = "Edit Payment Gateway";
-    }
-
-    function deletePaymentMethod(id) {
-      paymentMethods = paymentMethods.filter(p => p.id != id);
-      saveState();
-      renderAdminPaymentList();
     }
 
     // Admin Chatbot FAQs
@@ -858,7 +817,7 @@
       } else { alert("Invalid credentials."); }
     }
 
-    // Driving Game Engine
+    // Driving Game
     let gameInterval = null, carX = 150, progress = 0, trafficCars = [];
     function openDrivingGameModal() {
       if (currentUser.taskReward === 0) { alert("Select a plan first!"); return; }
@@ -902,7 +861,7 @@
           currentUser.balance += currentUser.taskReward;
           saveState();
           updateUI();
-          alert(`Finished! Earned ₦${currentUser.taskReward.toLocaleString()}.`);
+          alert(`Finished! Earned $${currentUser.taskReward.toFixed(2)}.`);
           closeDrivingModal();
         }
       }, 100);
@@ -921,35 +880,35 @@
         if (seconds > 0) btn.innerText = `Verifying (${seconds}s)...`;
         else {
           clearInterval(timer);
-          currentUser.balance += 100;
+          currentUser.balance += 0.20;
           directLinkVerified = true;
           saveState();
           updateUI();
           btn.innerText = "Claimed ✓";
-          alert("Sponsor visit verified! ₦100 credited.");
+          alert("Sponsor visit verified! $0.20 credited.");
         }
       }, 1000);
     }
 
-    // Withdrawal (Enforces 5 paying referrals + 15% charge)
+    // Withdrawal (Enforces 5 paying referrals + $120 threshold + 15% charge)
     function openWithdrawModal() { document.getElementById('withdrawModal').style.display = 'flex'; }
     function closeWithdrawModal() { document.getElementById('withdrawModal').style.display = 'none'; }
     function submitWithdrawal() {
       const amt = parseFloat(document.getElementById('wdAmount').value);
       const pin = document.getElementById('wdPinInput').value;
-      if (!amt || amt < 100000) { alert("Minimum cashout is ₦100,000."); return; }
+      if (!amt || amt < 120) { alert("Minimum cashout threshold is $120.00."); return; }
       if (currentUser.activeReferrals < 5) { alert(`Withdrawal locked! You have ${currentUser.activeReferrals}/5 paying referrals. At least 5 active subscribers are required to withdraw.`); return; }
       if (pin !== currentUser.pin) { alert("Incorrect withdrawal PIN!"); return; }
 
       let charge = amt * 0.15;
       let totalDeduction = amt + charge;
-      if (totalDeduction > currentUser.balance) { alert(`Insufficient balance. Total deduction including 15% fee (₦${charge.toLocaleString()}) is ₦${totalDeduction.toLocaleString()}.`); return; }
+      if (totalDeduction > currentUser.balance) { alert(`Insufficient balance. Total deduction including 15% fee ($${charge.toFixed(2)}) is $${totalDeduction.toFixed(2)}.`); return; }
 
       currentUser.balance -= totalDeduction;
       saveState();
       updateUI();
       closeWithdrawModal();
-      alert(`Cashout of ₦${amt.toLocaleString()} requested successfully! 15% processing fee (₦${charge.toLocaleString()}) applied.`);
+      alert(`Cashout of $${amt.toFixed(2)} requested successfully! 15% processing fee ($${charge.toFixed(2)}) applied.`);
     }
 
     // Settings Updaters
@@ -985,28 +944,36 @@
       document.getElementById('settingsNewPin').value = '';
     }
 
-    // LIVE CASH-OUT POPUP SIMULATOR
-    const fakeNames = ["Adeb***45", "Kehinde4", "Chidi_O", "Blessing99", "Tunde_X", "Musa_B", "Funmi_P", "Emeka_33"];
-    const fakeBanks = ["Access Bank", "UBA", "OPay", "Kuda Bank", "Zenith Bank", "GTBank", "Moniepoint"];
-    const fakeAmounts = ["₦100,000", "₦125,000", "₦150,000", "₦200,000", "₦110,000"];
+    // CONTINUOUS NON-REPEATING DYNAMIC PAYOUT POPUPS
+    const namesPool = ["Adeb***45", "Kehinde4", "Chidi_O", "Blessing99", "Tunde_X", "Musa_B", "Funmi_P", "Emeka_33", "NaijaFlexer", "KoboKing99", "Zainab_01", "Solomon_V", "Dapo_R", "Chisom_M", "Femi_K"];
+    const banksPool = ["Access Bank", "UBA", "OPay", "Kuda Bank", "Zenith Bank", "GTBank", "Moniepoint", "FirstBank", "Fidelity Bank"];
+    const amountsPool = ["$120.00", "$150.00", "$200.00", "$250.00", "$135.00", "$180.00"];
+
+    let lastUsedIndex = -1;
 
     function triggerLiveNotification() {
       const notifEl = document.getElementById('payoutNotification');
       const textEl = document.getElementById('payoutNotifText');
 
-      const name = fakeNames[Math.floor(Math.random() * fakeNames.length)];
-      const bank = fakeBanks[Math.floor(Math.random() * fakeBanks.length)];
-      const amt = fakeAmounts[Math.floor(Math.random() * fakeAmounts.length)];
+      let idx;
+      do {
+        idx = Math.floor(Math.random() * namesPool.length);
+      } while (idx === lastUsedIndex);
+      lastUsedIndex = idx;
+
+      const name = namesPool[idx];
+      const bank = banksPool[Math.floor(Math.random() * banksPool.length)];
+      const amt = amountsPool[Math.floor(Math.random() * amountsPool.length)];
 
       textEl.innerHTML = `User <b>${name}</b> withdrew <b>${amt}</b> to ${bank}`;
       notifEl.classList.add('show');
 
       setTimeout(() => {
         notifEl.classList.remove('show');
-      }, 4000);
+      }, 3500);
     }
 
-    setInterval(triggerLiveNotification, 10000); // Pops up every 10 seconds
+    setInterval(triggerLiveNotification, 6000); // Triggers every 6 seconds
 
     if (currentUser) updateUI();
   </script>
