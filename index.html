@@ -23,7 +23,7 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; }
-    body { background-color: var(--bg); color: var(--text); padding-bottom: 60px; }
+    body { background-color: var(--bg); color: var(--text); padding-bottom: 70px; }
 
     header {
       background: #04100a;
@@ -84,28 +84,56 @@
     .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin: 20px 0; }
     .stat-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 18px; text-align: center; }
     .stat-card h4 { font-size: 12px; color: var(--text-muted); text-transform: uppercase; }
-    .stat-card p { font-size: 22px; font-weight: 900; margin-top: 6px; color: var(--gold); }
+    .stat-card p { font-size: 20px; font-weight: 900; margin-top: 6px; color: var(--gold); }
 
     .section-title { font-size: 18px; font-weight: 800; margin: 25px 0 15px 0; color: #fff; border-left: 4px solid var(--primary); padding-left: 10px; }
 
-    /* Upgrade Banner (Bottom) */
-    .upgrade-banner {
-      background: linear-gradient(135deg, #0d281a, #16422b);
-      border: 1px dashed var(--primary);
+    /* Visible Membership Plans Grid */
+    .plans-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px; }
+    .plan-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
       border-radius: 16px;
       padding: 20px;
+      text-align: center;
+      position: relative;
       display: flex;
+      flex-direction: column;
       justify-content: space-between;
-      align-items: center;
-      margin: 25px 0;
-      flex-wrap: wrap;
-      gap: 15px;
     }
+    .plan-card.active-plan { border-color: var(--primary); box-shadow: 0 0 15px rgba(0, 230, 118, 0.2); }
+    .plan-title { font-size: 18px; font-weight: 900; color: var(--gold); }
+    .plan-price { font-size: 22px; font-weight: 900; color: #fff; margin: 8px 0; }
+    .plan-perks { font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 15px; }
+    .plan-bonus { background: rgba(0, 230, 118, 0.15); color: var(--primary); font-size: 11px; font-weight: bold; padding: 4px 8px; border-radius: 10px; margin-bottom: 10px; display: inline-block; }
 
     .task-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; }
     .task-info h4 { font-size: 15px; font-weight: 800; color: #fff; }
     .task-info p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
     .task-reward { color: var(--primary); font-weight: 800; font-size: 13px; margin-top: 5px; }
+
+    /* Live Withdrawal Popup Notification */
+    .live-notification {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background: #04100a;
+      border: 1px solid var(--primary);
+      border-radius: 12px;
+      padding: 12px 18px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.8);
+      z-index: 99;
+      transform: translateY(150%);
+      transition: transform 0.5s ease;
+      max-width: 320px;
+    }
+    .live-notification.show { transform: translateY(0); }
+    .live-icon { font-size: 22px; }
+    .live-text { font-size: 12px; color: #fff; line-height: 1.3; }
+    .live-text b { color: var(--primary); }
 
     /* Chatbot Box */
     .chat-container { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; height: 350px; display: flex; flex-direction: column; }
@@ -127,6 +155,14 @@
   </style>
 </head>
 <body>
+
+  <!-- LIVE POPUP WITHDRAWAL NOTIFICATION -->
+  <div class="live-notification" id="payoutNotification">
+    <div class="live-icon">💸</div>
+    <div class="live-text" id="payoutNotifText">
+      User <b>Adeb***45</b> withdrew <b>₦100,000</b> to Access Bank
+    </div>
+  </div>
 
   <!-- AUTHENTICATION CONTAINER -->
   <div id="authContainer" class="container" style="max-width:440px; margin-top:60px;">
@@ -157,6 +193,8 @@
         <input type="password" id="regPassword" placeholder="••••••••">
         <label>Create 4-Digit Withdrawal PIN (Mandatory)</label>
         <input type="password" id="regPin" maxlength="4" placeholder="••••">
+        <label>Referral Code (Optional)</label>
+        <input type="text" id="regRefCode" placeholder="EP-XXXXX">
         <button class="btn" style="width:100%; margin-top:5px;" onclick="handleRegister()">Sign Up</button>
         <div style="text-align:center; margin-top:15px; font-size:13px;">
           <a href="#" style="color:var(--primary);" onclick="switchAuthView('login')">Already have an account? Login</a>
@@ -210,24 +248,77 @@
             <div class="balance" id="walletBalance">₦0.00</div>
           </div>
           <div class="wallet-actions">
-            <!-- SUBSCRIBE PLAN BUTTON (UP) -->
-            <button class="btn" onclick="openPlansModal('subscribe')">Subscribe Plan</button>
             <button class="btn btn-secondary" onclick="openWithdrawModal()">Cashout</button>
           </div>
         </div>
 
-        <!-- Stats Grid -->
+        <!-- Stats Grid & Referral Code -->
         <div class="stats-grid">
           <div class="stat-card">
-            <h4>Active Referrals</h4>
+            <h4>Paying Referrals</h4>
             <p id="refCountDisplay">0 / 5</p>
-            <span style="font-size:11px; color:var(--text-muted);">Required for cashout</span>
+            <span style="font-size:11px; color:var(--text-muted);">Compulsory for cashout</span>
           </div>
           <div class="stat-card">
-            <h4>Daily Expressway Drives</h4>
+            <h4>Expressway Drives</h4>
             <p id="drivesDisplay">0 / 4 Sessions</p>
             <span style="font-size:11px; color:var(--text-muted);">Resets every 24h</span>
           </div>
+        </div>
+
+        <!-- Copyable Referral Link Box -->
+        <div class="stat-card" style="text-align:left; margin-bottom:20px;">
+          <h4 style="margin-bottom:6px;">Your Referral Link (Earn 10% on Subscriber Plans)</h4>
+          <div style="display:flex; gap:10px;">
+            <input type="text" id="refLinkInput" readonly style="margin-bottom:0; font-size:13px; color:var(--gold);">
+            <button class="btn" style="padding:8px 16px; font-size:12px; white-space:nowrap;" onclick="copyReferralLink()">Copy Link</button>
+          </div>
+        </div>
+
+        <!-- VISIBLE MEMBERSHIP PLANS GRID -->
+        <div class="section-title">Select Membership Plan</div>
+        <div class="plans-grid">
+          
+          <div class="plan-card" id="planStarter">
+            <div>
+              <div class="plan-bonus">₦6,000 Cashback (40%)</div>
+              <div class="plan-title">Starter</div>
+              <div class="plan-price">₦15,000</div>
+              <div class="plan-perks">Earn ₦300/day<br>₦300 per trip<br>10 Daily Tasks</div>
+            </div>
+            <button class="btn" onclick="selectPlanPayment('Starter', 15000, 300, 6000)">Subscribe (₦15k)</button>
+          </div>
+
+          <div class="plan-card" id="planSilver">
+            <div>
+              <div class="plan-bonus">₦12,000 Cashback (40%)</div>
+              <div class="plan-title">Silver</div>
+              <div class="plan-price">₦30,000</div>
+              <div class="plan-perks">Earn ₦600/day<br>₦600 per trip<br>10 Daily Tasks</div>
+            </div>
+            <button class="btn" onclick="selectPlanPayment('Silver', 30000, 600, 12000)">Subscribe (₦30k)</button>
+          </div>
+
+          <div class="plan-card" id="planGold">
+            <div>
+              <div class="plan-bonus">₦20,000 Cashback (40%)</div>
+              <div class="plan-title">Gold</div>
+              <div class="plan-price">₦50,000</div>
+              <div class="plan-perks">Earn ₦1,000/day<br>₦1,000 per trip<br>10 Daily Tasks</div>
+            </div>
+            <button class="btn" onclick="selectPlanPayment('Gold', 50000, 1000, 20000)">Subscribe (₦50k)</button>
+          </div>
+
+          <div class="plan-card" id="planPlatinum">
+            <div>
+              <div class="plan-bonus">₦40,000 Cashback (40%)</div>
+              <div class="plan-title">Platinum</div>
+              <div class="plan-price">₦100,000</div>
+              <div class="plan-perks">Earn ₦1,500/day<br>₦1,500 per trip<br>10 Daily Tasks</div>
+            </div>
+            <button class="btn" onclick="selectPlanPayment('Platinum', 100000, 1500, 40000)">Subscribe (₦100k)</button>
+          </div>
+
         </div>
 
         <!-- Daily Tasks Module -->
@@ -251,15 +342,6 @@
             <div class="task-reward">Reward: +₦100.00 per click</div>
           </div>
           <button class="btn" id="directLinkBtn" onclick="handleDirectLinkTask('https://your-propeller-direct-link-url.com')">Visit Sponsor Link</button>
-        </div>
-
-        <!-- UPGRADE PLAN BANNER (DOWN) -->
-        <div class="upgrade-banner">
-          <div>
-            <h3 style="font-size:15px; font-weight:800; color:var(--gold);">Need Higher Task Payouts?</h3>
-            <p style="font-size:12px; color:var(--text-muted);">Upgrade your tier. Previous plan amount will be deducted + ₦5k surcharge.</p>
-          </div>
-          <button class="btn btn-secondary" style="white-space:nowrap;" onclick="openPlansModal('upgrade')">Upgrade Plan</button>
         </div>
 
       </div>
@@ -335,32 +417,21 @@
     </div>
   </div>
 
-  <!-- PLAN SELECTION MODAL -->
-  <div class="modal-overlay" id="plansModal">
+  <!-- PLAN PAYMENT CHECKOUT MODAL -->
+  <div class="modal-overlay" id="checkoutModal">
     <div class="modal">
-      <h3 id="planModalHeaderTitle">Select Subscription Plan</h3>
-      <p style="font-size:12px; color:var(--text-muted); margin-bottom:15px;" id="modalPlanSubtitle"></p>
+      <h3 id="checkoutTitle">Plan Checkout</h3>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:15px;">Transfer exact payable amount to bank details below and enter sender name.</p>
 
-      <select id="selectedPlanDropdown" onchange="updatePlanPaymentView()">
-        <option value="">-- Choose Package Tier --</option>
-        <option value="15000">Starter Plan (₦15,000) -> ₦6k Cashback</option>
-        <option value="30000">Silver Plan (₦30,000) -> ₦12k Cashback</option>
-        <option value="50000">Gold Plan (₦50,000) -> ₦20k Cashback</option>
-        <option value="100000">Platinum Plan (₦100,000) -> ₦40k Cashback</option>
-      </select>
-
-      <div id="planPaymentDetailsContainer" style="display:none;">
-        <div class="payment-account-card">
-          <p style="font-size:12px; color:var(--gold); font-weight:bold;" id="paymentCalculationText"></p>
-          <div id="activeBankInfoDisplay" style="margin-top:8px; font-size:13px; line-height:1.5;"></div>
-        </div>
-
-        <label>Your Bank Account Name (Sender Name)</label>
-        <input type="text" id="userSenderNameInput" placeholder="Sender Name">
-        <button class="btn" style="width:100%;" onclick="submitPlanPaymentProof()">Submit Payment Proof</button>
+      <div class="payment-account-card">
+        <p style="font-size:12px; color:var(--gold); font-weight:bold;" id="checkoutPayableText"></p>
+        <div id="activeBankInfoDisplay" style="margin-top:8px; font-size:13px; line-height:1.5;"></div>
       </div>
 
-      <button class="btn btn-secondary" style="width:100%; margin-top:10px;" onclick="closePlansModal()">Cancel</button>
+      <label>Your Bank Account Name (Sender Name)</label>
+      <input type="text" id="userSenderNameInput" placeholder="Sender Name">
+      <button class="btn" style="width:100%;" onclick="submitPlanPaymentProof()">Submit Payment Proof</button>
+      <button class="btn btn-secondary" style="width:100%; margin-top:10px;" onclick="closeCheckoutModal()">Cancel</button>
     </div>
   </div>
 
@@ -395,7 +466,7 @@
   <div class="modal-overlay" id="withdrawModal">
     <div class="modal">
       <h3>Request Cashout</h3>
-      <p style="font-size:12px; color:var(--text-muted); margin-bottom:15px;">Min threshold ₦100,000 | 5 Referrals | <b>15% withdrawal charge</b>.</p>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:15px;">Min threshold ₦100,000 | <b>5 Paying Referrals Compulsory</b> | <b>15% Fee</b>.</p>
       <input type="number" id="wdAmount" placeholder="Amount (Min ₦100,000)">
       <input type="text" id="wdBank" placeholder="Bank Name">
       <input type="text" id="wdAccount" placeholder="Account Number">
@@ -413,11 +484,11 @@
     let usersDb = JSON.parse(localStorage.getItem('earnplanet_users') || '[]');
     let activeSessionEmail = localStorage.getItem('earnplanet_session');
     let isAdminAuthenticated = false;
-    let currentModalMode = 'subscribe'; // 'subscribe' or 'upgrade'
+    let activeCheckoutPlan = null;
 
     let paymentMethods = JSON.parse(localStorage.getItem('earnplanet_banks') || '[{"id":1,"bank":"OPay Digital Bank","account":"8012345678","name":"EarnPlanet Official"}]');
     let pendingPaymentProofs = JSON.parse(localStorage.getItem('earnplanet_pending_payments') || '[]');
-    let chatbotFaqs = JSON.parse(localStorage.getItem('earnplanet_faqs') || '[{"id":1,"keywords":"cashout withdraw fee","answer":"Minimum cashout is ₦100,000 with 5 active referrals. A 15% charge applies."},{"id":2,"keywords":"bonus cashback","answer":"You receive an instant 40% cashback bonus credited to your wallet upon plan payment approval!"}]');
+    let chatbotFaqs = JSON.parse(localStorage.getItem('earnplanet_faqs') || '[{"id":1,"keywords":"cashout withdraw fee","answer":"Minimum cashout is ₦100,000 with 5 paying referrals. A 15% charge applies."},{"id":2,"keywords":"bonus cashback referral","answer":"You receive 40% instant cashback bonus on plan approval and 10% commission on referred subscriptions!"}]');
 
     function saveState() {
       localStorage.setItem('earnplanet_users', JSON.stringify(usersDb));
@@ -450,9 +521,10 @@
       const email = document.getElementById('regEmail').value.trim();
       const password = document.getElementById('regPassword').value;
       const pin = document.getElementById('regPin').value;
+      const refCode = document.getElementById('regRefCode').value.trim();
 
       if (!email || !password || pin.length !== 4) {
-        alert("Please fill all fields and ensure your PIN is exactly 4 digits.");
+        alert("Please fill all required fields and ensure PIN is 4 digits.");
         return;
       }
 
@@ -461,8 +533,11 @@
         return;
       }
 
+      const refId = "EP-" + Math.floor(10000 + Math.random() * 90000);
+
       const newUser = {
-        email, password, pin,
+        email, password, pin, refCode: refId,
+        referredBy: refCode || null,
         balance: 0,
         tier: "None",
         taskReward: 0,
@@ -518,9 +593,18 @@
       const rText = currentUser.taskReward > 0 ? `Reward: +₦${currentUser.taskReward} per trip` : "Reward: Select plan to unlock";
       document.getElementById('drivingRewardText').innerText = rText;
 
+      document.getElementById('refLinkInput').value = `https://earnplanet.com.ng/?ref=${currentUser.refCode}`;
+
       renderAdminPaymentList();
       renderPendingApprovals();
       renderAdminFaqs();
+    }
+
+    function copyReferralLink() {
+      const copyText = document.getElementById("refLinkInput");
+      copyText.select();
+      navigator.clipboard.writeText(copyText.value);
+      alert("Referral link copied to clipboard!");
     }
 
     function switchTab(tab) {
@@ -545,7 +629,7 @@
       list.innerHTML += `<div class="msg msg-user">${input.value}</div>`;
       input.value = '';
 
-      let reply = "I'm sorry, I couldn't find an answer for that. Please contact our support team or check back later.";
+      let reply = "I couldn't find an exact answer for that. Please ask about withdrawals, plans, or driving tasks!";
 
       for (let faq of chatbotFaqs) {
         let keys = faq.keywords.toLowerCase().split(' ');
@@ -561,101 +645,60 @@
       }, 400);
     }
 
-    // Modal Control for Subscribe vs Upgrade
-    function openPlansModal(mode) {
-      currentModalMode = mode;
-      document.getElementById('plansModal').style.display = 'flex';
-      document.getElementById('selectedPlanDropdown').value = '';
-      document.getElementById('planPaymentDetailsContainer').style.display = 'none';
-
-      if (mode === 'subscribe') {
-        document.getElementById('planModalHeaderTitle').innerText = "Subscribe to Plan";
-        document.getElementById('modalPlanSubtitle').innerText = "Select a plan tier to make a direct subscription.";
-      } else {
-        document.getElementById('planModalHeaderTitle').innerText = "Upgrade Plan Tier";
-        document.getElementById('modalPlanSubtitle').innerText = "Upgrading deducts your current tier and adds a ₦5,000 surcharge.";
-      }
-    }
-
-    function closePlansModal() { document.getElementById('plansModal').style.display = 'none'; }
-
-    function updatePlanPaymentView() {
-      const targetPrice = parseInt(document.getElementById('selectedPlanDropdown').value);
-      const container = document.getElementById('planPaymentDetailsContainer');
-      const calcText = document.getElementById('paymentCalculationText');
-      const bankDisplay = document.getElementById('activeBankInfoDisplay');
-
-      if (!targetPrice) { container.style.display = 'none'; return; }
-
+    // Plan Selection Checkout
+    function selectPlanPayment(name, price, reward, bonus) {
       let tierPrices = { "None": 0, "Starter": 15000, "Silver": 30000, "Gold": 50000, "Platinum": 100000 };
       let currentTierPrice = tierPrices[currentUser.tier] || 0;
 
-      if (currentModalMode === 'upgrade' && currentTierPrice === 0) {
-        alert("You do not have an active plan yet! Please use 'Subscribe Plan' instead.");
-        document.getElementById('selectedPlanDropdown').value = '';
-        container.style.display = 'none';
-        return;
-      }
-
-      if (targetPrice <= currentTierPrice) {
+      if (price <= currentTierPrice) {
         alert("You are already on this plan or a higher tier!");
-        document.getElementById('selectedPlanDropdown').value = "";
-        container.style.display = 'none';
         return;
       }
 
-      let priceDifference = targetPrice - currentTierPrice;
-      let surcharge = (currentModalMode === 'upgrade' && currentTierPrice > 0) ? 5000 : 0;
+      let priceDifference = price - currentTierPrice;
+      let surcharge = (currentTierPrice > 0) ? 5000 : 0; // 5k upgrade fee
       let totalPayable = priceDifference + surcharge;
 
-      if (currentModalMode === 'upgrade' && currentTierPrice > 0) {
-        calcText.innerHTML = `Upgrading from ${currentUser.tier} (₦${currentTierPrice.toLocaleString()}) -> Difference: ₦${priceDifference.toLocaleString()} + ₦5k Surcharge = <span style="color:#00e676;">Total Payable: ₦${totalPayable.toLocaleString()}</span>`;
+      activeCheckoutPlan = { name, price: totalPayable, reward, bonus, basePrice: price };
+
+      document.getElementById('checkoutTitle').innerText = `${name} Plan Checkout`;
+      if (currentTierPrice > 0) {
+        document.getElementById('checkoutPayableText').innerHTML = `Upgrading from ${currentUser.tier} -> Difference: ₦${priceDifference.toLocaleString()} + ₦5k Surcharge = <span style="color:#00e676;">Total Payable: ₦${totalPayable.toLocaleString()}</span>`;
       } else {
-        calcText.innerHTML = `Direct Subscription -> <span style="color:#00e676;">Total Payable: ₦${totalPayable.toLocaleString()}</span>`;
+        document.getElementById('checkoutPayableText').innerHTML = `Direct Subscription -> <span style="color:#00e676;">Total Payable: ₦${totalPayable.toLocaleString()}</span>`;
       }
 
       const activeBank = paymentMethods[0] || { bank: "OPay", account: "8012345678", name: "EarnPlanet" };
-      bankDisplay.innerHTML = `<b>Bank:</b> ${activeBank.bank}<br><b>Account Number:</b> ${activeBank.account}<br><b>Account Name:</b> ${activeBank.name}`;
-      container.style.display = 'block';
+      document.getElementById('activeBankInfoDisplay').innerHTML = `<b>Bank:</b> ${activeBank.bank}<br><b>Account Number:</b> ${activeBank.account}<br><b>Account Name:</b> ${activeBank.name}`;
+
+      document.getElementById('checkoutModal').style.display = 'flex';
     }
 
+    function closeCheckoutModal() { document.getElementById('checkoutModal').style.display = 'none'; }
+
     function submitPlanPaymentProof() {
-      const targetPrice = parseInt(document.getElementById('selectedPlanDropdown').value);
       const sender = document.getElementById('userSenderNameInput').value;
-      if (!targetPrice || !sender) { alert("Fill all details!"); return; }
-
-      let tierPrices = { "None": 0, "Starter": 15000, "Silver": 30000, "Gold": 50000, "Platinum": 100000 };
-      let currentTierPrice = tierPrices[currentUser.tier] || 0;
-
-      let tierMeta = {
-        15000: { name: "Starter", reward: 300, bonus: 6000 },
-        30000: { name: "Silver", reward: 600, bonus: 12000 },
-        50000: { name: "Gold", reward: 1000, bonus: 20000 },
-        100000: { name: "Platinum", reward: 1500, bonus: 40000 }
-      };
-      let meta = tierMeta[targetPrice];
-
-      let priceDifference = targetPrice - currentTierPrice;
-      let surcharge = (currentModalMode === 'upgrade' && currentTierPrice > 0) ? 5000 : 0;
-      let totalPayable = priceDifference + surcharge;
+      if (!sender) { alert("Please enter your bank sender name!"); return; }
 
       pendingPaymentProofs.push({
         id: Date.now(),
         userEmail: currentUser.email,
         sender,
-        amount: totalPayable,
-        planName: meta.name,
-        reward: meta.reward,
-        bonus: meta.bonus
+        amount: activeCheckoutPlan.price,
+        planName: activeCheckoutPlan.name,
+        reward: activeCheckoutPlan.reward,
+        bonus: activeCheckoutPlan.bonus,
+        basePrice: activeCheckoutPlan.basePrice
       });
 
       saveState();
-      closePlansModal();
-      alert(`Payment submitted for ${meta.name} Plan (₦${totalPayable.toLocaleString()}). Pending admin approval.`);
+      closeCheckoutModal();
+      document.getElementById('userSenderNameInput').value = '';
+      alert(`Payment details submitted for ${activeCheckoutPlan.name} Plan (₦${activeCheckoutPlan.price.toLocaleString()}). Pending admin approval.`);
       updateUI();
     }
 
-    // Admin Pending Approvals
+    // Admin Approvals (Credits 40% Cashback + 10% Referral Reward)
     function renderPendingApprovals() {
       const container = document.getElementById('adminPendingApprovalsList');
       if (pendingPaymentProofs.length === 0) { container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No pending payments.</p>`; return; }
@@ -677,15 +720,26 @@
       if (targetUser) {
         targetUser.tier = item.planName;
         targetUser.taskReward = item.reward;
-        targetUser.balance += item.bonus;
+        targetUser.balance += item.bonus; // 40% cashback
+
+        // Check if user was referred by someone and award 10% commission
+        if (targetUser.referredBy) {
+          const referrer = usersDb.find(u => u.refCode === targetUser.referredBy);
+          if (referrer) {
+            let refCommission = item.basePrice * 0.10; // 10% of base subscription amount
+            referrer.balance += refCommission;
+            referrer.activeReferrals += 1; // Increment paying referral count
+          }
+        }
       }
+
       pendingPaymentProofs = pendingPaymentProofs.filter(p => p.id !== id);
       saveState();
       updateUI();
-      alert("Payment approved and bonus credited!");
+      alert("Payment approved! 40% cashback credited to user and 10% awarded to referrer.");
     }
 
-    // Admin Payment Methods (Add / Edit / Delete)
+    // Admin Payment Methods
     function renderAdminPaymentList() {
       const container = document.getElementById('adminPaymentList');
       container.innerHTML = paymentMethods.map(item => `
@@ -739,7 +793,7 @@
       renderAdminPaymentList();
     }
 
-    // Admin Chatbot FAQs (Add / Edit / Delete)
+    // Admin Chatbot FAQs
     function renderAdminFaqs() {
       const container = document.getElementById('adminFaqList');
       container.innerHTML = chatbotFaqs.map(f => `
@@ -804,7 +858,7 @@
       } else { alert("Invalid credentials."); }
     }
 
-    // Driving Game
+    // Driving Game Engine
     let gameInterval = null, carX = 150, progress = 0, trafficCars = [];
     function openDrivingGameModal() {
       if (currentUser.taskReward === 0) { alert("Select a plan first!"); return; }
@@ -877,25 +931,25 @@
       }, 1000);
     }
 
-    // Withdrawal
+    // Withdrawal (Enforces 5 paying referrals + 15% charge)
     function openWithdrawModal() { document.getElementById('withdrawModal').style.display = 'flex'; }
     function closeWithdrawModal() { document.getElementById('withdrawModal').style.display = 'none'; }
     function submitWithdrawal() {
       const amt = parseFloat(document.getElementById('wdAmount').value);
       const pin = document.getElementById('wdPinInput').value;
       if (!amt || amt < 100000) { alert("Minimum cashout is ₦100,000."); return; }
-      if (currentUser.activeReferrals < 5) { alert("5 active referrals required."); return; }
+      if (currentUser.activeReferrals < 5) { alert(`Withdrawal locked! You have ${currentUser.activeReferrals}/5 paying referrals. At least 5 active subscribers are required to withdraw.`); return; }
       if (pin !== currentUser.pin) { alert("Incorrect withdrawal PIN!"); return; }
 
       let charge = amt * 0.15;
       let totalDeduction = amt + charge;
-      if (totalDeduction > currentUser.balance) { alert(`Insufficient balance.`); return; }
+      if (totalDeduction > currentUser.balance) { alert(`Insufficient balance. Total deduction including 15% fee (₦${charge.toLocaleString()}) is ₦${totalDeduction.toLocaleString()}.`); return; }
 
       currentUser.balance -= totalDeduction;
       saveState();
       updateUI();
       closeWithdrawModal();
-      alert(`Cashout of ₦${amt.toLocaleString()} requested!`);
+      alert(`Cashout of ₦${amt.toLocaleString()} requested successfully! 15% processing fee (₦${charge.toLocaleString()}) applied.`);
     }
 
     // Settings Updaters
@@ -930,6 +984,29 @@
       document.getElementById('settingsOldPin').value = '';
       document.getElementById('settingsNewPin').value = '';
     }
+
+    // LIVE CASH-OUT POPUP SIMULATOR
+    const fakeNames = ["Adeb***45", "Kehinde4", "Chidi_O", "Blessing99", "Tunde_X", "Musa_B", "Funmi_P", "Emeka_33"];
+    const fakeBanks = ["Access Bank", "UBA", "OPay", "Kuda Bank", "Zenith Bank", "GTBank", "Moniepoint"];
+    const fakeAmounts = ["₦100,000", "₦125,000", "₦150,000", "₦200,000", "₦110,000"];
+
+    function triggerLiveNotification() {
+      const notifEl = document.getElementById('payoutNotification');
+      const textEl = document.getElementById('payoutNotifText');
+
+      const name = fakeNames[Math.floor(Math.random() * fakeNames.length)];
+      const bank = fakeBanks[Math.floor(Math.random() * fakeBanks.length)];
+      const amt = fakeAmounts[Math.floor(Math.random() * fakeAmounts.length)];
+
+      textEl.innerHTML = `User <b>${name}</b> withdrew <b>${amt}</b> to ${bank}`;
+      notifEl.classList.add('show');
+
+      setTimeout(() => {
+        notifEl.classList.remove('show');
+      }, 4000);
+    }
+
+    setInterval(triggerLiveNotification, 10000); // Pops up every 10 seconds
 
     if (currentUser) updateUI();
   </script>
