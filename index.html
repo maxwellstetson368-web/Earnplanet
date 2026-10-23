@@ -237,7 +237,6 @@
           <button class="tab-btn" onclick="switchTab('store')">🛍️ Resell Flip Store</button>
           <button class="tab-btn" onclick="switchTab('support')">💬 Support & FAQs</button>
           <button class="tab-btn" onclick="switchTab('settings')">⚙️ Settings</button>
-          <button class="tab-btn" style="background:#16422b; color:var(--primary); border-color:var(--primary);" onclick="switchTab('admin')">⚙️ Admin Panel</button>
         </div>
       </div>
 
@@ -436,7 +435,8 @@
           <h4 style="margin-bottom:10px;">Add New Resell Product</h4>
           <input type="text" id="newProdTitle" placeholder="Product Title (e.g. Luxury Handbag)">
           <input type="number" id="newProdPrice" placeholder="Price in USD (e.g. 20)">
-          <input type="text" id="newProdImg" placeholder="Image URL (Unsplash or direct link)">
+          <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Upload Product Image</label>
+          <input type="file" id="newProdImgFile" accept="image/*">
           <button class="btn" onclick="adminAddProduct()">+ Add Product</button>
         </div>
         <div id="adminProductsList"></div>
@@ -585,7 +585,7 @@
   <div class="modal-overlay" id="withdrawModal">
     <div class="modal">
       <h3>Request Cashout</h3>
-      <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;" id="withdrawRuleNotice">Min threshold: ₦180,000</p>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;" id="withdrawRuleNotice">Min threshold: $120 ($100 for subsequent) | 15% Fee</p>
       <div class="payment-account-card">
         <span style="font-size:11px; color:var(--text-muted);">Available Cashout Balance:</span><br>
         <b style="font-size:18px; color:var(--primary);" id="wdAvailableDisplayNgn">₦0.00</b>
@@ -679,6 +679,7 @@
     let activeSessionEmail = localStorage.getItem('earnplanet_session');
     let activeCheckoutPlan = null;
     let activeSocialPlatform = null;
+    let showAllAdminUsers = false;
 
     let manualUserCount = parseInt(localStorage.getItem('earnplanet_manual_users') || '1280');
     let pendingPaymentProofs = JSON.parse(localStorage.getItem('earnplanet_pending_payments') || '[]');
@@ -690,7 +691,6 @@
       {id:2, q:"When can I use the Resell Flip Store?", a:"The Resell Flip Store is open Monday through Friday, with a limit of 1 flip daily."}
     ]));
     
-    // EXACT DEPOSIT INSTRUCTIONS WORD-FOR-WORD
     let defaultPaymentMethods = [
       {
         id: 1, 
@@ -774,6 +774,10 @@
       document.getElementById('headerTier').innerText = currentUser.tier === "None" ? "No Active Plan" : `${currentUser.tier} Plan`;
       document.getElementById('refLinkInput').value = `https://earnplanet.com.ng/?ref=${currentUser.refCode}`;
 
+      // Calculate paying referrals (only count if referred user has an active plan)
+      const payingRefsCount = usersDb.filter(u => u.referredBy === currentUser.refCode && u.tier && u.tier !== "None").length;
+      document.getElementById('refCountDisplay').innerText = `${payingRefsCount} / 7`;
+
       const todayStr = new Date().toDateString();
       if (currentUser.lastDriveDate !== todayStr) {
         currentUser.lastDriveDate = todayStr;
@@ -797,6 +801,17 @@
       renderUserStoreProducts();
       renderUserActiveFlips();
       renderUserSocialLinks();
+    }
+
+    function copyReferralLink() {
+      const input = document.getElementById('refLinkInput');
+      input.select();
+      input.setSelectionRange(0, 99999);
+      navigator.clipboard.writeText(input.value).then(() => {
+        alert("Referral link copied to clipboard!");
+      }).catch(err => {
+        alert("Failed to copy referral link.");
+      });
     }
 
     function renderMembershipPlansSection() {
@@ -1174,7 +1189,7 @@
       alert(`Approved! ₦70 credited to ${item.userEmail}'s balance.`);
     }
 
-    // ADMIN FAQ MANAGER
+    // ADMIN FAQ MANAGER (WITH EDIT & DELETE)
     function adminAddFaq() {
       const q = document.getElementById('newFaqQ').value.trim();
       const a = document.getElementById('newFaqA').value.trim();
@@ -1197,6 +1212,23 @@
       alert("FAQ deleted.");
     }
 
+    function adminEditFaq(id) {
+      const f = faqsDb.find(item => item.id === id);
+      if (!f) return;
+      const newQ = prompt("Edit FAQ Question:", f.q);
+      if (newQ === null) return;
+      const newA = prompt("Edit FAQ Answer:", f.a);
+      if (newA === null) return;
+
+      if (!newQ.trim() || !newA.trim()) { alert("Question and answer cannot be empty!"); return; }
+
+      f.q = newQ.trim();
+      f.a = newA.trim();
+      saveState();
+      updateUI();
+      alert("FAQ updated successfully!");
+    }
+
     function renderAdminFaqsList() {
       const container = document.getElementById('adminFaqsList');
       if (!container) return;
@@ -1208,7 +1240,10 @@
         <div class="payment-account-card" style="margin-bottom:8px;">
           <div style="font-weight:bold; color:var(--gold); font-size:13px;">Q: ${f.q}</div>
           <div style="font-size:12px; color:var(--text-muted); margin:4px 0 8px 0;">A: ${f.a}</div>
-          <button class="btn btn-danger" style="padding:4px 10px; font-size:11px;" onclick="adminDeleteFaq(${f.id})">Delete FAQ</button>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-secondary" style="padding:4px 10px; font-size:11px;" onclick="adminEditFaq(${f.id})">Edit</button>
+            <button class="btn btn-danger" style="padding:4px 10px; font-size:11px;" onclick="adminDeleteFaq(${f.id})">Delete</button>
+          </div>
         </div>
       `).join('');
     }
@@ -1228,7 +1263,7 @@
       `).join('');
     }
 
-    // ADMIN MANUAL USER CREATOR
+    // ADMIN MANUAL USER CREATOR (INCREMENTS TOTAL USERS & SENDS TELEGRAM ALERT)
     function adminCreateUserManually() {
       const email = document.getElementById('manRegEmail').value.trim();
       const password = document.getElementById('manRegPass').value;
@@ -1260,8 +1295,16 @@
       };
 
       usersDb.push(newUser);
-      manualUserCount++;
+      manualUserCount++; // Increment active total users
       saveState();
+
+      // Send Telegram alert
+      sendAdminTelegramAlert(
+        `👤 <b>ADMIN CREATED NEW USER!</b>\n\n` +
+        `📧 <b>Email:</b> ${email}\n` +
+        `💰 <b>Initial Bal:</b> $${initialBalUsd.toFixed(2)}\n` +
+        `👥 <b>Total Users:</b> ${manualUserCount}`
+      );
 
       document.getElementById('manRegEmail').value = '';
       document.getElementById('manRegPass').value = '';
@@ -1269,33 +1312,37 @@
       document.getElementById('manRegBal').value = '';
 
       updateUI();
-      alert(`User ${email} created successfully! They can now log in using these credentials.`);
+      alert(`User ${email} created successfully and added to platform total!`);
     }
 
-    // ADMIN RESELL PRODUCTS MANAGER
+    // ADMIN RESELL PRODUCTS MANAGER WITH DIRECT FILE UPLOAD
     function adminAddProduct() {
       const title = document.getElementById('newProdTitle').value.trim();
       const priceUsd = parseFloat(document.getElementById('newProdPrice').value);
-      const img = document.getElementById('newProdImg').value.trim();
+      const fileInput = document.getElementById('newProdImgFile');
 
-      if (!title || isNaN(priceUsd) || priceUsd <= 0 || !img) {
-        alert("Please fill out all product fields with valid values!");
+      if (!title || isNaN(priceUsd) || priceUsd <= 0 || !fileInput.files || !fileInput.files[0]) {
+        alert("Please fill out all product fields and select an image file!");
         return;
       }
 
-      storeProducts.push({
-        id: Date.now(),
-        title,
-        priceUsd,
-        img
-      });
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        storeProducts.push({
+          id: Date.now(),
+          title,
+          priceUsd,
+          img: e.target.result
+        });
 
-      saveState();
-      document.getElementById('newProdTitle').value = '';
-      document.getElementById('newProdPrice').value = '';
-      document.getElementById('newProdImg').value = '';
-      updateUI();
-      alert("Resell product added successfully!");
+        saveState();
+        document.getElementById('newProdTitle').value = '';
+        document.getElementById('newProdPrice').value = '';
+        fileInput.value = '';
+        updateUI();
+        alert("Resell product added successfully with uploaded image!");
+      };
+      reader.readAsDataURL(fileInput.files[0]);
     }
 
     function adminDeleteProduct(id) {
@@ -1324,7 +1371,7 @@
       `).join('');
     }
 
-    // ADMIN USER MANAGER WITH CREDENTIALS RESTORE / EDITING
+    // ADMIN USER MANAGER (WITH PAGINATION: 6 PER VIEW + SEE MORE)
     function renderAdminUsersList() {
       const container = document.getElementById('adminUsersListContainer');
       if (!container) return;
@@ -1333,12 +1380,14 @@
         return;
       }
 
-      container.innerHTML = usersDb.map(u => `
+      const displayedUsers = showAllAdminUsers ? usersDb : usersDb.slice(0, 6);
+
+      let html = displayedUsers.map(u => `
         <div class="payment-account-card" style="margin-bottom:12px; font-size:13px;">
           <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:8px;">
             <div>
               <b>Email:</b> <span style="color:var(--primary);">${u.email}</span><br>
-              <b>Tier:</b> <span style="color:var(--gold);">${u.tier || 'None'}</span> | <b>Refs:</b> ${u.activeReferrals || 0}<br>
+              <b>Tier:</b> <span style="color:var(--gold);">${u.tier || 'None'}</span> | <b>Refs:</b> ${usersDb.filter(ref => ref.referredBy === u.refCode && ref.tier && ref.tier !== "None").length} (${u.refCode})<br>
               <b>Password:</b> <span style="color:var(--text-muted);">${u.password}</span> | <b>PIN:</b> <span style="color:var(--text-muted);">${u.pin}</span>
             </div>
             <div>
@@ -1367,6 +1416,17 @@
           </div>
         </div>
       `).join('');
+
+      if (usersDb.length > 6) {
+        html += `<div style="text-align:center; margin-top:10px;"><button class="btn btn-secondary" style="font-size:12px; padding:8px 20px;" onclick="toggleSeeMoreUsers()">${showAllAdminUsers ? 'Collapse List' : 'See More Users (' + usersDb.length + ' total)'}</button></div>`;
+      }
+
+      container.innerHTML = html;
+    }
+
+    function toggleSeeMoreUsers() {
+      showAllAdminUsers = !showAllAdminUsers;
+      renderAdminUsersList();
     }
 
     function adminUpdateUserCreds(oldEmail) {
@@ -1530,14 +1590,36 @@
       `).join('');
     }
 
+    // WITHDRAWAL WITH MINIMUMS ($120 1st, $100 subsequent), 15% AUTOMATIC FEE, AND REFERRAL REQUIREMENT
     function submitWithdrawal() {
       if (!currentUser) return;
       const cashoutType = document.getElementById('cashoutTypeSelect').value;
       const amountNgn = parseFloat(document.getElementById('wdAmountInput').value);
       const pin = document.getElementById('wdPinInput').value;
 
-      let destinationInfo = "";
+      // Check referral condition: 7 paying referrals required
+      const payingRefsCount = usersDb.filter(u => u.referredBy === currentUser.refCode && u.tier && u.tier !== "None").length;
+      if (payingRefsCount < 7) {
+        alert(`Withdrawal locked! You need at least 7 paying referrals (referrals who have purchased a membership plan). You currently have ${payingRefsCount} / 7.`);
+        return;
+      }
 
+      const amountUsd = amountNgn / NGN_RATE;
+      const isFirstWithdrawal = !currentUser.hasWithdrawnBefore;
+      const minUsd = isFirstWithdrawal ? 120 : 100;
+      const minNgn = minUsd * NGN_RATE;
+
+      if (isNaN(amountNgn) || amountNgn <= 0) {
+        alert("Please enter a valid withdrawal amount!");
+        return;
+      }
+
+      if (amountUsd < minUsd) {
+        alert(`Minimum withdrawal amount for ${isFirstWithdrawal ? 'your first withdrawal is $120 (₦' + minNgn.toLocaleString() + ')' : 'subsequent withdrawals is $100 (₦' + minNgn.toLocaleString() + ')'}!`);
+        return;
+      }
+
+      let destinationInfo = "";
       if (cashoutType === 'bank') {
         const bankSelectVal = document.getElementById('wdBankSelect').value;
         const bankName = bankSelectVal === 'Other' ? document.getElementById('wdBankNameCustom').value.trim() : bankSelectVal;
@@ -1557,12 +1639,7 @@
         destinationInfo = `USDT TRC20 Address: ${usdtAddr}`;
       }
 
-      if (isNaN(amountNgn) || !pin) {
-        alert("Please fill out amount and PIN!");
-        return;
-      }
-
-      if (pin !== currentUser.pin) {
+      if (!pin || pin !== currentUser.pin) {
         alert("Incorrect 4-digit withdrawal PIN!");
         return;
       }
@@ -1573,8 +1650,14 @@
         return;
       }
 
-      const amountUsd = amountNgn / NGN_RATE;
+      // Automatic 15% charge
+      const feeUsd = amountUsd * 0.15;
+      const netUsd = amountUsd - feeUsd;
+      const feeNgn = feeUsd * NGN_RATE;
+      const netNgn = netUsd * NGN_RATE;
+
       currentUser.balanceUsd -= amountUsd;
+      currentUser.hasWithdrawnBefore = true;
       saveState();
       updateUI();
       closeWithdrawModal();
@@ -1582,12 +1665,14 @@
       sendAdminTelegramAlert(
         `💸 <b>NEW CASHOUT REQUEST!</b>\n\n` +
         `👤 <b>User:</b> ${currentUser.email}\n` +
-        `💵 <b>Amount:</b> ₦${amountNgn.toLocaleString()} ($${amountUsd.toFixed(2)})\n` +
+        `💵 <b>Gross Amount:</b> ₦${amountNgn.toLocaleString()} ($${amountUsd.toFixed(2)})\n` +
+        `📉 <b>15% Auto Fee:</b> ₦${feeNgn.toLocaleString()} ($${feeUsd.toFixed(2)})\n` +
+        `✅ <b>Net Payout:</b> ₦${netNgn.toLocaleString()} ($${netUsd.toFixed(2)})\n` +
         `📍 <b>Destination:</b> ${destinationInfo}\n\n` +
         `Process payout immediately.`
       );
 
-      alert(`Cashout request of ₦${amountNgn.toLocaleString()} submitted successfully!`);
+      alert(`Cashout request of ₦${amountNgn.toLocaleString()} submitted successfully! (15% fee applied: ₦${feeNgn.toLocaleString()}). Net payout: ₦${netNgn.toLocaleString()}`);
     }
 
     function submitAddFromMain() {
@@ -1670,7 +1755,6 @@
         drivingProgress += 2;
         document.getElementById('drivingGameStatus').innerText = `Progress: ${drivingProgress}%`;
 
-        // Draw highway road
         ctx.fillStyle = '#1f2937';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -1682,25 +1766,21 @@
         ctx.stroke();
 
         // DRAW REAL SPORTS CAR
-        ctx.fillStyle = '#ef4444'; // Red body
+        ctx.fillStyle = '#ef4444';
         ctx.beginPath();
         ctx.roundRect(carX, canvas.height - 75, 38, 64, [8]);
         ctx.fill();
 
-        // Windshield
         ctx.fillStyle = '#38bdf8';
         ctx.fillRect(carX + 4, canvas.height - 54, 30, 18);
 
-        // Rear window
         ctx.fillStyle = '#111827';
         ctx.fillRect(carX + 6, canvas.height - 24, 26, 8);
 
-        // Headlights
         ctx.fillStyle = '#facc15';
         ctx.fillRect(carX + 2, canvas.height - 73, 6, 4);
         ctx.fillRect(carX + 30, canvas.height - 73, 6, 4);
 
-        // Wheels
         ctx.fillStyle = '#111827';
         ctx.fillRect(carX - 5, canvas.height - 64, 6, 16);
         ctx.fillRect(carX + 37, canvas.height - 64, 6, 16);
@@ -1723,29 +1803,33 @@
       }, 100);
     }
 
-    // REGISTRATION WITH ₦10,000 WELCOME BONUS + TELEGRAM ALERT
+    // REGISTRATION WITH UNIQUE REFERRAL LINK SUPPORT & ₦10,000 BONUS
     function handleRegister() {
       const email = document.getElementById('regEmail').value.trim();
       const password = document.getElementById('regPassword').value;
       const pin = document.getElementById('regPin').value;
+      const refCodeInput = document.getElementById('regRefCode').value.trim();
 
       if (!email || !password || pin.length !== 4) { alert("Fill all fields correctly!"); return; }
       if (usersDb.some(u => u.email === email)) { alert("Email already exists!"); return; }
 
       const welcomeBonusUsd = 10000 / NGN_RATE;
+      const uniqueRefCode = "EP-" + Math.floor(10000 + Math.random() * 90000);
 
       const newUser = { 
         email, 
         password, 
         pin, 
-        refCode: "EP-" + Math.floor(10000 + Math.random() * 90000), 
+        refCode: uniqueRefCode, 
+        referredBy: refCodeInput || "",
         balanceUsd: welcomeBonusUsd, 
         storeBalanceUsd: 0, 
         tier: "None", 
         activeReferrals: 0,
         drivesCountToday: 0,
         lastDriveDate: "",
-        lastFlipDate: ""
+        lastFlipDate: "",
+        hasWithdrawnBefore: false
       };
       usersDb.push(newUser);
       manualUserCount++;
@@ -1754,6 +1838,7 @@
       sendAdminTelegramAlert(
         `👤 <b>NEW USER REGISTERED!</b>\n\n` +
         `📧 <b>Email:</b> ${email}\n` +
+        `🔗 <b>Referred By:</b> ${refCodeInput || 'None'}\n` +
         `🎁 <b>Welcome Bonus:</b> ₦10,000 ($${welcomeBonusUsd.toFixed(2)})\n` +
         `👥 <b>Total Users:</b> ${manualUserCount}`
       );
@@ -1787,6 +1872,17 @@
       document.getElementById('registerView').style.display = v === 'register' ? 'block' : 'none';
       document.getElementById('forgotView').style.display = v === 'forgot' ? 'block' : 'none';
     }
+
+    // Auto-fill referral code from URL query parameters if present
+    window.addEventListener('DOMContentLoaded', () => {
+      const urlParams = new URLSearchParams(window.location.search);
+      const refParam = urlParams.get('ref');
+      if (refParam) {
+        const refInput = document.getElementById('regRefCode');
+        if (refInput) refInput.value = refParam;
+        switchAuthView('register');
+      }
+    });
 
     function openAdminAuthModal() { document.getElementById('adminAuthModal').style.display = 'flex'; }
     function closeAdminAuthModal() { document.getElementById('adminAuthModal').style.display = 'none'; }
