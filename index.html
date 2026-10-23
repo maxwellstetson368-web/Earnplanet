@@ -172,6 +172,8 @@
     .payment-instruction-box b { color: var(--gold); }
     .payment-account-card { background: #04100a; border: 1px solid var(--primary); border-radius: 12px; padding: 15px; margin-bottom: 15px; }
 
+    .tx-item { background: #04100a; border: 1px solid var(--card-border); padding: 10px 14px; border-radius: 10px; margin-bottom: 8px; font-size: 12px; display: flex; justify-content: space-between; align-items: center; }
+
     #gameCanvas { background: #1f2937; border-radius: 12px; display: block; margin: 12px auto; border: 3px solid var(--primary); box-shadow: 0 0 15px rgba(0,230,118,0.2); }
   </style>
 </head>
@@ -324,8 +326,8 @@
 
         <div class="task-card" style="border-color: var(--gold);">
           <div class="task-info">
-            <h4>🛍️ Resell Flip Store (+20% Profit)</h4>
-            <p>Purchase merchandise slots and earn 20% guaranteed return. (Open Mon-Fri, 1 flip daily)</p>
+            <h4>🛍️ Resell Flip Store (20% - 25% Profit)</h4>
+            <p>Purchase merchandise slots & earn up to 25% return on an 8-day cycle. Withdraw every penny anytime!</p>
             <div class="task-reward" style="color:var(--gold);">Available Mon - Fri Only</div>
           </div>
           <button class="btn" onclick="switchTab('store')">Open Resell Store</button>
@@ -373,6 +375,10 @@
           </div>
         </div>
 
+        <!-- MAIN DASHBOARD TRANSACTION HISTORY LOG -->
+        <div class="section-title">📜 Transaction & Earnings History</div>
+        <div id="mainTransactionHistoryList" style="margin-bottom:25px;"></div>
+
         <div class="section-title">📢 Follow Our Official Social Media Pages</div>
         <div class="social-grid" id="userSocialLinksGrid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:12px; margin-top:15px;"></div>
 
@@ -391,7 +397,7 @@
           <div class="wallet-actions" style="gap:8px;">
             <button class="btn" style="background:var(--gold); color:#04100a; font-size:12px; padding:8px 12px;" onclick="openDepositModal()">+ Deposit</button>
             <button class="btn btn-secondary" style="font-size:12px; padding:8px 12px;" onclick="openAddFromMainModal()">+ Add From Main</button>
-            <button class="btn btn-secondary" style="font-size:12px; padding:8px 12px;" onclick="openTransferModal()">Withdraw to Main (5%)</button>
+            <button class="btn btn-secondary" style="font-size:12px; padding:8px 12px;" onclick="openTransferModal()">Withdraw Every Penny to Main</button>
           </div>
         </div>
 
@@ -401,7 +407,7 @@
 
         <div class="products-grid" id="userStoreProductsGrid"></div>
 
-        <div class="section-title" style="margin-top:25px;">Your Resell Investments & History</div>
+        <div class="section-title" style="margin-top:25px;">Your Resell Investments & History (8-Day Cycles)</div>
         <div id="userActiveFlipsList"></div>
       </div>
 
@@ -600,14 +606,14 @@
   <!-- WITHDRAW TO MAIN MODAL -->
   <div class="modal-overlay" id="transferModal">
     <div class="modal">
-      <h3>Withdraw Earnings to Main Dashboard</h3>
+      <h3>Withdraw Every Penny to Main Dashboard</h3>
       <div class="payment-account-card">
         <span style="font-size:11px; color:var(--text-muted);">Available Flip Store Balance:</span><br>
         <b style="font-size:18px; color:var(--gold);" id="transferAvailableDisplay">$0.00 USD</b>
       </div>
       <label>Enter Transfer Amount in USD ($)</label>
       <input type="number" id="transferAmountUsd" placeholder="e.g. 50">
-      <button class="btn" style="width:100%; margin-top:5px;" onclick="submitInternalTransfer()">Withdraw to Main (5% Fee)</button>
+      <button class="btn" style="width:100%; margin-top:5px;" onclick="submitInternalTransfer()">Withdraw to Main (0% Fee)</button>
       <button class="btn btn-secondary" style="width:100%; margin-top:10px;" onclick="closeTransferModal()">Cancel</button>
     </div>
   </div>
@@ -745,12 +751,33 @@
     let approvedPaymentsHistory = [];
     let pendingSocialTasks = [];
     
-    // WITHDRAWAL POPUPS STORAGE
+    // FULL RESTORED 25 WITHDRAWAL POPUPS STORAGE
     let withdrawalPopsDb = [
       {id: 1, name: "Femi45", amount: "₦500,000", method: "Palmpay"},
       {id: 2, name: "Chinedu99", amount: "₦180,000", method: "OPay"},
       {id: 3, name: "Amina_H", amount: "₦350,000", method: "Kuda Bank"},
-      {id: 4, name: "Tunde_B", amount: "₦220,000", method: "Access Bank"}
+      {id: 4, name: "Tunde_B", amount: "₦220,000", method: "Access Bank"},
+      {id: 5, name: "Blessing_K", amount: "₦150,000", method: "GTBank"},
+      {id: 6, name: "Emeka_X", amount: "₦420,000", method: "First Bank"},
+      {id: 7, name: "Suleiman_M", amount: "₦280,000", method: "Palmpay"},
+      {id: 8, name: "Rita_P", amount: "₦600,000", method: "USDT TRC20"},
+      {id: 9, name: "Dayo_V", amount: "₦195,000", method: "OPay"},
+      {id: 10, name: "Kemi_S", amount: "₦310,000", method: "Zenith Bank"},
+      {id: 11, name: "David_O", amount: "₦550,000", method: "UBA"},
+      {id: 12, name: "Joy_E", amount: "₦140,000", method: "Kuda Bank"},
+      {id: 13, name: "Usman_A", amount: "₦260,000", method: "Palmpay"},
+      {id: 14, name: "Grace_C", amount: "₦380,000", method: "Access Bank"},
+      {id: 15, name: "Ibrahim_K", amount: "₦720,000", method: "USDT TRC20"},
+      {id: 16, name: "Nkechi_M", amount: "₦210,000", method: "OPay"},
+      {id: 17, name: "Victor_W", amount: "₦490,000", method: "GTBank"},
+      {id: 18, name: "Zainab_H", amount: "₦165,000", method: "Kuda Bank"},
+      {id: 19, name: "Gbenga_R", amount: "₦330,000", method: "First Bank"},
+      {id: 20, name: "Precious_T", amount: "₦240,000", method: "Palmpay"},
+      {id: 21, name: "Daniel_L", amount: "₦580,000", method: "Zenith Bank"},
+      {id: 22, name: "Funke_A", amount: "₦175,000", method: "OPay"},
+      {id: 23, name: "Musa_B", amount: "₦410,000", method: "UBA"},
+      {id: 24, name: "Anietie_U", amount: "₦290,000", method: "Access Bank"},
+      {id: 25, name: "Harrison_G", amount: "₦850,000", method: "USDT TRC20"}
     ];
 
     // FAQ STORAGE
@@ -776,7 +803,8 @@
 
     let storeProducts = [
       {id:1, title:"Luxury Leather Tote Bag", priceUsd:20, img:"https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=400&q=80"},
-      {id:2, title:"Designer Chronograph Watch", priceUsd:35, img:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=400&q=80"}
+      {id:2, title:"Designer Chronograph Watch", priceUsd:35, img:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=400&q=80"},
+      {id:3, title:"High-End Smartphone Slot", priceUsd:80, img:"https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=400&q=80"}
     ];
 
     let socialLinks = [
@@ -790,6 +818,21 @@
       { name: "Gold", priceUsd: 50, cashbackUsd: 20.00, cashbackNgn: 30000, dailyDriveUsd: 0.35 },
       { name: "Platinum", priceUsd: 100, cashbackUsd: 40.00, cashbackNgn: 60000, dailyDriveUsd: 0.50 }
     ];
+
+    // LOG TRANSACTION TO USER PROFILE IN FIRESTORE
+    function logUserTransaction(type, detail, amountUsd) {
+      if (!currentUser) return;
+      if (!currentUser.txHistory) currentUser.txHistory = [];
+      
+      currentUser.txHistory.unshift({
+        id: Date.now(),
+        type: type,
+        detail: detail,
+        amountUsd: amountUsd,
+        date: new Date().toLocaleString()
+      });
+      saveState();
+    }
 
     // --- FIRESTORE REAL-TIME SYNC ---
     function initFirebaseSync() {
@@ -805,17 +848,17 @@
         updateUI();
       });
 
-      // 2. Sync Platform Data (Pending Payments, History, Social Tasks, etc.)
+      // 2. Sync Platform Data Document
       db.collection("platform_data").doc("state").onSnapshot((doc) => {
         if (doc.exists) {
           const data = doc.data();
           if (data.pendingPayments) pendingPaymentProofs = data.pendingPayments;
           if (data.approvedHistory) approvedPaymentsHistory = data.approvedHistory;
           if (data.pendingSocial) pendingSocialTasks = data.pendingSocial;
-          if (data.withdrawalPops) withdrawalPopsDb = data.withdrawalPops;
+          if (data.withdrawalPops && data.withdrawalPops.length >= 5) withdrawalPopsDb = data.withdrawalPops;
           if (data.faqs) faqsDb = data.faqs;
           if (data.paymentMethods) paymentMethods = data.paymentMethods;
-          if (data.storeProducts) storeProducts = data.storeProducts;
+          if (data.storeProducts && data.storeProducts.length >= 3) storeProducts = data.storeProducts;
           if (data.manualUserCount) manualUserCount = data.manualUserCount;
           updateUI();
         }
@@ -830,7 +873,6 @@
         localStorage.removeItem('earnplanet_session');
       }
 
-      // Save platform data to Firestore document
       db.collection("platform_data").doc("state").set({
         pendingPayments: pendingPaymentProofs,
         approvedHistory: approvedPaymentsHistory,
@@ -883,19 +925,20 @@
     function updateUI() {
       if (!currentUser) return;
 
-      // Check active flips maturity
+      // Check active flips maturity (8-Day Cycle)
       if (currentUser.activeFlips) {
         let matured = false;
         currentUser.activeFlips.forEach(f => {
           if (f.status === 'active' && new Date() >= new Date(f.expectedDate)) {
             f.status = 'completed';
             currentUser.balanceUsd = (currentUser.balanceUsd || 0) + f.returnUsd;
+            logUserTransaction("Flip Return", `Matured flip return for ${f.title}`, f.returnUsd);
             matured = true;
           }
         });
         if (matured) {
           saveState();
-          alert("🎉 Resell investment matured! Your 20% return has been added to your Main Balance.");
+          alert("🎉 Resell investment matured! Your return has been automatically added to your Main Balance.");
         }
       }
 
@@ -911,6 +954,9 @@
       const storeNgn = storeUsd * NGN_RATE;
       document.getElementById('storeBalanceNgn').innerText = `₦${storeNgn.toLocaleString('en-NG', {minimumFractionDigits: 2})}`;
       document.getElementById('storeBalanceUsd').innerText = `≈ $${storeUsd.toFixed(2)} USD`;
+      
+      const transferAvail = document.getElementById('transferAvailableDisplay');
+      if (transferAvail) transferAvail.innerText = `$${storeUsd.toFixed(2)} USD`;
 
       document.getElementById('activeUsersDisplay').innerText = manualUserCount.toLocaleString();
       document.getElementById('headerTier').innerText = currentUser.tier === "None" ? "No Active Plan" : `${currentUser.tier} Plan`;
@@ -967,6 +1013,28 @@
       renderUserStoreProducts();
       renderUserActiveFlips();
       renderUserSocialLinks();
+      renderMainTransactionHistory();
+    }
+
+    function renderMainTransactionHistory() {
+      const container = document.getElementById('mainTransactionHistoryList');
+      if (!container) return;
+      if (!currentUser.txHistory || currentUser.txHistory.length === 0) {
+        container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No recorded transactions yet.</p>`;
+        return;
+      }
+
+      container.innerHTML = currentUser.txHistory.slice(0, 10).map(tx => `
+        <div class="tx-item">
+          <div>
+            <b>${tx.type}</b> - ${tx.detail}<br>
+            <span style="font-size:10px; color:var(--text-muted);">${tx.date}</span>
+          </div>
+          <div style="font-weight:bold; color:${tx.amountUsd >= 0 ? 'var(--primary)' : 'var(--danger)'};">
+            ${tx.amountUsd >= 0 ? '+' : ''}$${tx.amountUsd.toFixed(2)}
+          </div>
+        </div>
+      `).join('');
     }
 
     function copyReferralLink() {
@@ -998,7 +1066,7 @@
               <div class="plan-price-usd">$${plan.priceUsd.toFixed(2)} USD</div>
               <div class="plan-perks">Earn $${plan.dailyDriveUsd.toFixed(2)} per drive<br>4 Drives Daily</div>
             </div>
-            <button class="btn" ${hasPendingSub ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''} onclick="${hasPendingSub ? '' : `openCheckoutModal('${plan.name}', ${plan.priceUsd}, false)`}">Subscribe</button>
+            <button class="btn" ${hasPendingSub ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''} onclick="${hasPendingSub ? '' : `openCheckoutModal('${plan.name}', ${plan.priceUsd}, false)`}">${hasPendingSub ? '⏳ Verification Pending' : 'Subscribe'}</button>
           </div>
         `).join('');
       } else {
@@ -1024,7 +1092,7 @@
                 <div class="plan-price-usd">($${priceDiffUsd} diff + ₦5,000 fee)</div>
                 <div class="plan-perks">New Perks: Earn $${plan.dailyDriveUsd.toFixed(2)} per drive<br>4 Drives Daily</div>
               </div>
-              <button class="btn" ${hasPendingSub ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''} onclick="${hasPendingSub ? '' : `openCheckoutModal('${plan.name}', ${totalUpgradeUsd}, true)`}">Upgrade Plan</button>
+              <button class="btn" ${hasPendingSub ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''} onclick="${hasPendingSub ? '' : `openCheckoutModal('${plan.name}', ${totalUpgradeUsd}, true)`}">${hasPendingSub ? '⏳ Verification Pending' : 'Upgrade Plan'}</button>
             </div>
           `;
         }).join('');
@@ -1205,6 +1273,9 @@
           proofImg: e.target.result,
           type: "subscription"
         });
+
+        logUserTransaction("Plan Purchase", `Submitted proof for ${activeCheckoutPlan.name} plan`, -activeCheckoutPlan.priceUsd);
+
         saveState();
         closeCheckoutModal();
 
@@ -1388,6 +1459,14 @@
       const user = usersDb.find(u => u.email === item.userEmail);
       if (user) {
         user.balanceUsd = (user.balanceUsd || 0) + SOCIAL_REWARD_USD;
+        if (!user.txHistory) user.txHistory = [];
+        user.txHistory.unshift({
+          id: Date.now(),
+          type: "Social Task Reward",
+          detail: `Approved ${item.platform} submission`,
+          amountUsd: SOCIAL_REWARD_USD,
+          date: new Date().toLocaleString()
+        });
         await db.collection("users").doc(user.email).set(user, { merge: true });
       }
 
@@ -1573,7 +1652,10 @@
         lastDriveDate: "",
         lastFlipDate: "",
         withdrawalCount: 0,
-        activeFlips: []
+        activeFlips: [],
+        txHistory: [
+          { id: Date.now(), type: "Admin Grant", detail: "Initial Account Creation", amountUsd: initialBalUsd, date: new Date().toLocaleString() }
+        ]
       };
 
       await db.collection("users").doc(email).set(newUser);
@@ -1640,15 +1722,19 @@
         container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No products in store.</p>`;
         return;
       }
-      container.innerHTML = storeProducts.map(p => `
-        <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-          <div style="display:flex; gap:10px; align-items:center;">
-            <img src="${p.img}" style="width:40px; height:40px; object-fit:cover; border-radius:6px;">
-            <div><b>${p.title}</b><br><span style="font-size:12px; color:var(--gold);">$${p.priceUsd} (₦${(p.priceUsd * NGN_RATE).toLocaleString()})</span></div>
+      container.innerHTML = storeProducts.map(p => {
+        const isHighTier = p.priceUsd * NGN_RATE >= 100000;
+        const profitRate = isHighTier ? 25 : 20;
+        return `
+          <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <div style="display:flex; gap:10px; align-items:center;">
+              <img src="${p.img}" style="width:40px; height:40px; object-fit:cover; border-radius:6px;">
+              <div><b>${p.title}</b><br><span style="font-size:12px; color:var(--gold);">$${p.priceUsd} (₦${(p.priceUsd * NGN_RATE).toLocaleString()}) [${profitRate}% Return / 8 Days]</span></div>
+            </div>
+            <button class="btn btn-danger" style="padding:6px 10px; font-size:11px;" onclick="adminDeleteProduct(${p.id})">Delete</button>
           </div>
-          <button class="btn btn-danger" style="padding:6px 10px; font-size:11px;" onclick="adminDeleteProduct(${p.id})">Delete</button>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     function renderAdminUsersList() {
@@ -1810,15 +1896,22 @@
     function renderUserStoreProducts() {
       const container = document.getElementById('userStoreProductsGrid');
       if (!container) return;
-      container.innerHTML = storeProducts.map(p => `
-        <div class="product-card">
-          <img src="${p.img}" class="product-img" alt="${p.title}">
-          <div class="product-title">${p.title}</div>
-          <div class="product-price">₦${(p.priceUsd * NGN_RATE).toLocaleString()} ($${p.priceUsd})</div>
-          <div class="product-profit">Return: ₦${(p.priceUsd * 1.2 * NGN_RATE).toLocaleString()} ($${(p.priceUsd * 1.2).toFixed(2)}) [+20%]</div>
-          <button class="btn" onclick="buyProduct(${p.id})">Flip Product</button>
-        </div>
-      `).join('');
+      container.innerHTML = storeProducts.map(p => {
+        const isHighTier = (p.priceUsd * NGN_RATE) >= 100000;
+        const profitRate = isHighTier ? 0.25 : 0.20;
+        const profitText = isHighTier ? "+25%" : "+20%";
+        const returnAmount = p.priceUsd * (1 + profitRate);
+
+        return `
+          <div class="product-card">
+            <img src="${p.img}" class="product-img" alt="${p.title}">
+            <div class="product-title">${p.title}</div>
+            <div class="product-price">₦${(p.priceUsd * NGN_RATE).toLocaleString()} ($${p.priceUsd})</div>
+            <div class="product-profit">Return: ₦${(returnAmount * NGN_RATE).toLocaleString()} ($${returnAmount.toFixed(2)}) [${profitText} / 8 Days]</div>
+            <button class="btn" onclick="buyProduct(${p.id})">Flip Product</button>
+          </div>
+        `;
+      }).join('');
     }
 
     function buyProduct(productId) {
@@ -1848,10 +1941,14 @@
       }
 
       currentUser.storeBalanceUsd -= price;
-      const returnAmount = price * 1.2;
+      
+      const isHighTier = (price * NGN_RATE) >= 100000;
+      const profitRate = isHighTier ? 0.25 : 0.20;
+      const returnAmount = price * (1 + profitRate);
       
       const purchaseDateStr = new Date().toLocaleString();
-      const expectedDateObj = new Date(Date.now() + 24 * 60 * 60 * 1000);
+      // 8-DAY CYCLE (8 * 24 HOURS)
+      const expectedDateObj = new Date(Date.now() + 8 * 24 * 60 * 60 * 1000);
       const expectedDateStr = expectedDateObj.toLocaleString();
 
       if (!currentUser.activeFlips) currentUser.activeFlips = [];
@@ -1866,9 +1963,12 @@
       });
 
       currentUser.lastFlipDate = todayStr;
+      
+      logUserTransaction("Flip Investment", `Purchased slot for ${product.title}`, -price);
+
       saveState();
       updateUI();
-      alert(`Successfully invested in ${product.title}! Expected maturity: ${expectedDateStr}. Return (+20%) will be automatically credited to your main balance upon maturity.`);
+      alert(`Successfully invested in ${product.title}! Expected maturity (8 days): ${expectedDateStr}. Return (${isHighTier ? '25%' : '20%'}) will be credited automatically upon maturity.`);
     }
 
     function renderUserActiveFlips() {
@@ -1884,10 +1984,10 @@
           <div>
             <b>${f.title}</b> ($${f.priceUsd} ➔ Return: $${f.returnUsd.toFixed(2)})<br>
             <span style="font-size:11px; color:var(--text-muted);">Purchased: ${f.purchaseDate}</span><br>
-            <span style="font-size:11px; color:var(--text-muted);">Expected Maturity Date: <b style="color:var(--gold);">${f.expectedDate}</b></span>
+            <span style="font-size:11px; color:var(--text-muted);">Maturity Date (8-Day Cycle): <b style="color:var(--gold);">${f.expectedDate}</b></span>
           </div>
           <div>
-            <span style="font-size:11px; font-weight:bold; padding:6px 12px; border-radius:8px; background:${f.status === 'active' ? 'rgba(251,191,36,0.2); color:var(--gold); border:1px solid var(--gold);' : 'rgba(0,230,118,0.2); color:var(--primary); border:1px solid var(--primary);'}">${f.status === 'active' ? '⏳ ACTIVE (Pending Maturity)' : '✔ COMPLETED (Credited)'}</span>
+            <span style="font-size:11px; font-weight:bold; padding:6px 12px; border-radius:8px; background:${f.status === 'active' ? 'rgba(251,191,36,0.2); color:var(--gold); border:1px solid var(--gold);' : 'rgba(0,230,118,0.2); color:var(--primary); border:1px solid var(--primary);'}">${f.status === 'active' ? '⏳ ACTIVE (Locked 8 Days)' : '✔ COMPLETED (Credited)'}</span>
           </div>
         </div>
       `).join('');
@@ -1974,6 +2074,9 @@
 
       currentUser.balanceUsd -= amountUsd;
       currentUser.withdrawalCount = wCount + 1;
+
+      logUserTransaction("Cashout Request", `Requested cashout to ${destinationInfo}`, -amountUsd);
+
       saveState();
       updateUI();
       closeWithdrawModal();
@@ -1998,6 +2101,9 @@
 
       currentUser.balanceUsd -= amt;
       currentUser.storeBalanceUsd = (currentUser.storeBalanceUsd || 0) + amt;
+
+      logUserTransaction("Store Transfer", `Transferred funds to Resell Flip Store`, -amt);
+
       saveState();
       updateUI();
       closeAddFromMainModal();
@@ -2009,14 +2115,15 @@
       if (isNaN(amt) || amt <= 0) { alert("Enter a valid amount!"); return; }
       if ((currentUser.storeBalanceUsd || 0) < amt) { alert("Insufficient store balance!"); return; }
 
-      const fee = amt * 0.05;
-      const net = amt - fee;
       currentUser.storeBalanceUsd -= amt;
-      currentUser.balanceUsd = (currentUser.balanceUsd || 0) + net;
+      currentUser.balanceUsd = (currentUser.balanceUsd || 0) + amt;
+
+      logUserTransaction("Store Cashout", `Withdrew earnings from Resell Flip Store to Main`, amt);
+
       saveState();
       updateUI();
       closeTransferModal();
-      alert(`Transferred $${net.toFixed(2)} to main dashboard ($${fee.toFixed(2)} 5% fee applied).`);
+      alert(`Transferred $${amt.toFixed(2)} to main dashboard with 0% fee!`);
     }
 
     let drivingGameInterval = null;
@@ -2109,6 +2216,9 @@
           const planObj = availablePlans.find(p => p.name === currentUser.tier);
           const rewardUsd = planObj ? planObj.dailyDriveUsd : 0.15;
           currentUser.balanceUsd = (currentUser.balanceUsd || 0) + rewardUsd;
+
+          logUserTransaction("Expressway Drive", `Completed Lagos expressway drive session`, rewardUsd);
+
           saveState();
           updateUI();
 
@@ -2213,7 +2323,10 @@
         lastDriveDate: "",
         lastFlipDate: "",
         withdrawalCount: 0,
-        activeFlips: []
+        activeFlips: [],
+        txHistory: [
+          { id: Date.now(), type: "Welcome Bonus", detail: "₦10,000 Sign Up Welcome Bonus", amountUsd: welcomeBonusUsd, date: new Date().toLocaleString() }
+        ]
       };
 
       await db.collection("users").doc(email).set(newUser);
