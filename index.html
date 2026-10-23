@@ -64,7 +64,6 @@
       align-items: center;
       gap: 10px;
       box-shadow: 0 4px 15px rgba(0, 230, 118, 0.15);
-      animation: fadeInOut 4s infinite;
     }
 
     .planetians-welcome {
@@ -303,6 +302,9 @@
         </div>
 
         <div class="section-title">Membership Plans</div>
+        <div id="pendingSubscriptionNotice" style="display:none; background:rgba(251,191,36,0.15); border:1px solid var(--gold); padding:12px; border-radius:10px; margin-bottom:15px; color:var(--gold); font-size:13px; font-weight:bold;">
+          ⏳ You have a pending subscription payment waiting for admin approval. You cannot submit a new one until approved.
+        </div>
         <div class="plans-grid" id="plansContainer"></div>
 
         <div class="section-title">Earning Modules</div>
@@ -389,9 +391,13 @@
           </div>
         </div>
 
+        <div id="pendingDepositNotice" style="display:none; background:rgba(251,191,36,0.15); border:1px solid var(--gold); padding:12px; border-radius:10px; margin-bottom:15px; color:var(--gold); font-size:13px; font-weight:bold;">
+          ⏳ You have a pending deposit verification waiting for admin approval. You cannot submit a new deposit until approved.
+        </div>
+
         <div class="products-grid" id="userStoreProductsGrid"></div>
 
-        <div class="section-title" style="margin-top:25px;">Your Active Resell Investments</div>
+        <div class="section-title" style="margin-top:25px;">Your Resell Investments & History</div>
         <div id="userActiveFlipsList"></div>
       </div>
 
@@ -481,6 +487,9 @@
 
         <div class="section-title" style="margin-top:30px;">⚙️ Pending Payment & Deposit Approvals</div>
         <div id="adminPendingApprovalsList"></div>
+
+        <div class="section-title" style="margin-top:30px;">⚙️ Approved Payments History (Logged)</div>
+        <div id="adminApprovedHistoryList"></div>
 
         <div class="section-title" style="margin-top:30px;">⚙️ Payment Methods & Account Details Manager</div>
         <div class="stat-card" style="text-align:left; margin-bottom:15px;">
@@ -713,9 +722,11 @@
     let activeSocialPlatform = null;
     let showAllAdminUsers = false;
     let showAllAdminWdPops = false;
+    let showAllAdminApproved = false;
 
     let manualUserCount = parseInt(localStorage.getItem('earnplanet_manual_users') || '1280');
     let pendingPaymentProofs = JSON.parse(localStorage.getItem('earnplanet_pending_payments') || '[]');
+    let approvedPaymentsHistory = JSON.parse(localStorage.getItem('earnplanet_approved_history') || '[]');
     let pendingSocialTasks = JSON.parse(localStorage.getItem('earnplanet_pending_social') || '[]');
     
     // WITHDRAWAL POPUPS STORAGE
@@ -755,7 +766,6 @@
       {id:2, title:"Designer Chronograph Watch", priceUsd:35, img:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=400&q=80"}
     ]));
 
-    let activeUserFlips = JSON.parse(localStorage.getItem('earnplanet_user_flips') || '{}');
     let socialLinks = JSON.parse(localStorage.getItem('earnplanet_social_links') || JSON.stringify([
       {id:1, platform:"Telegram Channel", url:"https://t.me/earnplanetofficial"},
       {id:2, platform:"Facebook Page", url:"https://facebook.com/earnplanet"}
@@ -772,11 +782,10 @@
       localStorage.setItem('earnplanet_users', JSON.stringify(usersDb));
       localStorage.setItem('earnplanet_manual_users', manualUserCount.toString());
       localStorage.setItem('earnplanet_pending_payments', JSON.stringify(pendingPaymentProofs));
+      localStorage.setItem('earnplanet_approved_history', JSON.stringify(approvedPaymentsHistory));
       localStorage.setItem('earnplanet_pending_social', JSON.stringify(pendingSocialTasks));
       localStorage.setItem('earnplanet_pay_methods', JSON.stringify(paymentMethods));
       localStorage.setItem('earnplanet_products', JSON.stringify(storeProducts));
-      localStorage.setItem('earnplanet_user_flips', JSON.stringify(activeUserFlips));
-      localStorage.setItem('earnplanet_social_links', JSON.stringify(socialLinks));
       localStorage.setItem('earnplanet_faqs', JSON.stringify(faqsDb));
       localStorage.setItem('earnplanet_withdrawal_pops', JSON.stringify(withdrawalPopsDb));
 
@@ -796,7 +805,7 @@
       }
     }
 
-    // LIVE WITHDRAWAL POPUP TICKER LOOP (Every 1-2 seconds)
+    // LIVE WITHDRAWAL POPUP TICKER LOOP
     let popIndex = 0;
     function startWithdrawalTicker() {
       const popEl = document.getElementById('liveWithdrawalPopup');
@@ -808,13 +817,28 @@
       popEl.style.display = 'flex';
       const item = withdrawalPopsDb[popIndex];
       popEl.innerHTML = `💸 <b>${item.name}</b> just withdrew <b>${item.amount}</b> through <b>${item.method}</b>`;
-      
       popIndex = (popIndex + 1) % withdrawalPopsDb.length;
     }
     setInterval(startWithdrawalTicker, 2500);
 
     function updateUI() {
       if (!currentUser) return;
+
+      // Check active flips maturity
+      if (currentUser.activeFlips) {
+        let matured = false;
+        currentUser.activeFlips.forEach(f => {
+          if (f.status === 'active' && new Date() >= new Date(f.expectedDate)) {
+            f.status = 'completed';
+            currentUser.balanceUsd = (currentUser.balanceUsd || 0) + f.returnUsd;
+            matured = true;
+          }
+        });
+        if (matured) {
+          saveState();
+          alert("🎉 Resell investment matured! Your 20% return has been added to your Main Balance.");
+        }
+      }
 
       const usdBal = currentUser.balanceUsd || 0;
       const ngnBal = usdBal * NGN_RATE;
@@ -833,7 +857,6 @@
       document.getElementById('headerTier').innerText = currentUser.tier === "None" ? "No Active Plan" : `${currentUser.tier} Plan`;
       document.getElementById('refLinkInput').value = `https://earnplanet.com.ng/?ref=${currentUser.refCode}`;
 
-      // Calculate paying referrals & dynamic requirement based on withdrawal count
       const payingRefsCount = usersDb.filter(u => u.referredBy === currentUser.refCode && u.tier && u.tier !== "None").length;
       const wCount = currentUser.withdrawalCount || 0;
       let requiredRefs = 7;
@@ -862,9 +885,19 @@
       const mainStoreDisplay = document.getElementById('mainAvailableForStoreDisplay');
       if (mainStoreDisplay) mainStoreDisplay.innerText = `$${usdBal.toFixed(2)} USD`;
 
+      const hasPendingSub = pendingPaymentProofs.some(p => p.userEmail === currentUser.email && p.type === 'subscription');
+      const hasPendingDep = pendingPaymentProofs.some(p => p.userEmail === currentUser.email && p.type === 'deposit');
+
+      const subNotice = document.getElementById('pendingSubscriptionNotice');
+      if (subNotice) subNotice.style.display = hasPendingSub ? 'block' : 'none';
+
+      const depNotice = document.getElementById('pendingDepositNotice');
+      if (depNotice) depNotice.style.display = hasPendingDep ? 'block' : 'none';
+
       renderMembershipPlansSection();
       renderPaymentMethodDropdowns();
       renderPendingApprovals();
+      renderAdminApprovedHistory();
       renderPendingSocialTasks();
       renderAdminUsersList();
       renderAdminWithdrawalPops();
@@ -892,6 +925,7 @@
       const container = document.getElementById('plansContainer');
       if (!container) return;
 
+      const hasPendingSub = pendingPaymentProofs.some(p => p.userEmail === currentUser.email && p.type === 'subscription');
       const hasActivePlan = currentUser.tier && currentUser.tier !== "None";
       const currentPlanObj = availablePlans.find(p => p.name === currentUser.tier);
 
@@ -905,7 +939,7 @@
               <div class="plan-price-usd">$${plan.priceUsd.toFixed(2)} USD</div>
               <div class="plan-perks">Earn $${plan.dailyDriveUsd.toFixed(2)} per drive<br>4 Drives Daily</div>
             </div>
-            <button class="btn" onclick="openCheckoutModal('${plan.name}', ${plan.priceUsd}, false)">Subscribe</button>
+            <button class="btn" ${hasPendingSub ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''} onclick="${hasPendingSub ? '' : `openCheckoutModal('${plan.name}', ${plan.priceUsd}, false)`}">Subscribe</button>
           </div>
         `).join('');
       } else {
@@ -931,7 +965,7 @@
                 <div class="plan-price-usd">($${priceDiffUsd} diff + ₦5,000 fee)</div>
                 <div class="plan-perks">New Perks: Earn $${plan.dailyDriveUsd.toFixed(2)} per drive<br>4 Drives Daily</div>
               </div>
-              <button class="btn" onclick="openCheckoutModal('${plan.name}', ${totalUpgradeUsd}, true)">Upgrade Plan</button>
+              <button class="btn" ${hasPendingSub ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''} onclick="${hasPendingSub ? '' : `openCheckoutModal('${plan.name}', ${totalUpgradeUsd}, true)`}">Upgrade Plan</button>
             </div>
           `;
         }).join('');
@@ -1124,7 +1158,7 @@
           `Review in Admin Panel at earnplanet.com.ng`
         );
 
-        alert("Payment proof submitted successfully! Admin notified.");
+        alert("Payment proof submitted successfully! Pending admin approval.");
         updateUI();
       };
       reader.readAsDataURL(fileInput.files[0]);
@@ -1165,7 +1199,7 @@
           `Review in Admin Panel at earnplanet.com.ng`
         );
 
-        alert("Deposit verification submitted! Admin notified.");
+        alert("Deposit verification submitted! Pending admin approval.");
         updateUI();
       };
       reader.readAsDataURL(fileInput.files[0]);
@@ -1213,10 +1247,17 @@
         }
       }
 
+      approvedPaymentsHistory.unshift({
+        id: item.id,
+        userEmail: item.userEmail,
+        detail: `${item.planName} - $${item.amountUsd} (₦${(item.amountUsd * NGN_RATE).toLocaleString()})`,
+        approvedDate: new Date().toLocaleString()
+      });
+
       pendingPaymentProofs = pendingPaymentProofs.filter(p => p.id !== id);
       saveState();
       updateUI();
-      alert("Payment approved successfully!");
+      alert("Payment approved and logged successfully!");
     }
 
     function rejectPaymentProof(id) {
@@ -1225,6 +1266,38 @@
       saveState();
       updateUI();
       alert("Payment rejected.");
+    }
+
+    function renderAdminApprovedHistory() {
+      const container = document.getElementById('adminApprovedHistoryList');
+      if (!container) return;
+      if (approvedPaymentsHistory.length === 0) {
+        container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No approved payments history yet.</p>`;
+        return;
+      }
+
+      const displayedApproved = showAllAdminApproved ? approvedPaymentsHistory : approvedPaymentsHistory.slice(0, 5);
+      let html = displayedApproved.map(item => `
+        <div class="payment-account-card" style="margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; font-size:13px;">
+          <div>
+            ✅ <b>${item.userEmail}</b> paid for/requested: <span style="color:var(--gold);">${item.detail}</span><br>
+            <span style="font-size:11px; color:var(--text-muted);">Approved on: ${item.approvedDate}</span>
+          </div>
+          <div>
+            <span style="font-size:11px; background:rgba(0,230,118,0.15); color:var(--primary); padding:4px 8px; border-radius:6px; font-weight:bold;">APPROVED ✔</span>
+          </div>
+        </div>
+      `).join('');
+
+      if (approvedPaymentsHistory.length > 5) {
+        html += `<div style="text-align:center; margin-top:10px;"><button class="btn btn-secondary" style="font-size:12px; padding:6px 16px;" onclick="toggleSeeMoreApproved()">${showAllAdminApproved ? 'Collapse List' : 'See More (' + approvedPaymentsHistory.length + ' total)'}</button></div>`;
+      }
+      container.innerHTML = html;
+    }
+
+    function toggleSeeMoreApproved() {
+      showAllAdminApproved = !showAllAdminApproved;
+      renderAdminApprovedHistory();
     }
 
     function renderPendingSocialTasks() {
@@ -1263,7 +1336,6 @@
       alert(`Approved! ₦70 credited to ${item.userEmail}'s balance.`);
     }
 
-    // ADMIN WITHDRAWAL POP-UP MANAGER
     function adminAddWithdrawalPop() {
       const name = document.getElementById('newWdPopName').value.trim();
       const amount = document.getElementById('newWdPopAmount').value.trim();
@@ -1288,6 +1360,26 @@
       alert("Withdrawal pop-up deleted.");
     }
 
+    function adminEditWithdrawalPop(id) {
+      const p = withdrawalPopsDb.find(item => item.id === id);
+      if (!p) return;
+      const newName = prompt("Edit Name / Username:", p.name);
+      if (newName === null) return;
+      const newAmount = prompt("Edit Amount (e.g. ₦500,000):", p.amount);
+      if (newAmount === null) return;
+      const newMethod = prompt("Edit Method (e.g. Palmpay):", p.method);
+      if (newMethod === null) return;
+
+      if (!newName.trim() || !newAmount.trim() || !newMethod.trim()) { alert("Fields cannot be empty!"); return; }
+
+      p.name = newName.trim();
+      p.amount = newAmount.trim();
+      p.method = newMethod.trim();
+      saveState();
+      updateUI();
+      alert("Withdrawal pop-up updated successfully!");
+    }
+
     function renderAdminWithdrawalPops() {
       const container = document.getElementById('adminWithdrawalPopsList');
       if (!container) return;
@@ -1296,15 +1388,18 @@
         return;
       }
 
-      const displayedPops = showAllAdminWdPops ? withdrawalPopsDb : withdrawalPopsDb.slice(0, 6);
+      const displayedPops = showAllAdminWdPops ? withdrawalPopsDb : withdrawalPopsDb.slice(0, 5);
       let html = displayedPops.map(p => `
-        <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+        <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:13px;">
           <div><b>${p.name}</b> withdrew <span style="color:var(--primary);">${p.amount}</span> through <span style="color:var(--gold);">${p.method}</span></div>
-          <button class="btn btn-danger" style="padding:4px 10px; font-size:11px;" onclick="adminDeleteWithdrawalPop(${p.id})">Delete</button>
+          <div style="display:flex; gap:6px;">
+            <button class="btn btn-secondary" style="padding:4px 8px; font-size:11px;" onclick="adminEditWithdrawalPop(${p.id})">Edit</button>
+            <button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="adminDeleteWithdrawalPop(${p.id})">Delete</button>
+          </div>
         </div>
       `).join('');
 
-      if (withdrawalPopsDb.length > 6) {
+      if (withdrawalPopsDb.length > 5) {
         html += `<div style="text-align:center; margin-top:10px;"><button class="btn btn-secondary" style="font-size:12px; padding:6px 16px;" onclick="toggleSeeMoreWdPops()">${showAllAdminWdPops ? 'Collapse List' : 'See More (' + withdrawalPopsDb.length + ' total)'}</button></div>`;
       }
       container.innerHTML = html;
@@ -1315,7 +1410,6 @@
       renderAdminWithdrawalPops();
     }
 
-    // ADMIN FAQ MANAGER (WITH EDIT & DELETE)
     function adminAddFaq() {
       const q = document.getElementById('newFaqQ').value.trim();
       const a = document.getElementById('newFaqA').value.trim();
@@ -1389,7 +1483,6 @@
       `).join('');
     }
 
-    // ADMIN MANUAL USER CREATOR (INCREMENTS TOTAL USERS & SENDS TELEGRAM ALERT)
     function adminCreateUserManually() {
       const email = document.getElementById('manRegEmail').value.trim();
       const password = document.getElementById('manRegPass').value;
@@ -1418,11 +1511,12 @@
         drivesCountToday: 0,
         lastDriveDate: "",
         lastFlipDate: "",
-        withdrawalCount: 0
+        withdrawalCount: 0,
+        activeFlips: []
       };
 
       usersDb.push(newUser);
-      manualUserCount++; // Increment active total users
+      manualUserCount++;
       saveState();
 
       sendAdminTelegramAlert(
@@ -1441,7 +1535,6 @@
       alert(`User ${email} created successfully and added to platform total!`);
     }
 
-    // ADMIN RESELL PRODUCTS MANAGER WITH DIRECT FILE UPLOAD
     function adminAddProduct() {
       const title = document.getElementById('newProdTitle').value.trim();
       const priceUsd = parseFloat(document.getElementById('newProdPrice').value);
@@ -1497,7 +1590,6 @@
       `).join('');
     }
 
-    // ADMIN USER MANAGER (WITH PAGINATION: 6 PER VIEW + SEE MORE)
     function renderAdminUsersList() {
       const container = document.getElementById('adminUsersListContainer');
       if (!container) return;
@@ -1522,7 +1614,6 @@
             </div>
           </div>
           
-          <!-- Restore / Edit Credentials Form -->
           <div style="background:#04100a; border:1px solid var(--card-border); padding:8px; border-radius:8px; margin-top:8px;">
             <div style="font-size:11px; color:var(--gold); margin-bottom:4px; font-weight:bold;">Restore / Edit User Credentials:</div>
             <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
@@ -1692,18 +1783,48 @@
 
       currentUser.storeBalanceUsd -= price;
       const returnAmount = price * 1.2;
-      currentUser.balanceUsd = (currentUser.balanceUsd || 0) + returnAmount;
       
+      const purchaseDateStr = new Date().toLocaleString();
+      const expectedDateObj = new Date(Date.now() + 24 * 60 * 60 * 1000);
+      const expectedDateStr = expectedDateObj.toLocaleString();
+
+      if (!currentUser.activeFlips) currentUser.activeFlips = [];
+      currentUser.activeFlips.unshift({
+        id: Date.now(),
+        title: product.title,
+        priceUsd: price,
+        returnUsd: returnAmount,
+        purchaseDate: purchaseDateStr,
+        expectedDate: expectedDateStr,
+        status: 'active'
+      });
+
       currentUser.lastFlipDate = todayStr;
       saveState();
       updateUI();
-      alert(`Successfully flipped ${product.title}! Earned $${returnAmount.toFixed(2)} (₦${(returnAmount * NGN_RATE).toLocaleString()}) added to your Main Balance.`);
+      alert(`Successfully invested in ${product.title}! Expected maturity: ${expectedDateStr}. Return (+20%) will be automatically credited to your main balance upon maturity.`);
     }
 
     function renderUserActiveFlips() {
       const container = document.getElementById('userActiveFlipsList');
       if (!container) return;
-      container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No active resell flips.</p>`;
+      if (!currentUser.activeFlips || currentUser.activeFlips.length === 0) {
+        container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No active resell investments or history yet.</p>`;
+        return;
+      }
+
+      container.innerHTML = currentUser.activeFlips.map(f => `
+        <div class="payment-account-card" style="margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div>
+            <b>${f.title}</b> ($${f.priceUsd} ➔ Return: $${f.returnUsd.toFixed(2)})<br>
+            <span style="font-size:11px; color:var(--text-muted);">Purchased: ${f.purchaseDate}</span><br>
+            <span style="font-size:11px; color:var(--text-muted);">Expected Maturity Date: <b style="color:var(--gold);">${f.expectedDate}</b></span>
+          </div>
+          <div>
+            <span style="font-size:11px; font-weight:bold; padding:6px 12px; border-radius:8px; background:${f.status === 'active' ? 'rgba(251,191,36,0.2); color:var(--gold); border:1px solid var(--gold);' : 'rgba(0,230,118,0.2); color:var(--primary); border:1px solid var(--primary);'}">${f.status === 'active' ? '⏳ ACTIVE (Pending Maturity)' : '✔ COMPLETED (Credited)'}</span>
+          </div>
+        </div>
+      `).join('');
     }
 
     function renderUserSocialLinks() {
@@ -1716,7 +1837,6 @@
       `).join('');
     }
 
-    // WITHDRAWAL WITH TIERED REFERRAL REQUIREMENTS, MINIMUMS ($120 1st, $100 subsequent), AND 15% AUTOMATIC FEE
     function submitWithdrawal() {
       if (!currentUser) return;
       const cashoutType = document.getElementById('cashoutTypeSelect').value;
@@ -1781,7 +1901,6 @@
         return;
       }
 
-      // Automatic 15% charge
       const feeUsd = amountUsd * 0.15;
       const netUsd = amountUsd - feeUsd;
       const feeNgn = feeUsd * NGN_RATE;
@@ -1896,7 +2015,6 @@
         ctx.moveTo(226, 0); ctx.lineTo(226, canvas.height);
         ctx.stroke();
 
-        // DRAW REAL SPORTS CAR
         ctx.fillStyle = '#ef4444';
         ctx.beginPath();
         ctx.roundRect(carX, canvas.height - 75, 38, 64, [8]);
@@ -1934,7 +2052,74 @@
       }, 100);
     }
 
-    // REGISTRATION WITH UNIQUE REFERRAL LINK SUPPORT & ₦10,000 BONUS
+    // SETTINGS TAB HANDLERS (FIXED)
+    function updateUserEmail() {
+      const newEmail = document.getElementById('settingsNewEmail').value.trim();
+      if (!newEmail) { alert("Please enter a new email address!"); return; }
+      if (usersDb.some(u => u.email === newEmail)) { alert("This email is already in use by another account!"); return; }
+
+      currentUser.email = newEmail;
+      saveState();
+      document.getElementById('settingsNewEmail').value = '';
+      updateUI();
+      alert("Email updated successfully!");
+    }
+
+    function updateUserPassword() {
+      const oldPass = document.getElementById('settingsOldPass').value;
+      const newPass = document.getElementById('settingsNewPass').value;
+
+      if (!oldPass || !newPass) { alert("Please fill both password fields!"); return; }
+      if (oldPass !== currentUser.password) { alert("Current password is incorrect!"); return; }
+
+      currentUser.password = newPass;
+      saveState();
+      document.getElementById('settingsOldPass').value = '';
+      document.getElementById('settingsNewPass').value = '';
+      alert("Password updated successfully!");
+    }
+
+    // CHATBOT SUPPORT HANDLER (FIXED)
+    function sendChatMessage() {
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      const list = document.getElementById('chatMessagesList');
+      list.innerHTML += `<div class="msg msg-user">${text}</div>`;
+      input.value = '';
+
+      setTimeout(() => {
+        let reply = "Thanks for reaching out! For instant verification or issues, contact our support team or check our FAQs below.";
+        const lower = text.toLowerCase();
+        if (lower.includes('withdraw') || lower.includes('cashout')) {
+          reply = "Withdrawals require meeting your tiered referral requirements and a minimum of $120 for 1st cashout ($100 subsequently) with an automatic 15% fee.";
+        } else if (lower.includes('deposit') || lower.includes('fund')) {
+          reply = "You can deposit using Apple Gift Cards via PalmPay, OPay, or Kuda, or via USDT TRC20 crypto transfer.";
+        } else if (lower.includes('referral')) {
+          reply = "Your referral link is on your dashboard. Referrals only count when they purchase an active subscription plan!";
+        }
+        list.innerHTML += `<div class="msg msg-bot">${reply}</div>`;
+        list.scrollTop = list.scrollHeight;
+      }, 600);
+      list.scrollTop = list.scrollHeight;
+    }
+
+    // FORGOT PASSWORD HANDLER (FIXED)
+    function handlePasswordReset() {
+      const email = document.getElementById('forgotEmail').value.trim();
+      const newPass = document.getElementById('forgotNewPassword').value;
+
+      if (!email || !newPass) { alert("Please enter your email and new password!"); return; }
+      const user = usersDb.find(u => u.email === email);
+      if (!user) { alert("No account found with this email address!"); return; }
+
+      user.password = newPass;
+      saveState();
+      alert("Password reset successful! You can now login with your new password.");
+      switchAuthView('login');
+    }
+
     function handleRegister() {
       const email = document.getElementById('regEmail').value.trim();
       const password = document.getElementById('regPassword').value;
@@ -1960,7 +2145,8 @@
         drivesCountToday: 0,
         lastDriveDate: "",
         lastFlipDate: "",
-        withdrawalCount: 0
+        withdrawalCount: 0,
+        activeFlips: []
       };
       usersDb.push(newUser);
       manualUserCount++;
@@ -2042,6 +2228,11 @@
     function closeCheckoutModal() { document.getElementById('checkoutModal').style.display = 'none'; }
 
     function openDepositModal() {
+      const hasPendingDep = pendingPaymentProofs.some(p => p.userEmail === currentUser.email && p.type === 'deposit');
+      if (hasPendingDep) {
+        alert("You have a pending deposit waiting for admin approval. You cannot submit a new one until approved.");
+        return;
+      }
       document.getElementById('depositModal').style.display = 'flex';
       renderDepositInstructions();
     }
