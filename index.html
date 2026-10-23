@@ -64,6 +64,7 @@
       align-items: center;
       gap: 10px;
       box-shadow: 0 4px 15px rgba(0, 230, 118, 0.15);
+      animation: fadeInOut 4s infinite;
     }
 
     .planetians-welcome {
@@ -302,9 +303,6 @@
         </div>
 
         <div class="section-title">Membership Plans</div>
-        <div id="pendingSubscriptionNotice" style="display:none; background:rgba(251,191,36,0.15); border:1px solid var(--gold); padding:12px; border-radius:10px; margin-bottom:15px; color:var(--gold); font-size:13px; font-weight:bold;">
-          ⏳ You have a pending subscription payment waiting for admin approval. You cannot submit a new one until approved.
-        </div>
         <div class="plans-grid" id="plansContainer"></div>
 
         <div class="section-title">Earning Modules</div>
@@ -391,13 +389,9 @@
           </div>
         </div>
 
-        <div id="pendingDepositNotice" style="display:none; background:rgba(251,191,36,0.15); border:1px solid var(--gold); padding:12px; border-radius:10px; margin-bottom:15px; color:var(--gold); font-size:13px; font-weight:bold;">
-          ⏳ You have a pending deposit verification waiting for admin approval. You cannot submit a new deposit until approved.
-        </div>
-
         <div class="products-grid" id="userStoreProductsGrid"></div>
 
-        <div class="section-title" style="margin-top:25px;">Your Resell Investments & History</div>
+        <div class="section-title" style="margin-top:25px;">Your Active Resell Investments</div>
         <div id="userActiveFlipsList"></div>
       </div>
 
@@ -487,9 +481,6 @@
 
         <div class="section-title" style="margin-top:30px;">⚙️ Pending Payment & Deposit Approvals</div>
         <div id="adminPendingApprovalsList"></div>
-
-        <div class="section-title" style="margin-top:30px;">⚙️ Approved Payments History (Logged)</div>
-        <div id="adminApprovedHistoryList"></div>
 
         <div class="section-title" style="margin-top:30px;">⚙️ Payment Methods & Account Details Manager</div>
         <div class="stat-card" style="text-align:left; margin-bottom:15px;">
@@ -722,11 +713,9 @@
     let activeSocialPlatform = null;
     let showAllAdminUsers = false;
     let showAllAdminWdPops = false;
-    let showAllAdminApproved = false;
 
     let manualUserCount = parseInt(localStorage.getItem('earnplanet_manual_users') || '1280');
     let pendingPaymentProofs = JSON.parse(localStorage.getItem('earnplanet_pending_payments') || '[]');
-    let approvedPaymentsHistory = JSON.parse(localStorage.getItem('earnplanet_approved_history') || '[]');
     let pendingSocialTasks = JSON.parse(localStorage.getItem('earnplanet_pending_social') || '[]');
     
     // WITHDRAWAL POPUPS STORAGE
@@ -766,6 +755,7 @@
       {id:2, title:"Designer Chronograph Watch", priceUsd:35, img:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=400&q=80"}
     ]));
 
+    let activeUserFlips = JSON.parse(localStorage.getItem('earnplanet_user_flips') || '{}');
     let socialLinks = JSON.parse(localStorage.getItem('earnplanet_social_links') || JSON.stringify([
       {id:1, platform:"Telegram Channel", url:"https://t.me/earnplanetofficial"},
       {id:2, platform:"Facebook Page", url:"https://facebook.com/earnplanet"}
@@ -782,10 +772,11 @@
       localStorage.setItem('earnplanet_users', JSON.stringify(usersDb));
       localStorage.setItem('earnplanet_manual_users', manualUserCount.toString());
       localStorage.setItem('earnplanet_pending_payments', JSON.stringify(pendingPaymentProofs));
-      localStorage.setItem('earnplanet_approved_history', JSON.stringify(approvedPaymentsHistory));
       localStorage.setItem('earnplanet_pending_social', JSON.stringify(pendingSocialTasks));
       localStorage.setItem('earnplanet_pay_methods', JSON.stringify(paymentMethods));
       localStorage.setItem('earnplanet_products', JSON.stringify(storeProducts));
+      localStorage.setItem('earnplanet_user_flips', JSON.stringify(activeUserFlips));
+      localStorage.setItem('earnplanet_social_links', JSON.stringify(socialLinks));
       localStorage.setItem('earnplanet_faqs', JSON.stringify(faqsDb));
       localStorage.setItem('earnplanet_withdrawal_pops', JSON.stringify(withdrawalPopsDb));
 
@@ -805,7 +796,7 @@
       }
     }
 
-    // LIVE WITHDRAWAL POPUP TICKER LOOP (Every 2.5 seconds)
+    // LIVE WITHDRAWAL POPUP TICKER LOOP (Every 1-2 seconds)
     let popIndex = 0;
     function startWithdrawalTicker() {
       const popEl = document.getElementById('liveWithdrawalPopup');
@@ -824,22 +815,6 @@
 
     function updateUI() {
       if (!currentUser) return;
-
-      // Check active flips maturity
-      if (currentUser.activeFlips) {
-        let matured = false;
-        currentUser.activeFlips.forEach(f => {
-          if (f.status === 'active' && new Date() >= new Date(f.expectedDate)) {
-            f.status = 'completed';
-            currentUser.balanceUsd = (currentUser.balanceUsd || 0) + f.returnUsd;
-            matured = true;
-          }
-        });
-        if (matured) {
-          saveState();
-          alert("🎉 Resell investment matured! Your 20% return has been added to your Main Balance.");
-        }
-      }
 
       const usdBal = currentUser.balanceUsd || 0;
       const ngnBal = usdBal * NGN_RATE;
@@ -887,20 +862,9 @@
       const mainStoreDisplay = document.getElementById('mainAvailableForStoreDisplay');
       if (mainStoreDisplay) mainStoreDisplay.innerText = `$${usdBal.toFixed(2)} USD`;
 
-      // Check pending submissions for locking
-      const hasPendingSub = pendingPaymentProofs.some(p => p.userEmail === currentUser.email && p.type === 'subscription');
-      const hasPendingDep = pendingPaymentProofs.some(p => p.userEmail === currentUser.email && p.type === 'deposit');
-
-      const subNotice = document.getElementById('pendingSubscriptionNotice');
-      if (subNotice) subNotice.style.display = hasPendingSub ? 'block' : 'none';
-
-      const depNotice = document.getElementById('pendingDepositNotice');
-      if (depNotice) depNotice.style.display = hasPendingDep ? 'block' : 'none';
-
       renderMembershipPlansSection();
       renderPaymentMethodDropdowns();
       renderPendingApprovals();
-      renderAdminApprovedHistory();
       renderPendingSocialTasks();
       renderAdminUsersList();
       renderAdminWithdrawalPops();
@@ -928,7 +892,6 @@
       const container = document.getElementById('plansContainer');
       if (!container) return;
 
-      const hasPendingSub = pendingPaymentProofs.some(p => p.userEmail === currentUser.email && p.type === 'subscription');
       const hasActivePlan = currentUser.tier && currentUser.tier !== "None";
       const currentPlanObj = availablePlans.find(p => p.name === currentUser.tier);
 
@@ -942,7 +905,7 @@
               <div class="plan-price-usd">$${plan.priceUsd.toFixed(2)} USD</div>
               <div class="plan-perks">Earn $${plan.dailyDriveUsd.toFixed(2)} per drive<br>4 Drives Daily</div>
             </div>
-            <button class="btn" ${hasPendingSub ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''} onclick="${hasPendingSub ? '' : `openCheckoutModal('${plan.name}', ${plan.priceUsd}, false)`}">Subscribe</button>
+            <button class="btn" onclick="openCheckoutModal('${plan.name}', ${plan.priceUsd}, false)">Subscribe</button>
           </div>
         `).join('');
       } else {
@@ -968,7 +931,7 @@
                 <div class="plan-price-usd">($${priceDiffUsd} diff + ₦5,000 fee)</div>
                 <div class="plan-perks">New Perks: Earn $${plan.dailyDriveUsd.toFixed(2)} per drive<br>4 Drives Daily</div>
               </div>
-              <button class="btn" ${hasPendingSub ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''} onclick="${hasPendingSub ? '' : `openCheckoutModal('${plan.name}', ${totalUpgradeUsd}, true)`}">Upgrade Plan</button>
+              <button class="btn" onclick="openCheckoutModal('${plan.name}', ${totalUpgradeUsd}, true)">Upgrade Plan</button>
             </div>
           `;
         }).join('');
@@ -1161,7 +1124,7 @@
           `Review in Admin Panel at earnplanet.com.ng`
         );
 
-        alert("Payment proof submitted successfully! Pending admin approval.");
+        alert("Payment proof submitted successfully! Admin notified.");
         updateUI();
       };
       reader.readAsDataURL(fileInput.files[0]);
@@ -1202,7 +1165,7 @@
           `Review in Admin Panel at earnplanet.com.ng`
         );
 
-        alert("Deposit verification submitted! Pending admin approval.");
+        alert("Deposit verification submitted! Admin notified.");
         updateUI();
       };
       reader.readAsDataURL(fileInput.files[0]);
@@ -1250,18 +1213,10 @@
         }
       }
 
-      // Log to approved history
-      approvedPaymentsHistory.unshift({
-        id: item.id,
-        userEmail: item.userEmail,
-        detail: `${item.planName} - $${item.amountUsd} (₦${(item.amountUsd * NGN_RATE).toLocaleString()})`,
-        approvedDate: new Date().toLocaleString()
-      });
-
       pendingPaymentProofs = pendingPaymentProofs.filter(p => p.id !== id);
       saveState();
       updateUI();
-      alert("Payment approved and logged successfully!");
+      alert("Payment approved successfully!");
     }
 
     function rejectPaymentProof(id) {
@@ -1270,38 +1225,6 @@
       saveState();
       updateUI();
       alert("Payment rejected.");
-    }
-
-    function renderAdminApprovedHistory() {
-      const container = document.getElementById('adminApprovedHistoryList');
-      if (!container) return;
-      if (approvedPaymentsHistory.length === 0) {
-        container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No approved payments history yet.</p>`;
-        return;
-      }
-
-      const displayedApproved = showAllAdminApproved ? approvedPaymentsHistory : approvedPaymentsHistory.slice(0, 5);
-      let html = displayedApproved.map(item => `
-        <div class="payment-account-card" style="margin-bottom:8px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px; font-size:13px;">
-          <div>
-            ✅ <b>${item.userEmail}</b> paid for/requested: <span style="color:var(--gold);">${item.detail}</span><br>
-            <span style="font-size:11px; color:var(--text-muted);">Approved on: ${item.approvedDate}</span>
-          </div>
-          <div>
-            <span style="font-size:11px; background:rgba(0,230,118,0.15); color:var(--primary); padding:4px 8px; border-radius:6px; font-weight:bold;">APPROVED ✔</span>
-          </div>
-        </div>
-      `).join('');
-
-      if (approvedPaymentsHistory.length > 5) {
-        html += `<div style="text-align:center; margin-top:10px;"><button class="btn btn-secondary" style="font-size:12px; padding:6px 16px;" onclick="toggleSeeMoreApproved()">${showAllAdminApproved ? 'Collapse List' : 'See More (' + approvedPaymentsHistory.length + ' total)'}</button></div>`;
-      }
-      container.innerHTML = html;
-    }
-
-    function toggleSeeMoreApproved() {
-      showAllAdminApproved = !showAllAdminApproved;
-      renderAdminApprovedHistory();
     }
 
     function renderPendingSocialTasks() {
@@ -1340,7 +1263,7 @@
       alert(`Approved! ₦70 credited to ${item.userEmail}'s balance.`);
     }
 
-    // ADMIN WITHDRAWAL POP-UP MANAGER (WITH EDIT & DELETE & 5 LIMIT PAGINATION)
+    // ADMIN WITHDRAWAL POP-UP MANAGER
     function adminAddWithdrawalPop() {
       const name = document.getElementById('newWdPopName').value.trim();
       const amount = document.getElementById('newWdPopAmount').value.trim();
@@ -1365,26 +1288,6 @@
       alert("Withdrawal pop-up deleted.");
     }
 
-    function adminEditWithdrawalPop(id) {
-      const p = withdrawalPopsDb.find(item => item.id === id);
-      if (!p) return;
-      const newName = prompt("Edit Name / Username:", p.name);
-      if (newName === null) return;
-      const newAmount = prompt("Edit Amount (e.g. ₦500,000):", p.amount);
-      if (newAmount === null) return;
-      const newMethod = prompt("Edit Method (e.g. Palmpay):", p.method);
-      if (newMethod === null) return;
-
-      if (!newName.trim() || !newAmount.trim() || !newMethod.trim()) { alert("Fields cannot be empty!"); return; }
-
-      p.name = newName.trim();
-      p.amount = newAmount.trim();
-      p.method = newMethod.trim();
-      saveState();
-      updateUI();
-      alert("Withdrawal pop-up updated successfully!");
-    }
-
     function renderAdminWithdrawalPops() {
       const container = document.getElementById('adminWithdrawalPopsList');
       if (!container) return;
@@ -1393,18 +1296,15 @@
         return;
       }
 
-      const displayedPops = showAllAdminWdPops ? withdrawalPopsDb : withdrawalPopsDb.slice(0, 5);
+      const displayedPops = showAllAdminWdPops ? withdrawalPopsDb : withdrawalPopsDb.slice(0, 6);
       let html = displayedPops.map(p => `
-        <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:13px;">
+        <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
           <div><b>${p.name}</b> withdrew <span style="color:var(--primary);">${p.amount}</span> through <span style="color:var(--gold);">${p.method}</span></div>
-          <div style="display:flex; gap:6px;">
-            <button class="btn btn-secondary" style="padding:4px 8px; font-size:11px;" onclick="adminEditWithdrawalPop(${p.id})">Edit</button>
-            <button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="adminDeleteWithdrawalPop(${p.id})">Delete</button>
-          </div>
+          <button class="btn btn-danger" style="padding:4px 10px; font-size:11px;" onclick="adminDeleteWithdrawalPop(${p.id})">Delete</button>
         </div>
       `).join('');
 
-      if (withdrawalPopsDb.length > 5) {
+      if (withdrawalPopsDb.length > 6) {
         html += `<div style="text-align:center; margin-top:10px;"><button class="btn btn-secondary" style="font-size:12px; padding:6px 16px;" onclick="toggleSeeMoreWdPops()">${showAllAdminWdPops ? 'Collapse List' : 'See More (' + withdrawalPopsDb.length + ' total)'}</button></div>`;
       }
       container.innerHTML = html;
@@ -1518,8 +1418,7 @@
         drivesCountToday: 0,
         lastDriveDate: "",
         lastFlipDate: "",
-        withdrawalCount: 0,
-        activeFlips: []
+        withdrawalCount: 0
       };
 
       usersDb.push(newUser);
@@ -1793,49 +1692,18 @@
 
       currentUser.storeBalanceUsd -= price;
       const returnAmount = price * 1.2;
+      currentUser.balanceUsd = (currentUser.balanceUsd || 0) + returnAmount;
       
-      // Create investment item with expected maturity date (1 day / 24 hours from now)
-      const purchaseDateStr = new Date().toLocaleString();
-      const expectedDateObj = new Date(Date.now() + 24 * 60 * 60 * 1000);
-      const expectedDateStr = expectedDateObj.toLocaleString();
-
-      if (!currentUser.activeFlips) currentUser.activeFlips = [];
-      currentUser.activeFlips.unshift({
-        id: Date.now(),
-        title: product.title,
-        priceUsd: price,
-        returnUsd: returnAmount,
-        purchaseDate: purchaseDateStr,
-        expectedDate: expectedDateStr,
-        status: 'active'
-      });
-
       currentUser.lastFlipDate = todayStr;
       saveState();
       updateUI();
-      alert(`Successfully invested in ${product.title}! Expected maturity: ${expectedDateStr}. Return (+20%) will be automatically credited to your main balance upon maturity.`);
+      alert(`Successfully flipped ${product.title}! Earned $${returnAmount.toFixed(2)} (₦${(returnAmount * NGN_RATE).toLocaleString()}) added to your Main Balance.`);
     }
 
     function renderUserActiveFlips() {
       const container = document.getElementById('userActiveFlipsList');
       if (!container) return;
-      if (!currentUser.activeFlips || currentUser.activeFlips.length === 0) {
-        container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No active resell investments or history yet.</p>`;
-        return;
-      }
-
-      container.innerHTML = currentUser.activeFlips.map(f => `
-        <div class="payment-account-card" style="margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-          <div>
-            <b>${f.title}</b> ($${f.priceUsd} ➔ Return: $${f.returnUsd.toFixed(2)})<br>
-            <span style="font-size:11px; color:var(--text-muted);">Purchased: ${f.purchaseDate}</span><br>
-            <span style="font-size:11px; color:var(--text-muted);">Expected Maturity Date: <b style="color:var(--gold);">${f.expectedDate}</b></span>
-          </div>
-          <div>
-            <span style="font-size:11px; font-weight:bold; padding:6px 12px; border-radius:8px; background:${f.status === 'active' ? 'rgba(251,191,36,0.2); color:var(--gold); border:1px solid var(--gold);' : 'rgba(0,230,118,0.2); color:var(--primary); border:1px solid var(--primary);'}">${f.status === 'active' ? '⏳ ACTIVE (Pending Maturity)' : '✔ COMPLETED (Credited)'}</span>
-          </div>
-        </div>
-      `).join('');
+      container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No active resell flips.</p>`;
     }
 
     function renderUserSocialLinks() {
@@ -2092,8 +1960,7 @@
         drivesCountToday: 0,
         lastDriveDate: "",
         lastFlipDate: "",
-        withdrawalCount: 0,
-        activeFlips: []
+        withdrawalCount: 0
       };
       usersDb.push(newUser);
       manualUserCount++;
@@ -2175,11 +2042,6 @@
     function closeCheckoutModal() { document.getElementById('checkoutModal').style.display = 'none'; }
 
     function openDepositModal() {
-      const hasPendingDep = pendingPaymentProofs.some(p => p.userEmail === currentUser.email && p.type === 'deposit');
-      if (hasPendingDep) {
-        alert("You have a pending deposit waiting for admin approval. You cannot submit a new one until approved.");
-        return;
-      }
       document.getElementById('depositModal').style.display = 'flex';
       renderDepositInstructions();
     }
