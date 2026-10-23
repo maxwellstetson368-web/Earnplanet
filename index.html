@@ -48,14 +48,14 @@
       font-weight: 800;
     }
 
-    .container { max-width: 900px; margin: 20px auto; padding: 0 15px; }
+    .container { max-width: 850px; margin: 20px auto; padding: 0 15px; }
 
     .planetians-welcome {
       background: linear-gradient(90deg, #16422b, #0d281a);
       border: 1px solid var(--primary);
       border-radius: 12px;
-      padding: 14px 20px;
-      margin-bottom: 20px;
+      padding: 12px 20px;
+      margin-bottom: 15px;
       font-size: 18px;
       font-weight: 900;
       color: var(--primary);
@@ -65,7 +65,7 @@
     }
 
     .tabs-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--card-border); padding-bottom: 10px; flex-wrap: wrap; gap: 10px; }
-    .tab-btn { background: var(--card-bg); color: var(--text-muted); border: 1px solid var(--card-border); padding: 10px 16px; font-size: 13px; font-weight: 700; cursor: pointer; border-radius: 8px; transition: 0.2s; }
+    .tab-btn { background: var(--card-bg); color: var(--text-muted); border: 1px solid var(--card-border); padding: 10px 16px; font-size: 13px; font-weight: 700; cursor: pointer; border-radius: 8px; }
     .tab-btn.active { background: var(--primary); color: #04100a; font-weight: 900; }
 
     .wallet-card {
@@ -79,7 +79,6 @@
       align-items: center;
       gap: 15px;
       box-shadow: 0 10px 25px rgba(0, 230, 118, 0.15);
-      margin-bottom: 25px;
     }
     .wallet-info h3 { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
     .wallet-info .balance-ngn { font-size: 36px; font-weight: 900; color: var(--primary); margin-top: 4px; }
@@ -91,13 +90,19 @@
     .btn-secondary { background: var(--card-bg); color: #fff; border: 1px solid var(--card-border); }
     .btn-secondary:hover { background: #16422b; }
     .btn-danger { background: rgba(239, 68, 68, 0.2); color: var(--danger); border: 1px solid var(--danger); }
+    .btn-danger:hover { background: var(--danger); color: #fff; }
+
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin: 20px 0; }
+    .stat-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 14px; padding: 18px; text-align: center; }
+    .stat-card h4 { font-size: 12px; color: var(--text-muted); text-transform: uppercase; }
+    .stat-card p { font-size: 22px; font-weight: 900; margin-top: 6px; color: var(--gold); }
 
     .section-title { font-size: 18px; font-weight: 800; margin: 25px 0 15px 0; color: #fff; border-left: 4px solid var(--primary); padding-left: 10px; }
 
     .social-task-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 25px; }
     .social-task-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 16px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; }
 
-    .plans-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+    .plans-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px; }
     .plan-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -107,31 +112,84 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
-      gap: 15px;
     }
-    .plan-card h3 { color: var(--gold); font-size: 18px; }
-    .plan-card p { font-size: 13px; color: var(--text-muted); }
+    .plan-title { font-size: 18px; font-weight: 900; color: var(--gold); }
+    .plan-price-ngn { font-size: 22px; font-weight: 900; color: #fff; margin-top: 6px; }
+    .plan-price-usd { font-size: 13px; font-weight: 700; color: var(--text-muted); margin-bottom: 8px; }
+    .plan-perks { font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 15px; }
+    .plan-bonus { background: rgba(0, 230, 118, 0.15); color: var(--primary); font-size: 11px; font-weight: bold; padding: 4px 8px; border-radius: 10px; margin-bottom: 10px; display: inline-block; }
 
     .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px; }
     .product-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; text-align: center; }
-    .product-img { width: 100%; height: 130px; object-fit: cover; border-radius: 10px; margin-bottom: 10px; background: #04100a; border: 1px solid var(--card-border); }
+    .product-img { width: 100%; height: 140px; object-fit: cover; border-radius: 10px; margin-bottom: 10px; background: #04100a; }
+    .product-title { font-size: 15px; font-weight: 800; color: #fff; margin-bottom: 4px; }
+    .product-price { font-size: 16px; font-weight: 900; color: var(--primary); }
+    .product-profit { font-size: 12px; color: var(--gold); margin: 4px 0 12px 0; font-weight: 700; }
 
-    .admin-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
+    .task-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; }
+    .task-info h4 { font-size: 15px; font-weight: 800; color: #fff; }
+    .task-info p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+    .task-reward { color: var(--primary); font-weight: 800; font-size: 13px; margin-top: 5px; }
+
+    .live-notification-top {
+      position: fixed;
+      top: 65px;
+      left: 50%;
+      transform: translateX(-50%) translateY(-150%);
+      background: #04100a;
+      border: 1px solid var(--primary);
+      border-radius: 30px;
+      padding: 10px 22px;
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      box-shadow: 0 10px 30px rgba(0,230,118,0.25);
+      z-index: 999;
+      transition: transform 0.4s ease;
+      width: 90%;
+      max-width: 440px;
+    }
+    .live-notification-top.show { transform: translateX(-50%) translateY(0); }
+    .live-icon { font-size: 20px; }
+    .live-text { font-size: 12px; color: #fff; line-height: 1.3; text-align: left; }
+    .live-text b { color: var(--primary); }
+
+    .chat-container { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; height: 350px; display: flex; flex-direction: column; }
+    .chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
+    .msg { padding: 10px 14px; border-radius: 12px; font-size: 13px; max-width: 80%; line-height: 1.4; }
+    .msg-bot { background: #16422b; color: #fff; align-self: flex-start; }
+    .msg-user { background: var(--primary); color: #04100a; font-weight: 700; align-self: flex-end; }
+    .chat-input-row { display: flex; gap: 10px; }
 
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(6px); display: none; justify-content: center; align-items: center; z-index: 1000; }
     .modal { background: #071f12; border: 1px solid var(--primary); border-radius: 20px; padding: 25px; width: 92%; max-width: 480px; box-shadow: 0 25px 50px rgba(0,0,0,0.8); max-height: 90vh; overflow-y: auto; }
     .modal h3 { margin-bottom: 12px; font-size: 20px; color: var(--primary); }
     .modal input, .modal select, .modal textarea { width: 100%; padding: 12px; background: #04100a; border: 1px solid var(--card-border); border-radius: 10px; color: #fff; margin-bottom: 12px; font-size: 14px; }
     .modal label { font-size: 12px; color: var(--text-muted); display: block; margin-bottom: 4px; }
+
+    .payment-instruction-box { background: #04100a; border: 1px solid var(--card-border); border-radius: 12px; padding: 15px; margin-bottom: 15px; font-size: 12px; line-height: 1.6; color: var(--text-muted); }
+    .payment-instruction-box b { color: var(--gold); }
+    .payment-account-card { background: #04100a; border: 1px solid var(--primary); border-radius: 12px; padding: 15px; margin-bottom: 15px; }
+
+    #gameCanvas { background: #1f2937; border-radius: 12px; display: block; margin: 12px auto; border: 3px solid var(--primary); box-shadow: 0 0 15px rgba(0,230,118,0.2); }
   </style>
 </head>
 <body>
+
+  <!-- TOP LIVE WITHDRAWAL POPUP NOTIFICATION -->
+  <div class="live-notification-top" id="payoutNotification">
+    <div class="live-icon">💸</div>
+    <div class="live-text" id="payoutNotifText">
+      User <b>Adeb***45</b> withdrew <b>₦180,000 ($120.00)</b> to Access Bank
+    </div>
+  </div>
 
   <!-- AUTHENTICATION CONTAINER -->
   <div id="authContainer" class="container" style="max-width:440px; margin-top:60px;">
     <div class="modal" style="display:block; width:100%;">
       <div class="brand" style="text-align:center; margin-bottom:20px; font-size:28px;">EarnPlanet</div>
       
+      <!-- LOGIN VIEW -->
       <div id="loginView">
         <h3>Welcome Back</h3>
         <label>Email Address</label>
@@ -141,27 +199,46 @@
         <button class="btn" style="width:100%; margin-top:5px;" onclick="handleLogin()">Login</button>
         
         <div style="display:flex; justify-content:space-between; margin-top:15px; font-size:13px;">
-          <a href="#" style="color:var(--primary);" onclick="switchAuthView('register')">Create New Account</a>
+          <a href="#" style="color:var(--primary);" onclick="switchAuthView('register')">Create Account</a>
+          <a href="#" style="color:var(--text-muted);" onclick="switchAuthView('forgot')">Forgot Password?</a>
         </div>
       </div>
 
+      <!-- REGISTER VIEW -->
       <div id="registerView" style="display:none;">
         <h3>Create New Account</h3>
         <label>Email Address</label>
         <input type="email" id="regEmail" placeholder="user@gmail.com">
         <label>Password</label>
         <input type="password" id="regPassword" placeholder="••••••••">
-        <label>4-Digit Withdrawal PIN</label>
+        <label>Create 4-Digit Withdrawal PIN (Mandatory)</label>
         <input type="password" id="regPin" maxlength="4" placeholder="••••">
+        <label>Referral Code (Optional)</label>
+        <input type="text" id="regRefCode" placeholder="EP-XXXXX">
         <button class="btn" style="width:100%; margin-top:5px;" onclick="handleRegister()">Sign Up</button>
+        <div style="text-align:center; margin-top:15px; font-size:13px;">
+          <a href="#" style="color:var(--primary);" onclick="switchAuthView('login')">Already have an account? Login</a>
+        </div>
+      </div>
+
+      <!-- FORGOT PASSWORD VIEW -->
+      <div id="forgotView" style="display:none;">
+        <h3>Reset Password</h3>
+        <label>Registered Email</label>
+        <input type="email" id="forgotEmail" placeholder="user@gmail.com">
+        <label>New Password</label>
+        <input type="password" id="forgotNewPassword" placeholder="••••••••">
+        <button class="btn" style="width:100%; margin-top:5px;" onclick="handlePasswordReset()">Reset Password</button>
         <div style="text-align:center; margin-top:15px; font-size:13px;">
           <a href="#" style="color:var(--primary);" onclick="switchAuthView('login')">Back to Login</a>
         </div>
       </div>
 
+      <!-- FOOTER SECRET ADMIN LINK -->
       <div style="text-align:center; margin-top:25px; border-top:1px solid var(--card-border); padding-top:10px;">
         <a href="#" style="font-size:11px; color:#16422b; text-decoration:none;" onclick="openAdminAuthModal()">🔒 Management Portal</a>
       </div>
+
     </div>
   </div>
 
@@ -176,19 +253,23 @@
     </header>
 
     <div class="container">
-      <div class="planetians-welcome">🪐 Welcome Planetians</div>
+      
+      <div class="planetians-welcome">
+        🪐 Welcome Planetians
+      </div>
 
       <div class="tabs-header">
-        <div style="display:flex; gap:10px; flex-wrap:wrap;">
-          <button class="tab-btn active" id="btnUserTab" onclick="switchTab('user')">Dashboard</button>
-          <button class="tab-btn" id="btnStoreTab" onclick="switchTab('store')">🛍️ Resell Flip Store</button>
-          <button class="tab-btn" id="btnGameTab" onclick="switchTab('game')">🚗 Driving Game</button>
-          <button class="tab-btn" id="btnAdminTab" style="display:none;" onclick="switchTab('admin')">⚙️ Management</button>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;" id="navTabsContainer">
+          <button class="tab-btn active" onclick="switchTab('user')">Dashboard</button>
+          <button class="tab-btn" onclick="switchTab('store')">🛍️ Resell Flip Store</button>
+          <button class="tab-btn" onclick="switchTab('support')">💬 Support</button>
+          <button class="tab-btn" onclick="switchTab('settings')">⚙️ Settings</button>
         </div>
       </div>
 
-      <!-- USER TAB (DASHBOARD) -->
+      <!-- USER DASHBOARD TAB -->
       <div id="userTab">
+        
         <div class="wallet-card">
           <div class="wallet-info">
             <h3>Main Available Balance</h3>
@@ -196,95 +277,228 @@
             <div class="balance-usd" id="walletBalanceUsd">≈ $0.00 USD</div>
           </div>
           <div class="wallet-actions">
-            <button class="btn btn-secondary" onclick="openWithdrawModal()">Withdraw Funds</button>
+            <button class="btn btn-secondary" onclick="openWithdrawModal()">Cashout</button>
           </div>
         </div>
 
+        <div class="stats-grid">
+          <div class="stat-card">
+            <h4>Active Platform Users</h4>
+            <p id="activeUsersDisplay" style="color:var(--primary);">1,280</p>
+            <span style="font-size:11px; color:var(--text-muted);">Verified Earners</span>
+          </div>
+          <div class="stat-card">
+            <h4>Paying Referrals Progress</h4>
+            <p id="refCountDisplay">0 / 7</p>
+            <span style="font-size:11px; color:var(--text-muted);" id="refRequirementText">7 required for 1st Cashout</span>
+          </div>
+          <div class="stat-card">
+            <h4>Expressway Drives</h4>
+            <p id="drivesDisplay">0 / 4 Sessions</p>
+            <span style="font-size:11px; color:var(--text-muted);">Resets every 24h</span>
+          </div>
+        </div>
+
+        <div class="stat-card" style="text-align:left; margin-bottom:20px;">
+          <h4 style="margin-bottom:6px;">Your Referral Link (Earn 10% on Subscriber Plans)</h4>
+          <div style="display:flex; gap:10px;">
+            <input type="text" id="refLinkInput" readonly style="margin-bottom:0; font-size:13px; color:var(--gold);">
+            <button class="btn" style="padding:8px 16px; font-size:12px; white-space:nowrap;" onclick="copyReferralLink()">Copy Link</button>
+          </div>
+        </div>
+
+        <!-- SOCIAL MEDIA TASKS SECTION -->
         <div class="section-title">📲 Earn ₦70 Daily Per Social Media Post</div>
+        <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Promote EarnPlanet on your social accounts. Submit your link or screenshot daily to earn ₦70 upon admin approval!</p>
+        
         <div class="social-task-grid">
           <div class="social-task-card">
-            <b>Facebook Post</b>
-            <button class="btn" style="font-size:11px;" onclick="openSocialTaskModal('Facebook')">Submit Link</button>
+            <div>
+              <b style="color:var(--primary);">Facebook Post</b>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Post about EarnPlanet & submit link</div>
+              <div style="font-size:13px; font-weight:bold; color:var(--gold); margin-top:6px;">Reward: ₦70</div>
+            </div>
+            <button class="btn" style="font-size:11px; padding:6px 10px;" onclick="openSocialTaskModal('Facebook')">Submit Link</button>
           </div>
+
           <div class="social-task-card">
-            <b>TikTok Video</b>
-            <button class="btn" style="font-size:11px;" onclick="openSocialTaskModal('TikTok')">Submit Link</button>
+            <div>
+              <b style="color:var(--primary);">TikTok Video</b>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Talk about EarnPlanet & submit link</div>
+              <div style="font-size:13px; font-weight:bold; color:var(--gold); margin-top:6px;">Reward: ₦70</div>
+            </div>
+            <button class="btn" style="font-size:11px; padding:6px 10px;" onclick="openSocialTaskModal('TikTok')">Submit Link</button>
           </div>
+
           <div class="social-task-card">
-            <b>Instagram Post</b>
-            <button class="btn" style="font-size:11px;" onclick="openSocialTaskModal('Instagram')">Submit Link</button>
+            <div>
+              <b style="color:var(--primary);">Instagram Post / Reel</b>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Share EarnPlanet & submit post link</div>
+              <div style="font-size:13px; font-weight:bold; color:var(--gold); margin-top:6px;">Reward: ₦70</div>
+            </div>
+            <button class="btn" style="font-size:11px; padding:6px 10px;" onclick="openSocialTaskModal('Instagram')">Submit Link</button>
           </div>
+
           <div class="social-task-card">
-            <b>WhatsApp Status</b>
-            <button class="btn" style="font-size:11px;" onclick="openSocialTaskModal('WhatsApp')">Submit Proof</button>
+            <div>
+              <b style="color:var(--primary);">WhatsApp Status</b>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Post on Status & upload screenshot</div>
+              <div style="font-size:13px; font-weight:bold; color:var(--gold); margin-top:6px;">Reward: ₦70</div>
+            </div>
+            <button class="btn" style="font-size:11px; padding:6px 10px;" onclick="openSocialTaskModal('WhatsApp')">Upload Screenshot</button>
           </div>
         </div>
 
         <div class="section-title">Select Membership Plan</div>
         <div class="plans-grid">
           <div class="plan-card">
-            <h3>Bronze Plan</h3>
-            <p>$10 Subscription</p>
-            <button class="btn" onclick="openCheckoutModal('Bronze', 10)">Subscribe</button>
+            <div>
+              <div class="plan-bonus">₦9,000 ($6.00) Cashback</div>
+              <div class="plan-title">Starter</div>
+              <div class="plan-price-ngn">₦22,500</div>
+              <div class="plan-price-usd">$15.00 USD</div>
+              <div class="plan-perks">Earn $0.15 (₦225) per drive<br>4 Drives Daily ($0.60 / ₦900)</div>
+            </div>
+            <button class="btn" onclick="openCheckoutModal('Starter', 15, 0.15, 6.00)">Subscribe (₦22.5k / $15)</button>
           </div>
+
           <div class="plan-card">
-            <h3>Silver Plan</h3>
-            <p>$25 Subscription</p>
-            <button class="btn" onclick="openCheckoutModal('Silver', 25)">Subscribe</button>
+            <div>
+              <div class="plan-bonus">₦15,000 ($10.00) Cashback</div>
+              <div class="plan-title">Silver</div>
+              <div class="plan-price-ngn">₦37,500</div>
+              <div class="plan-price-usd">$25.00 USD</div>
+              <div class="plan-perks">Earn $0.25 (₦375) per drive<br>4 Drives Daily ($1.00 / ₦1,500)</div>
+            </div>
+            <button class="btn" onclick="openCheckoutModal('Silver', 25, 0.25, 10.00)">Subscribe (₦37.5k / $25)</button>
           </div>
+
           <div class="plan-card">
-            <h3>Gold Plan</h3>
-            <p>$50 Subscription</p>
-            <button class="btn" onclick="openCheckoutModal('Gold', 50)">Subscribe</button>
+            <div>
+              <div class="plan-bonus">₦30,000 ($20.00) Cashback</div>
+              <div class="plan-title">Gold</div>
+              <div class="plan-price-ngn">₦75,000</div>
+              <div class="plan-price-usd">$50.00 USD</div>
+              <div class="plan-perks">Earn $0.35 (₦525) per drive<br>4 Drives Daily ($1.40 / ₦2,100)</div>
+            </div>
+            <button class="btn" onclick="openCheckoutModal('Gold', 50, 0.35, 20.00)">Subscribe (₦75k / $50)</button>
+          </div>
+
+          <div class="plan-card">
+            <div>
+              <div class="plan-bonus">₦60,000 ($40.00) Cashback</div>
+              <div class="plan-title">Platinum</div>
+              <div class="plan-price-ngn">₦150,000</div>
+              <div class="plan-price-usd">$100.00 USD</div>
+              <div class="plan-perks">Earn $0.50 (₦750) per drive<br>4 Drives Daily ($2.00 / ₦3,000)</div>
+            </div>
+            <button class="btn" onclick="openCheckoutModal('Platinum', 100, 0.50, 40.00)">Subscribe (₦150k / $100)</button>
           </div>
         </div>
+
+        <div class="section-title">Earning Modules</div>
+
+        <div class="task-card">
+          <div class="task-info">
+            <h4>🏎️ Lagos Highway Driving Run</h4>
+            <p>Drive through 3-lane Lagos traffic to reach 100% finish line. (Max 4 drives daily)</p>
+            <div class="task-reward" id="drivingRewardText">Reward: Select plan to unlock</div>
+          </div>
+          <button class="btn" onclick="openDrivingGameModal()">Start Drive</button>
+        </div>
+
+        <div class="task-card" style="border-color: var(--gold);">
+          <div class="task-info">
+            <h4>🛍️ Resell Flip Store (+20% Profit)</h4>
+            <p>Purchase merchandise slots and earn 20% guaranteed return in an 8-day lock cycle.</p>
+            <div class="task-reward" style="color:var(--gold);">Available Mon, Wed, Fri & Sat</div>
+          </div>
+          <button class="btn" onclick="switchTab('store')">Open Resell Store</button>
+        </div>
+
+        <div class="section-title">📢 Follow Our Official Social Media Pages</div>
+        <div class="social-grid" id="userSocialLinksGrid" style="display:grid; grid-template-columns:repeat(auto-fit, minmax(160px, 1fr)); gap:12px; margin-top:15px;"></div>
+
       </div>
 
-      <!-- STORE TAB -->
+      <!-- RESELL FLIP STORE TAB -->
       <div id="storeTab" style="display:none;">
-        <div class="section-title">🛍️ Merchandise Resell Flip Store</div>
-        <div style="margin-bottom: 15px; display:flex; justify-content:space-between; align-items:center;">
-          <span style="color:var(--text-muted); font-size:14px;">Store Balance: <b id="storeBalanceDisplay" style="color:var(--gold);">$0.00</b></span>
-          <button class="btn" onclick="openDepositModal()">+ Deposit to Store</button>
+        <div class="section-title">🛍️ Merchandise Flip Store</div>
+        
+        <div class="wallet-card" style="border-color:var(--gold); margin-bottom:20px;">
+          <div class="wallet-info">
+            <h3 style="color:var(--gold);">Flip Store Balance</h3>
+            <div class="balance-ngn" id="storeBalanceNgn">₦0.00</div>
+            <div class="balance-usd" id="storeBalanceUsd">≈ $0.00 USD</div>
+          </div>
+          <div class="wallet-actions" style="gap:8px;">
+            <button class="btn" style="background:var(--gold); color:#04100a; font-size:12px; padding:8px 12px;" onclick="openDepositModal()">+ Deposit</button>
+            <button class="btn btn-secondary" style="font-size:12px; padding:8px 12px;" onclick="openAddFromMainModal()">+ Add From Main</button>
+            <button class="btn btn-secondary" style="font-size:12px; padding:8px 12px;" onclick="openTransferModal()">Withdraw to Main (5%)</button>
+          </div>
         </div>
 
-        <div class="products-grid">
-          <div class="product-card">
-            <div class="product-img" style="display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-weight:700;">Smart Watch Series 9</div>
-            <b>Smart Watch Series 9</b>
-            <p style="font-size:12px; color:var(--text-muted); margin: 5px 0;">Resell Price: $35.00</p>
-            <button class="btn" style="font-size:12px;" onclick="buyProduct('Smart Watch Series 9', 35)">Flip / Purchase</button>
+        <div class="products-grid" id="userStoreProductsGrid"></div>
+
+        <div class="section-title" style="margin-top:25px;">Your Active Resell Investments</div>
+        <div id="userActiveFlipsList"></div>
+      </div>
+
+      <!-- SUPPORT & CHATBOT TAB -->
+      <div id="supportTab" style="display:none;">
+        <div class="section-title">💬 EarnPlanet Instant Assistant</div>
+        <div class="chat-container">
+          <div class="chat-messages" id="chatMessagesList">
+            <div class="msg msg-bot">Hello Planetian! I am the EarnPlanet Support Bot. How can I assist you today?</div>
           </div>
-          <div class="product-card">
-            <div class="product-img" style="display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-weight:700;">Wireless Earbuds Pro</div>
-            <b>Wireless Earbuds Pro</b>
-            <p style="font-size:12px; color:var(--text-muted); margin: 5px 0;">Resell Price: $20.00</p>
-            <button class="btn" style="font-size:12px;" onclick="buyProduct('Wireless Earbuds Pro', 20)">Flip / Purchase</button>
+          <div class="chat-input-row">
+            <input type="text" id="chatInput" placeholder="Type your question..." style="margin-bottom:0;" onkeypress="if(event.key==='Enter') sendChatMessage()">
+            <button class="btn" onclick="sendChatMessage()">Send</button>
           </div>
         </div>
       </div>
 
-      <!-- GAME TAB -->
-      <div id="gameTab" style="display:none;">
-        <div class="section-title">🚗 Driving Mini-Game Task</div>
-        <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:16px; padding:25px; text-align:center;">
-          <h3 style="color:var(--primary); margin-bottom:10px;">Daily Driving Challenge</h3>
-          <p style="color:var(--text-muted); font-size:14px; margin-bottom:20px;">Complete today's driving session to earn bonus rewards on EarnPlanet.</p>
-          <div id="gameScreen" style="background:#04100a; border:1px solid var(--primary); border-radius:12px; height:180px; display:flex; align-items:center; justify-content:center; margin-bottom:20px; font-size:24px;">
-            🚘 🛣️ 🌲 🌳
-          </div>
-          <button class="btn" onclick="playDrivingGame()">Play & Claim Reward</button>
+      <!-- SETTINGS TAB -->
+      <div id="settingsTab" style="display:none;">
+        <div class="section-title">⚙️ Account Settings</div>
+        <div class="stat-card" style="text-align:left; margin-bottom:20px;">
+          <h4 style="margin-bottom:10px;">Change Email Address</h4>
+          <input type="email" id="settingsNewEmail" placeholder="New Email Address">
+          <button class="btn" onclick="updateUserEmail()">Update Email</button>
+        </div>
+        <div class="stat-card" style="text-align:left; margin-bottom:20px;">
+          <h4 style="margin-bottom:10px;">Reset Account Password</h4>
+          <input type="password" id="settingsOldPass" placeholder="Current Password">
+          <input type="password" id="settingsNewPass" placeholder="New Password">
+          <button class="btn" onclick="updateUserPassword()">Update Password</button>
         </div>
       </div>
 
-      <!-- ADMIN TAB -->
+      <!-- ADMIN MANAGEMENT TAB -->
       <div id="adminTab" style="display:none;">
-        <div class="section-title">⚙️ Pending Social Task Approvals</div>
+        <div class="section-title">⚙️ Pending Social Media Tasks Approvals</div>
         <div id="adminPendingSocialTasksList"></div>
 
-        <div class="section-title" style="margin-top:20px;">⚙️ Pending Payment & Deposit Approvals</div>
+        <div class="section-title" style="margin-top:30px;">⚙️ User Accounts & Balance Manager</div>
+        <div class="stat-card" style="text-align:left; margin-bottom:15px;">
+          <h4 style="margin-bottom:10px;">All Registered Users & Balances</h4>
+          <div id="adminUsersListContainer" style="overflow-x:auto;"></div>
+        </div>
+
+        <div class="section-title" style="margin-top:30px;">⚙️ Pending Payment & Deposit Approvals</div>
         <div id="adminPendingApprovalsList"></div>
+
+        <div class="section-title" style="margin-top:30px;">⚙️ Payment Methods & Account Details Manager</div>
+        <div class="stat-card" style="text-align:left; margin-bottom:15px;">
+          <h4 style="margin-bottom:10px;" id="adminPayMethodFormTitle">Add / Edit Payment Method</h4>
+          <input type="hidden" id="editPayMethodId">
+          <input type="text" id="newPayMethodName" placeholder="Method Name (e.g. OPay Transfer or USDT TRC20)">
+          <textarea id="newPayMethodDetails" placeholder="Account Details / Address / Instructions"></textarea>
+          <button class="btn" onclick="saveAdminPaymentMethod()">+ Save Payment Method</button>
+        </div>
+        <div id="adminPaymentMethodsList"></div>
       </div>
+
     </div>
   </div>
 
@@ -292,51 +506,140 @@
   <div class="modal-overlay" id="checkoutModal">
     <div class="modal">
       <h3 id="checkoutTitle">Subscribe Plan</h3>
-      <label>Claim Code / TxID</label>
+      
+      <label>Choose Payment Method</label>
+      <select id="checkoutMethodSelect" onchange="renderCheckoutInstructions()"></select>
+
+      <div id="dynamicCheckoutInstructions" class="payment-instruction-box"></div>
+
+      <div class="payment-account-card">
+        <p style="font-size:12px; color:var(--gold); font-weight:bold;" id="checkoutPayableText"></p>
+      </div>
+
+      <label id="paymentProofLabel">Enter Code or TxID</label>
       <input type="text" id="userPaymentCodeInput" placeholder="Enter Code or TxID">
-      <button class="btn" style="width:100%;" onclick="submitPlanPaymentProof()">Submit Payment</button>
-      <button class="btn btn-secondary" style="width:100%; margin-top:8px;" onclick="closeCheckoutModal()">Cancel</button>
+
+      <label>Upload Payment Receipt / Screenshot (Mandatory)</label>
+      <input type="file" id="userPaymentProofFile" accept="image/*">
+
+      <button class="btn" style="width:100%; margin-top:5px;" onclick="submitPlanPaymentProof()">Submit Payment for Verification</button>
+      <button class="btn btn-secondary" style="width:100%; margin-top:10px;" onclick="closeCheckoutModal()">Cancel</button>
     </div>
   </div>
 
   <!-- DEPOSIT MODAL -->
   <div class="modal-overlay" id="depositModal">
     <div class="modal">
-      <h3>Deposit to Flip Store</h3>
-      <label>Amount in USD ($)</label>
-      <input type="number" id="depositAmountUsd" placeholder="e.g. 20">
-      <label>Claim Code / TxID</label>
+      <h3>Deposit to Buy Higher Products to Resell</h3>
+      <label>Enter Deposit Amount in USD ($)</label>
+      <input type="number" id="depositAmountUsd" placeholder="e.g. 20 (Min $10)" oninput="updateDepositPayableText()">
+
+      <label>Choose Payment Method</label>
+      <select id="depositMethodSelect" onchange="renderDepositInstructions()"></select>
+
+      <div id="dynamicDepositInstructions" class="payment-instruction-box"></div>
+
+      <div class="payment-account-card">
+        <p style="font-size:12px; color:var(--gold); font-weight:bold;" id="depositPayableText">Payable Amount: ₦0.00 ($0.00 USD)</p>
+      </div>
+
+      <label id="depositProofLabel">Enter Code or TxID</label>
       <input type="text" id="depositCodeInput" placeholder="Enter Code or TxID">
-      <button class="btn" style="width:100%;" onclick="submitDepositProof()">Submit Deposit</button>
-      <button class="btn btn-secondary" style="width:100%; margin-top:8px;" onclick="closeDepositModal()">Cancel</button>
+
+      <label>Upload Payment Receipt / Screenshot (Mandatory)</label>
+      <input type="file" id="depositProofFile" accept="image/*">
+
+      <button class="btn" style="width:100%; margin-top:5px;" onclick="submitDepositProof()">Submit Deposit Verification</button>
+      <button class="btn btn-secondary" style="width:100%; margin-top:10px;" onclick="closeDepositModal()">Cancel</button>
     </div>
   </div>
 
-  <!-- SOCIAL TASK MODAL -->
+  <!-- SOCIAL TASK SUBMISSION MODAL -->
   <div class="modal-overlay" id="socialTaskModal">
     <div class="modal">
-      <h3 id="socialTaskModalTitle">Submit Task</h3>
-      <label>Enter Live Post Link or Details</label>
-      <input type="text" id="socialTaskLinkInput" placeholder="https://...">
-      <button class="btn" style="width:100%;" onclick="submitSocialTask()">Submit Task (Earn ₦70)</button>
-      <button class="btn btn-secondary" style="width:100%; margin-top:8px;" onclick="closeSocialTaskModal()">Cancel</button>
+      <h3 id="socialTaskModalTitle">Submit Social Task</h3>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Earn ₦70 ($0.0467) directly to your Main Balance upon admin approval!</p>
+      
+      <div id="socialTaskLinkBox">
+        <label>Enter Post Link / Video URL</label>
+        <input type="text" id="socialTaskLinkInput" placeholder="https://facebook.com/posts/...">
+      </div>
+
+      <div id="socialTaskImgBox" style="display:none;">
+        <label>Upload WhatsApp Status Screenshot</label>
+        <input type="file" id="socialTaskImgInput" accept="image/*">
+      </div>
+
+      <button class="btn" style="width:100%; margin-top:5px;" onclick="submitSocialTask()">Submit For Approval (Earn ₦70)</button>
+      <button class="btn btn-secondary" style="width:100%; margin-top:10px;" onclick="closeSocialTaskModal()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- ADD FROM MAIN MODAL -->
+  <div class="modal-overlay" id="addFromMainModal">
+    <div class="modal">
+      <h3>Add Money From Main Balance</h3>
+      <div class="payment-account-card">
+        <span style="font-size:11px; color:var(--text-muted);">Available Main Dashboard Balance:</span><br>
+        <b style="font-size:18px; color:var(--primary);" id="mainAvailableForStoreDisplay">$0.00 USD</b>
+      </div>
+      <label>Enter Amount to Transfer to Flip Store ($)</label>
+      <input type="number" id="addFromMainAmountUsd" placeholder="e.g. 20">
+      <button class="btn" style="width:100%; margin-top:5px;" onclick="submitAddFromMain()">Transfer to Flip Store (0% Fee)</button>
+      <button class="btn btn-secondary" style="width:100%; margin-top:10px;" onclick="closeAddFromMainModal()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- WITHDRAW TO MAIN MODAL -->
+  <div class="modal-overlay" id="transferModal">
+    <div class="modal">
+      <h3>Withdraw Earnings to Main Dashboard</h3>
+      <div class="payment-account-card">
+        <span style="font-size:11px; color:var(--text-muted);">Available Flip Store Balance:</span><br>
+        <b style="font-size:18px; color:var(--gold);" id="transferAvailableDisplay">$0.00 USD</b>
+      </div>
+      <label>Enter Transfer Amount in USD ($)</label>
+      <input type="number" id="transferAmountUsd" placeholder="e.g. 50">
+      <button class="btn" style="width:100%; margin-top:5px;" onclick="submitInternalTransfer()">Withdraw to Main (5% Fee)</button>
+      <button class="btn btn-secondary" style="width:100%; margin-top:10px;" onclick="closeTransferModal()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- DRIVING GAME MODAL -->
+  <div class="modal-overlay" id="drivingModal">
+    <div class="modal" style="max-width: 440px; text-align: center;">
+      <h3>Lagos Expressway Rush</h3>
+      <canvas id="gameCanvas" width="340" height="280"></canvas>
+      <div id="gameStatus" style="font-weight:bold; margin: 8px 0; color:var(--gold);">Progress: 0%</div>
+      <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 10px;">
+        <button class="btn btn-secondary" style="padding: 10px 25px;" onclick="moveCar(-35)">◀ Left</button>
+        <button class="btn btn-secondary" style="padding: 10px 25px;" onclick="moveCar(35)">Right ▶</button>
+      </div>
+      <button class="btn btn-secondary" style="width:100%;" onclick="closeDrivingModal()">Exit Session</button>
     </div>
   </div>
 
   <!-- WITHDRAWAL MODAL -->
   <div class="modal-overlay" id="withdrawModal">
     <div class="modal">
-      <h3>Withdraw Funds</h3>
-      <label>Amount in NGN (₦)</label>
-      <input type="number" id="withdrawAmountNgn" placeholder="e.g. 5000">
+      <h3>Request Cashout</h3>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;" id="withdrawRuleNotice">Min threshold: ₦180,000</p>
+      <div class="payment-account-card">
+        <span style="font-size:11px; color:var(--text-muted);">Available Cashout Balance:</span><br>
+        <b style="font-size:18px; color:var(--primary);" id="wdAvailableDisplayNgn">₦0.00</b>
+      </div>
       <label>Bank Name</label>
-      <input type="text" id="withdrawBank" placeholder="e.g. Opay / Access Bank">
-      <label>Account Number</label>
-      <input type="text" id="withdrawAcctNo" placeholder="0123456789">
-      <label>4-Digit PIN</label>
-      <input type="password" id="withdrawPin" maxlength="4" placeholder="••••">
-      <button class="btn" style="width:100%;" onclick="submitWithdrawal()">Request Withdrawal</button>
-      <button class="btn btn-secondary" style="width:100%; margin-top:8px;" onclick="closeWithdrawModal()">Cancel</button>
+      <input type="text" id="wdBankName" placeholder="e.g. OPay / Access Bank">
+      <label>10-Digit Account Number</label>
+      <input type="text" id="wdAccountNum" placeholder="10-Digit Account Number">
+      <label>Withdrawal Amount (₦)</label>
+      <input type="number" id="wdAmountInput" placeholder="Enter Cashout Amount">
+      <label>4-Digit Withdrawal PIN</label>
+      <input type="password" id="wdPinInput" maxlength="4" placeholder="••••">
+      <div style="display:flex; gap:10px; margin-top:5px;">
+        <button class="btn btn-secondary" style="flex:1" onclick="closeWithdrawModal()">Cancel</button>
+        <button class="btn" style="flex:1" onclick="submitWithdrawal()">Request Cashout</button>
+      </div>
     </div>
   </div>
 
@@ -346,67 +649,387 @@
       <h3>🔒 Management Access</h3>
       <input type="text" id="adminUsername" placeholder="Username">
       <input type="password" id="adminPassword" placeholder="Password">
-      <button class="btn" style="width:100%;" onclick="loginAdmin()">Login</button>
-      <button class="btn btn-secondary" style="width:100%; margin-top:8px;" onclick="closeAdminAuthModal()">Cancel</button>
+      <div style="display:flex; gap:10px;">
+        <button class="btn btn-secondary" style="flex:1" onclick="closeAdminAuthModal()">Cancel</button>
+        <button class="btn" style="flex:1" onclick="loginAdmin()">Login</button>
+      </div>
     </div>
   </div>
 
   <script>
     const NGN_RATE = 1500;
-    const TELEGRAM_BOT_TOKEN = "8811500504:AAE67l-aKHEi6cgZ_TzaY5tUESlQpmJAngY";
-    const TELEGRAM_CHAT_ID = "8269612727"; // Your verified numeric ID!
+    const SOCIAL_REWARD_USD = 70 / NGN_RATE;
 
     let currentUser = null;
-    let isAdminLoggedIn = false;
     let usersDb = JSON.parse(localStorage.getItem('earnplanet_users') || '[]');
+    let activeSessionEmail = localStorage.getItem('earnplanet_session');
     let activeCheckoutPlan = null;
     let activeSocialPlatform = null;
 
+    let manualUserCount = parseInt(localStorage.getItem('earnplanet_manual_users') || '1280');
     let pendingPaymentProofs = JSON.parse(localStorage.getItem('earnplanet_pending_payments') || '[]');
     let pendingSocialTasks = JSON.parse(localStorage.getItem('earnplanet_pending_social') || '[]');
+    
+    let defaultPaymentMethods = [
+      {id: 1, name: "Apple Gift Card (PalmPay / OPay / Kuda)", details: "Purchase Apple Gift Card on PalmPay/OPay/Kuda app under More -> Services -> Apple Gift Card."},
+      {id: 2, name: "USDT Crypto (Binance / Bybit)", details: "Transfer TRC20 USDT to: TEP90124EarnPlanetOfficialUsdtAddr"}
+    ];
+    let paymentMethods = JSON.parse(localStorage.getItem('earnplanet_pay_methods') || JSON.stringify(defaultPaymentMethods));
 
-    // TELEGRAM ALERT ENGINE
-    function sendAdminTelegramAlert(messageText) {
-      const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-      fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: TELEGRAM_CHAT_ID,
-          text: messageText,
-          parse_mode: "HTML"
-        })
-      }).catch(err => console.error("Telegram Notification Error:", err));
-    }
+    let storeProducts = JSON.parse(localStorage.getItem('earnplanet_products') || JSON.stringify([
+      {id:1, title:"Luxury Leather Tote Bag", priceUsd:20, img:"https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=400&q=80"},
+      {id:2, title:"Designer Chronograph Watch", priceUsd:35, img:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=400&q=80"}
+    ]));
+
+    let activeUserFlips = JSON.parse(localStorage.getItem('earnplanet_user_flips') || '{}');
+    let socialLinks = JSON.parse(localStorage.getItem('earnplanet_social_links') || JSON.stringify([
+      {id:1, platform:"Telegram Channel", url:"https://t.me/earnplanetofficial"},
+      {id:2, platform:"Facebook Page", url:"https://facebook.com/earnplanet"}
+    ]));
 
     function saveState() {
       localStorage.setItem('earnplanet_users', JSON.stringify(usersDb));
+      localStorage.setItem('earnplanet_manual_users', manualUserCount.toString());
       localStorage.setItem('earnplanet_pending_payments', JSON.stringify(pendingPaymentProofs));
       localStorage.setItem('earnplanet_pending_social', JSON.stringify(pendingSocialTasks));
+      localStorage.setItem('earnplanet_pay_methods', JSON.stringify(paymentMethods));
+      localStorage.setItem('earnplanet_products', JSON.stringify(storeProducts));
+      localStorage.setItem('earnplanet_user_flips', JSON.stringify(activeUserFlips));
+      localStorage.setItem('earnplanet_social_links', JSON.stringify(socialLinks));
+
+      if (currentUser) {
+        localStorage.setItem('earnplanet_session', currentUser.email);
+      } else {
+        localStorage.removeItem('earnplanet_session');
+      }
+    }
+
+    if (activeSessionEmail) {
+      const found = usersDb.find(u => u.email === activeSessionEmail);
+      if (found) {
+        currentUser = found;
+        document.getElementById('authContainer').style.display = 'none';
+        document.getElementById('mainAppContainer').style.display = 'block';
+      }
     }
 
     function updateUI() {
       if (!currentUser) return;
+
       const usdBal = currentUser.balanceUsd || 0;
-      const storeBal = currentUser.storeBalanceUsd || 0;
-      document.getElementById('walletBalanceNgn').innerText = `₦${(usdBal * NGN_RATE).toLocaleString('en-NG', {minimumFractionDigits: 2})}`;
+      const ngnBal = usdBal * NGN_RATE;
+      document.getElementById('walletBalanceNgn').innerText = `₦${ngnBal.toLocaleString('en-NG', {minimumFractionDigits: 2})}`;
       document.getElementById('walletBalanceUsd').innerText = `≈ $${usdBal.toFixed(2)} USD`;
-      document.getElementById('storeBalanceDisplay').innerText = `$${storeBal.toFixed(2)}`;
-      document.getElementById('headerTier').innerText = currentUser.tier || "No Active Plan";
+
+      const storeUsd = currentUser.storeBalanceUsd || 0;
+      const storeNgn = storeUsd * NGN_RATE;
+      document.getElementById('storeBalanceNgn').innerText = `₦${storeNgn.toLocaleString('en-NG', {minimumFractionDigits: 2})}`;
+      document.getElementById('storeBalanceUsd').innerText = `≈ $${storeUsd.toFixed(2)} USD`;
+
+      document.getElementById('activeUsersDisplay').innerText = manualUserCount.toLocaleString();
+      document.getElementById('headerTier').innerText = currentUser.tier === "None" ? "No Active Plan" : `${currentUser.tier} Plan`;
+      document.getElementById('refLinkInput').value = `https://earnplanet.com.ng/?ref=${currentUser.refCode}`;
+
+      renderPaymentMethodDropdowns();
+      renderPendingApprovals();
+      renderPendingSocialTasks();
+      renderAdminUsersList();
+      renderAdminPaymentMethods();
+      renderUserStoreProducts();
+      renderUserActiveFlips();
+      renderUserSocialLinks();
     }
 
+    // Dynamic Payment Methods Rendering
+    function renderPaymentMethodDropdowns() {
+      const checkoutSelect = document.getElementById('checkoutMethodSelect');
+      const depositSelect = document.getElementById('depositMethodSelect');
+      if (!checkoutSelect || !depositSelect) return;
+
+      const options = paymentMethods.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+      checkoutSelect.innerHTML = options;
+      depositSelect.innerHTML = options;
+
+      renderCheckoutInstructions();
+      renderDepositInstructions();
+    }
+
+    function renderCheckoutInstructions() {
+      const selectedId = document.getElementById('checkoutMethodSelect').value;
+      const pm = paymentMethods.find(m => m.id == selectedId);
+      const box = document.getElementById('dynamicCheckoutInstructions');
+      if (box) box.innerHTML = pm ? `<b>${pm.name}:</b><br>${pm.details}` : '';
+    }
+
+    function renderDepositInstructions() {
+      const selectedId = document.getElementById('depositMethodSelect').value;
+      const pm = paymentMethods.find(m => m.id == selectedId);
+      const box = document.getElementById('dynamicDepositInstructions');
+      if (box) box.innerHTML = pm ? `<b>${pm.name}:</b><br>${pm.details}` : '';
+    }
+
+    // Social Media Task Handler
+    function openSocialTaskModal(platform) {
+      if (!currentUser) return;
+      activeSocialPlatform = platform;
+      document.getElementById('socialTaskModalTitle').innerText = `Submit ${platform} Post`;
+
+      if (platform === 'WhatsApp') {
+        document.getElementById('socialTaskLinkBox').style.display = 'none';
+        document.getElementById('socialTaskImgBox').style.display = 'block';
+      } else {
+        document.getElementById('socialTaskLinkBox').style.display = 'block';
+        document.getElementById('socialTaskImgBox').style.display = 'none';
+      }
+
+      document.getElementById('socialTaskModal').style.display = 'flex';
+    }
+
+    function closeSocialTaskModal() { document.getElementById('socialTaskModal').style.display = 'none'; }
+
+    function submitSocialTask() {
+      const todayStr = new Date().toDateString();
+      const userTasksKey = `${currentUser.email}_${activeSocialPlatform}_${todayStr}`;
+
+      if (localStorage.getItem(userTasksKey)) {
+        alert(`You have already submitted a ${activeSocialPlatform} post for today! Try again tomorrow.`);
+        return;
+      }
+
+      if (activeSocialPlatform === 'WhatsApp') {
+        const fileInput = document.getElementById('socialTaskImgInput');
+        if (!fileInput.files || !fileInput.files[0]) { alert("Please upload your WhatsApp Status screenshot!"); return; }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          pendingSocialTasks.push({
+            id: Date.now(),
+            userEmail: currentUser.email,
+            platform: activeSocialPlatform,
+            proofUrl: e.target.result,
+            isImage: true,
+            date: todayStr
+          });
+          localStorage.setItem(userTasksKey, 'true');
+          saveState();
+          closeSocialTaskModal();
+          alert("WhatsApp Status screenshot submitted successfully! Pending admin approval.");
+          updateUI();
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+      } else {
+        const link = document.getElementById('socialTaskLinkInput').value.trim();
+        if (!link) { alert("Please enter the live post URL!"); return; }
+
+        pendingSocialTasks.push({
+          id: Date.now(),
+          userEmail: currentUser.email,
+          platform: activeSocialPlatform,
+          proofUrl: link,
+          isImage: false,
+          date: todayStr
+        });
+
+        localStorage.setItem(userTasksKey, 'true');
+        saveState();
+        closeSocialTaskModal();
+        document.getElementById('socialTaskLinkInput').value = '';
+        alert(`${activeSocialPlatform} post link submitted successfully! Pending admin approval.`);
+        updateUI();
+      }
+    }
+
+    // Admin Pending Social Task Approval
+    function renderPendingSocialTasks() {
+      const container = document.getElementById('adminPendingSocialTasksList');
+      if (!container) return;
+
+      if (pendingSocialTasks.length === 0) {
+        container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No pending social media tasks.</p>`;
+        return;
+      }
+
+      container.innerHTML = pendingSocialTasks.map(item => `
+        <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+          <div>
+            <b>${item.platform} Task (₦70 Reward)</b><br>
+            <span style="font-size:12px;">User: ${item.userEmail}</span><br>
+            ${item.isImage ? `<a href="${item.proofUrl}" target="_blank"><img src="${item.proofUrl}" style="width:60px; height:60px; object-fit:cover; border-radius:6px; margin-top:4px;"></a>` : `<a href="${item.proofUrl}" target="_blank" style="color:var(--primary); font-size:12px;">View Submitted Link</a>`}
+          </div>
+          <button class="btn" style="padding:6px 12px; font-size:12px;" onclick="approveSocialTask(${item.id})">Approve & Credit ₦70</button>
+        </div>
+      `).join('');
+    }
+
+    function approveSocialTask(id) {
+      const item = pendingSocialTasks.find(t => t.id === id);
+      if (!item) return;
+
+      const user = usersDb.find(u => u.email === item.userEmail);
+      if (user) {
+        user.balanceUsd = (user.balanceUsd || 0) + SOCIAL_REWARD_USD;
+      }
+
+      pendingSocialTasks = pendingSocialTasks.filter(t => t.id !== id);
+      saveState();
+      updateUI();
+      alert(`Approved! ₦70 credited to ${item.userEmail}'s balance.`);
+    }
+
+    // Admin User Accounts & Balance Manager
+    function renderAdminUsersList() {
+      const container = document.getElementById('adminUsersListContainer');
+      if (!container) return;
+      if (!usersDb || usersDb.length === 0) {
+        container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No registered users found.</p>`;
+        return;
+      }
+
+      container.innerHTML = usersDb.map(u => `
+        <div class="payment-account-card" style="margin-bottom:10px; font-size:13px;">
+          <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:8px;">
+            <div>
+              <b>Email:</b> <span style="color:var(--primary);">${u.email}</span><br>
+              <b>Tier:</b> <span style="color:var(--gold);">${u.tier || 'None'}</span> | <b>Refs:</b> ${u.activeReferrals || 0}
+            </div>
+            <div>
+              <b>Main Bal:</b> $${(u.balanceUsd || 0).toFixed(2)} (₦${((u.balanceUsd || 0) * NGN_RATE).toLocaleString()})<br>
+              <b>Store Bal:</b> $${(u.storeBalanceUsd || 0).toFixed(2)} (₦${((u.storeBalanceUsd || 0) * NGN_RATE).toLocaleString()})
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; border-top:1px solid var(--card-border); padding-top:8px;">
+            <input type="number" id="adminAdjMain_${CSS.escape(u.email)}" placeholder="Adjust Main ($)" style="width:140px; margin-bottom:0; padding:6px; font-size:12px;">
+            <button class="btn" style="padding:6px 12px; font-size:12px;" onclick="adminAdjustBalance('${u.email}', 'main')">Update Main</button>
+            <input type="number" id="adminAdjStore_${CSS.escape(u.email)}" placeholder="Adjust Store ($)" style="width:140px; margin-bottom:0; padding:6px; font-size:12px;">
+            <button class="btn" style="padding:6px 12px; font-size:12px;" onclick="adminAdjustBalance('${u.email}', 'store')">Update Store</button>
+            <button class="btn btn-danger" style="padding:6px 12px; font-size:12px;" onclick="adminDeleteUser('${u.email}')">Delete User</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function adminAdjustBalance(email, walletType) {
+      const user = usersDb.find(u => u.email === email);
+      if (!user) return;
+      const inputId = walletType === 'main' ? `adminAdjMain_${CSS.escape(email)}` : `adminAdjStore_${CSS.escape(email)}`;
+      const val = parseFloat(document.getElementById(inputId).value);
+
+      if (isNaN(val)) { alert("Please enter a valid amount in USD!"); return; }
+
+      if (walletType === 'main') {
+        user.balanceUsd = (user.balanceUsd || 0) + val;
+      } else {
+        user.storeBalanceUsd = (user.storeBalanceUsd || 0) + val;
+      }
+
+      saveState();
+      updateUI();
+      alert(`Successfully updated ${walletType} balance for ${email}!`);
+    }
+
+    function adminDeleteUser(email) {
+      if (!confirm(`Are you sure you want to delete user ${email}?`)) return;
+      usersDb = usersDb.filter(u => u.email !== email);
+      saveState();
+      updateUI();
+      alert("User deleted successfully.");
+    }
+
+    // Payment Methods Manager
+    function renderAdminPaymentMethods() {
+      const container = document.getElementById('adminPaymentMethodsList');
+      if (!container) return;
+      container.innerHTML = paymentMethods.map(m => `
+        <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center;">
+          <div><b>${m.name}</b><br><span style="font-size:12px; color:var(--text-muted);">${m.details}</span></div>
+          <button class="btn btn-secondary" style="padding:4px 8px; font-size:11px;" onclick="editAdminPaymentMethod(${m.id})">Edit</button>
+        </div>
+      `).join('');
+    }
+
+    function saveAdminPaymentMethod() {
+      const id = document.getElementById('editPayMethodId').value;
+      const name = document.getElementById('newPayMethodName').value.trim();
+      const details = document.getElementById('newPayMethodDetails').value.trim();
+
+      if (!name || !details) { alert("Fill name and details!"); return; }
+
+      if (id) {
+        let pm = paymentMethods.find(item => item.id == id);
+        if (pm) { pm.name = name; pm.details = details; }
+      } else {
+        paymentMethods.push({ id: Date.now(), name, details });
+      }
+
+      saveState();
+      document.getElementById('editPayMethodId').value = '';
+      document.getElementById('newPayMethodName').value = '';
+      document.getElementById('newPayMethodDetails').value = '';
+      updateUI();
+      alert("Payment method updated!");
+    }
+
+    function editAdminPaymentMethod(id) {
+      let pm = paymentMethods.find(item => item.id == id);
+      if (!pm) return;
+      document.getElementById('editPayMethodId').value = pm.id;
+      document.getElementById('newPayMethodName').value = pm.name;
+      document.getElementById('newPayMethodDetails').value = pm.details;
+    }
+
+    // Store & Social Links rendering helpers
+    function renderUserStoreProducts() {
+      const container = document.getElementById('userStoreProductsGrid');
+      if (!container) return;
+      container.innerHTML = storeProducts.map(p => `
+        <div class="product-card">
+          <img src="${p.img}" class="product-img" alt="${p.title}">
+          <div class="product-title">${p.title}</div>
+          <div class="product-price">₦${(p.priceUsd * NGN_RATE).toLocaleString()} ($${p.priceUsd})</div>
+          <div class="product-profit">Return: ₦${(p.priceUsd * 1.2 * NGN_RATE).toLocaleString()} ($${(p.priceUsd * 1.2).toFixed(2)}) [+20%]</div>
+          <button class="btn" onclick="alert('Flip item selected!')">Flip Product</button>
+        </div>
+      `).join('');
+    }
+
+    function renderUserActiveFlips() {
+      const container = document.getElementById('userActiveFlipsList');
+      if (!container) return;
+      container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No active resell flips.</p>`;
+    }
+
+    function renderUserSocialLinks() {
+      const container = document.getElementById('userSocialLinksGrid');
+      if (!container) return;
+      container.innerHTML = socialLinks.map(s => `
+        <a href="${s.url}" target="_blank" class="btn btn-secondary" style="justify-content:center; text-align:center; padding:12px; font-size:13px; color:var(--gold);">
+          📢 Join ${s.platform}
+        </a>
+      `).join('');
+    }
+
+    function renderPendingApprovals() {
+      const container = document.getElementById('adminPendingApprovalsList');
+      if (!container) return;
+      if (pendingPaymentProofs.length === 0) {
+        container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No pending payments or deposits.</p>`;
+      }
+    }
+
+    // Auth & Navigation
     function handleRegister() {
       const email = document.getElementById('regEmail').value.trim();
       const password = document.getElementById('regPassword').value;
       const pin = document.getElementById('regPin').value;
 
-      if (!email || !password || pin.length !== 4) { alert("Fill all fields and ensure PIN is 4 digits!"); return; }
-      if (usersDb.some(u => u.email === email)) { alert("Email already registered!"); return; }
+      if (!email || !password || pin.length !== 4) { alert("Fill all fields correctly!"); return; }
+      if (usersDb.some(u => u.email === email)) { alert("Email already exists!"); return; }
 
-      const newUser = { email, password, pin, balanceUsd: 0, storeBalanceUsd: 0, tier: "None" };
+      const newUser = { email, password, pin, refCode: "EP-" + Math.floor(10000 + Math.random() * 90000), balanceUsd: 0, storeBalanceUsd: 0, tier: "None", activeReferrals: 0 };
       usersDb.push(newUser);
+      manualUserCount++;
       saveState();
-      alert("Registration successful! Please login.");
+      alert("Account created successfully! Please login.");
       switchAuthView('login');
     }
 
@@ -417,17 +1040,15 @@
       if (!user) { alert("Invalid credentials!"); return; }
 
       currentUser = user;
-      isAdminLoggedIn = false;
-      document.getElementById('btnAdminTab').style.display = 'none';
+      saveState();
       document.getElementById('authContainer').style.display = 'none';
       document.getElementById('mainAppContainer').style.display = 'block';
-      switchTab('user');
       updateUI();
     }
 
     function handleLogout() {
       currentUser = null;
-      isAdminLoggedIn = false;
+      saveState();
       document.getElementById('mainAppContainer').style.display = 'none';
       document.getElementById('authContainer').style.display = 'block';
     }
@@ -435,147 +1056,14 @@
     function switchAuthView(v) {
       document.getElementById('loginView').style.display = v === 'login' ? 'block' : 'none';
       document.getElementById('registerView').style.display = v === 'register' ? 'block' : 'none';
-    }
-
-    function openCheckoutModal(name, priceUsd) {
-      activeCheckoutPlan = { name, priceUsd };
-      document.getElementById('checkoutTitle').innerText = `${name} Plan Checkout`;
-      document.getElementById('userPaymentCodeInput').value = '';
-      document.getElementById('checkoutModal').style.display = 'flex';
-    }
-    function closeCheckoutModal() { document.getElementById('checkoutModal').style.display = 'none'; }
-
-    function submitPlanPaymentProof() {
-      const code = document.getElementById('userPaymentCodeInput').value.trim();
-      if (!code) { alert("Please enter Code or TxID!"); return; }
-
-      pendingPaymentProofs.push({ id: Date.now(), userEmail: currentUser.email, planName: activeCheckoutPlan.name, amountUsd: activeCheckoutPlan.priceUsd, code });
-      saveState();
-      closeCheckoutModal();
-
-      sendAdminTelegramAlert(
-        `🚨 <b>NEW PLAN SUBSCRIPTION PAYMENT!</b>\n\n` +
-        `👤 <b>User:</b> ${currentUser.email}\n` +
-        `💳 <b>Plan:</b> ${activeCheckoutPlan.name} ($${activeCheckoutPlan.priceUsd})\n` +
-        `🔑 <b>Code/TxID:</b> ${code}\n\n` +
-        `Review in Admin Panel at earnplanet.com.ng`
-      );
-
-      alert("Payment proof submitted! Admin notified.");
-    }
-
-    function openDepositModal() { 
-      document.getElementById('depositAmountUsd').value = '';
-      document.getElementById('depositCodeInput').value = '';
-      document.getElementById('depositModal').style.display = 'flex'; 
-    }
-    function closeDepositModal() { document.getElementById('depositModal').style.display = 'none'; }
-
-    function submitDepositProof() {
-      const amtUsd = parseFloat(document.getElementById('depositAmountUsd').value);
-      const code = document.getElementById('depositCodeInput').value.trim();
-
-      if (!amtUsd || !code) { alert("Fill all deposit details!"); return; }
-
-      pendingPaymentProofs.push({ id: Date.now(), userEmail: currentUser.email, planName: "Store Deposit", amountUsd: amtUsd, code });
-      saveState();
-      closeDepositModal();
-
-      sendAdminTelegramAlert(
-        `💰 <b>NEW FLIP STORE DEPOSIT!</b>\n\n` +
-        `👤 <b>User:</b> ${currentUser.email}\n` +
-        `💵 <b>Amount:</b> $${amtUsd.toFixed(2)} (₦${(amtUsd * NGN_RATE).toLocaleString()})\n` +
-        `🔑 <b>Code/TxID:</b> ${code}\n\n` +
-        `Review in Admin Panel at earnplanet.com.ng`
-      );
-
-      alert("Deposit submitted! Admin notified.");
-    }
-
-    function buyProduct(name, price) {
-      if ((currentUser.storeBalanceUsd || 0) < price) {
-        alert("Insufficient Store Balance! Please deposit to your store balance first.");
-        return;
-      }
-      currentUser.storeBalanceUsd -= price;
-      currentUser.balanceUsd = (currentUser.balanceUsd || 0) + (price * 1.3); // Resell profit markup
-      saveState();
-      updateUI();
-      alert(`Successfully flipped ${name}! Profit added to your main balance.`);
-    }
-
-    function openSocialTaskModal(platform) {
-      activeSocialPlatform = platform;
-      document.getElementById('socialTaskModalTitle').innerText = `Submit ${platform} Post`;
-      document.getElementById('socialTaskLinkInput').value = '';
-      document.getElementById('socialTaskModal').style.display = 'flex';
-    }
-    function closeSocialTaskModal() { document.getElementById('socialTaskModal').style.display = 'none'; }
-
-    function submitSocialTask() {
-      const link = document.getElementById('socialTaskLinkInput').value.trim();
-      if (!link) { alert("Please provide link or proof details!"); return; }
-
-      const todayStr = new Date().toDateString();
-      pendingSocialTasks.push({ id: Date.now(), userEmail: currentUser.email, platform: activeSocialPlatform, link, date: todayStr });
-      saveState();
-      closeSocialTaskModal();
-
-      sendAdminTelegramAlert(
-        `📲 <b>NEW SOCIAL MEDIA TASK SUBMISSION!</b>\n\n` +
-        `👤 <b>User:</b> ${currentUser.email}\n` +
-        `📌 <b>Platform:</b> ${activeSocialPlatform}\n` +
-        `🔗 <b>Link:</b> ${link}\n` +
-        `🎁 <b>Pending Reward:</b> ₦70\n\n` +
-        `Approve in Admin Panel at earnplanet.com.ng`
-      );
-
-      alert(`${activeSocialPlatform} task submitted! Pending admin approval.`);
-    }
-
-    function playDrivingGame() {
-      const rewardUsd = 100 / NGN_RATE; // ₦100 game reward
-      currentUser.balanceUsd = (currentUser.balanceUsd || 0) + rewardUsd;
-      saveState();
-      updateUI();
-      alert("🚗 Driving challenge completed! ₦100 added to your balance.");
-    }
-
-    function openWithdrawModal() { document.getElementById('withdrawModal').style.display = 'flex'; }
-    function closeWithdrawModal() { document.getElementById('withdrawModal').style.display = 'none'; }
-
-    function submitWithdrawal() {
-      const amt = parseFloat(document.getElementById('withdrawAmountNgn').value);
-      const bank = document.getElementById('withdrawBank').value.trim();
-      const acct = document.getElementById('withdrawAcctNo').value.trim();
-      const pin = document.getElementById('withdrawPin').value;
-
-      if (!amt || !bank || !acct || pin !== currentUser.pin) {
-        alert("Invalid withdrawal details or incorrect PIN!");
-        return;
-      }
-
-      const amtUsd = amt / NGN_RATE;
-      if ((currentUser.balanceUsd || 0) < amtUsd) {
-        alert("Insufficient balance!");
-        return;
-      }
-
-      currentUser.balanceUsd -= amtUsd;
-      saveState();
-      updateUI();
-      closeWithdrawModal();
-      alert("Withdrawal request submitted successfully!");
+      document.getElementById('forgotView').style.display = v === 'forgot' ? 'block' : 'none';
     }
 
     function openAdminAuthModal() { document.getElementById('adminAuthModal').style.display = 'flex'; }
     function closeAdminAuthModal() { document.getElementById('adminAuthModal').style.display = 'none'; }
-
     function loginAdmin() {
       if (document.getElementById('adminUsername').value === 'Admin' && document.getElementById('adminPassword').value === 'Femifresh43221') {
         closeAdminAuthModal();
-        isAdminLoggedIn = true;
-        document.getElementById('btnAdminTab').style.display = 'block';
         document.getElementById('authContainer').style.display = 'none';
         document.getElementById('mainAppContainer').style.display = 'block';
         switchTab('admin');
@@ -585,89 +1073,40 @@
     function switchTab(t) {
       document.getElementById('userTab').style.display = t === 'user' ? 'block' : 'none';
       document.getElementById('storeTab').style.display = t === 'store' ? 'block' : 'none';
-      document.getElementById('gameTab').style.display = t === 'game' ? 'block' : 'none';
+      document.getElementById('supportTab').style.display = t === 'support' ? 'block' : 'none';
+      document.getElementById('settingsTab').style.display = t === 'settings' ? 'block' : 'none';
       document.getElementById('adminTab').style.display = t === 'admin' ? 'block' : 'none';
-
-      document.getElementById('btnUserTab').className = t === 'user' ? 'tab-btn active' : 'tab-btn';
-      document.getElementById('btnStoreTab').className = t === 'store' ? 'tab-btn active' : 'tab-btn';
-      document.getElementById('btnGameTab').className = t === 'game' ? 'tab-btn active' : 'tab-btn';
-      if (isAdminLoggedIn) {
-        document.getElementById('btnAdminTab').className = t === 'admin' ? 'tab-btn active' : 'tab-btn';
-      }
-
-      if (t === 'admin' && isAdminLoggedIn) {
-        renderAdminLists();
-      }
     }
 
-    function renderAdminLists() {
-      const payListEl = document.getElementById('adminPendingApprovalsList');
-      if (pendingPaymentProofs.length === 0) {
-        payListEl.innerHTML = `<p style="color:var(--text-muted); font-size:13px;">No pending payments found.</p>`;
-      } else {
-        payListEl.innerHTML = pendingPaymentProofs.map(item => `
-          <div class="admin-card">
-            <div>
-              <b>${item.planName}</b> ($${item.amountUsd})<br>
-              <small style="color:var(--text-muted);">User: ${item.userEmail} | Code: ${item.code}</small>
-            </div>
-            <button class="btn" style="padding:6px 12px; font-size:12px;" onclick="approvePayment(${item.id})">Approve</button>
-          </div>
-        `).join('');
-      }
-
-      const socialListEl = document.getElementById('adminPendingSocialTasksList');
-      if (pendingSocialTasks.length === 0) {
-        socialListEl.innerHTML = `<p style="color:var(--text-muted); font-size:13px;">No pending social tasks found.</p>`;
-      } else {
-        socialListEl.innerHTML = pendingSocialTasks.map(item => `
-          <div class="admin-card">
-            <div>
-              <b>${item.platform} Task</b> (₦70)<br>
-              <small style="color:var(--text-muted);">User: ${item.userEmail} | <a href="${item.link}" target="_blank" style="color:var(--primary);">View Link</a></small>
-            </div>
-            <button class="btn" style="padding:6px 12px; font-size:12px;" onclick="approveSocialTask(${item.id})">Approve ₦70</button>
-          </div>
-        `).join('');
-      }
+    function openCheckoutModal(name, priceUsd) {
+      activeCheckoutPlan = { name, priceUsd };
+      document.getElementById('checkoutTitle').innerText = `${name} Plan Checkout`;
+      document.getElementById('checkoutModal').style.display = 'flex';
+      renderCheckoutInstructions();
     }
+    function closeCheckoutModal() { document.getElementById('checkoutModal').style.display = 'none'; }
 
-    function approvePayment(id) {
-      const idx = pendingPaymentProofs.findIndex(p => p.id === id);
-      if (idx === -1) return;
-      const item = pendingPaymentProofs[idx];
-
-      const targetUser = usersDb.find(u => u.email === item.userEmail);
-      if (targetUser) {
-        if (item.planName === "Store Deposit") {
-          targetUser.storeBalanceUsd = (targetUser.storeBalanceUsd || 0) + item.amountUsd;
-        } else {
-          targetUser.tier = item.planName;
-        }
-      }
-
-      pendingPaymentProofs.splice(idx, 1);
-      saveState();
-      renderAdminLists();
-      alert("Payment approved successfully!");
+    function openDepositModal() {
+      document.getElementById('depositModal').style.display = 'flex';
+      renderDepositInstructions();
     }
+    function closeDepositModal() { document.getElementById('depositModal').style.display = 'none'; }
 
-    function approveSocialTask(id) {
-      const idx = pendingSocialTasks.findIndex(s => s.id === id);
-      if (idx === -1) return;
-      const item = pendingSocialTasks[idx];
-
-      const targetUser = usersDb.find(u => u.email === item.userEmail);
-      if (targetUser) {
-        const rewardUsd = 70 / NGN_RATE;
-        targetUser.balanceUsd = (targetUser.balanceUsd || 0) + rewardUsd;
-      }
-
-      pendingSocialTasks.splice(idx, 1);
-      saveState();
-      renderAdminLists();
-      alert("Social task approved! ₦70 added to user balance.");
+    function openWithdrawModal() {
+      document.getElementById('withdrawModal').style.display = 'flex';
     }
+    function closeWithdrawModal() { document.getElementById('withdrawModal').style.display = 'none'; }
+
+    function openAddFromMainModal() { document.getElementById('addFromMainModal').style.display = 'flex'; }
+    function closeAddFromMainModal() { document.getElementById('addFromMainModal').style.display = 'none'; }
+
+    function openTransferModal() { document.getElementById('transferModal').style.display = 'flex'; }
+    function closeTransferModal() { document.getElementById('transferModal').style.display = 'none'; }
+
+    function openDrivingGameModal() { alert("Driving game session ready!"); }
+    function closeDrivingModal() {}
+
+    if (currentUser) updateUI();
   </script>
 </body>
 </html>
