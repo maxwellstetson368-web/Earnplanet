@@ -131,29 +131,6 @@
     .task-info p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
     .task-reward { color: var(--primary); font-weight: 800; font-size: 13px; margin-top: 5px; }
 
-    .live-notification-top {
-      position: fixed;
-      top: 65px;
-      left: 50%;
-      transform: translateX(-50%) translateY(-150%);
-      background: #04100a;
-      border: 1px solid var(--primary);
-      border-radius: 30px;
-      padding: 10px 22px;
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      box-shadow: 0 10px 30px rgba(0,230,118,0.25);
-      z-index: 999;
-      transition: transform 0.4s ease;
-      width: 90%;
-      max-width: 440px;
-    }
-    .live-notification-top.show { transform: translateX(-50%) translateY(0); }
-    .live-icon { font-size: 20px; }
-    .live-text { font-size: 12px; color: #fff; line-height: 1.3; text-align: left; }
-    .live-text b { color: var(--primary); }
-
     .chat-container { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; height: 350px; display: flex; flex-direction: column; }
     .chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
     .msg { padding: 10px 14px; border-radius: 12px; font-size: 13px; max-width: 80%; line-height: 1.4; }
@@ -175,14 +152,6 @@
   </style>
 </head>
 <body>
-
-  <!-- TOP LIVE WITHDRAWAL POPUP NOTIFICATION -->
-  <div class="live-notification-top" id="payoutNotification">
-    <div class="live-icon">💸</div>
-    <div class="live-text" id="payoutNotifText">
-      User <b>Adeb***45</b> withdrew <b>₦180,000 ($120.00)</b> to Access Bank
-    </div>
-  </div>
 
   <!-- AUTHENTICATION CONTAINER -->
   <div id="authContainer" class="container" style="max-width:440px; margin-top:60px;">
@@ -349,51 +318,9 @@
           </div>
         </div>
 
-        <div class="section-title">Select Membership Plan</div>
-        <div class="plans-grid">
-          <div class="plan-card">
-            <div>
-              <div class="plan-bonus">₦9,000 ($6.00) Cashback</div>
-              <div class="plan-title">Starter</div>
-              <div class="plan-price-ngn">₦22,500</div>
-              <div class="plan-price-usd">$15.00 USD</div>
-              <div class="plan-perks">Earn $0.15 (₦225) per drive<br>4 Drives Daily ($0.60 / ₦900)</div>
-            </div>
-            <button class="btn" onclick="openCheckoutModal('Starter', 15, 0.15, 6.00)">Subscribe (₦22.5k / $15)</button>
-          </div>
-
-          <div class="plan-card">
-            <div>
-              <div class="plan-bonus">₦15,000 ($10.00) Cashback</div>
-              <div class="plan-title">Silver</div>
-              <div class="plan-price-ngn">₦37,500</div>
-              <div class="plan-price-usd">$25.00 USD</div>
-              <div class="plan-perks">Earn $0.25 (₦375) per drive<br>4 Drives Daily ($1.00 / ₦1,500)</div>
-            </div>
-            <button class="btn" onclick="openCheckoutModal('Silver', 25, 0.25, 10.00)">Subscribe (₦37.5k / $25)</button>
-          </div>
-
-          <div class="plan-card">
-            <div>
-              <div class="plan-bonus">₦30,000 ($20.00) Cashback</div>
-              <div class="plan-title">Gold</div>
-              <div class="plan-price-ngn">₦75,000</div>
-              <div class="plan-price-usd">$50.00 USD</div>
-              <div class="plan-perks">Earn $0.35 (₦525) per drive<br>4 Drives Daily ($1.40 / ₦2,100)</div>
-            </div>
-            <button class="btn" onclick="openCheckoutModal('Gold', 50, 0.35, 20.00)">Subscribe (₦75k / $50)</button>
-          </div>
-
-          <div class="plan-card">
-            <div>
-              <div class="plan-bonus">₦60,000 ($40.00) Cashback</div>
-              <div class="plan-title">Platinum</div>
-              <div class="plan-price-ngn">₦150,000</div>
-              <div class="plan-price-usd">$100.00 USD</div>
-              <div class="plan-perks">Earn $0.50 (₦750) per drive<br>4 Drives Daily ($2.00 / ₦3,000)</div>
-            </div>
-            <button class="btn" onclick="openCheckoutModal('Platinum', 100, 0.50, 40.00)">Subscribe (₦150k / $100)</button>
-          </div>
+        <div class="section-title">Membership Plans</div>
+        <div class="plans-grid" id="plansContainer">
+          <!-- Rendered dynamically depending on user subscription status -->
         </div>
 
         <div class="section-title">Earning Modules</div>
@@ -516,10 +443,10 @@
         <p style="font-size:12px; color:var(--gold); font-weight:bold;" id="checkoutPayableText"></p>
       </div>
 
-      <label id="paymentProofLabel">Enter Code or TxID</label>
+      <label id="paymentProofLabel">Enter Code or TxID / Apple Card Code</label>
       <input type="text" id="userPaymentCodeInput" placeholder="Enter Code or TxID">
 
-      <label>Upload Payment Receipt / Screenshot (Mandatory)</label>
+      <label>Upload Payment Receipt / Apple Card Screenshot (Mandatory)</label>
       <input type="file" id="userPaymentProofFile" accept="image/*">
 
       <button class="btn" style="width:100%; margin-top:5px;" onclick="submitPlanPaymentProof()">Submit Payment for Verification</button>
@@ -543,10 +470,10 @@
         <p style="font-size:12px; color:var(--gold); font-weight:bold;" id="depositPayableText">Payable Amount: ₦0.00 ($0.00 USD)</p>
       </div>
 
-      <label id="depositProofLabel">Enter Code or TxID</label>
+      <label id="depositProofLabel">Enter Code or TxID / Apple Card Code</label>
       <input type="text" id="depositCodeInput" placeholder="Enter Code or TxID">
 
-      <label>Upload Payment Receipt / Screenshot (Mandatory)</label>
+      <label>Upload Payment Receipt / Apple Card Screenshot (Mandatory)</label>
       <input type="file" id="depositProofFile" accept="image/*">
 
       <button class="btn" style="width:100%; margin-top:5px;" onclick="submitDepositProof()">Submit Deposit Verification</button>
@@ -629,29 +556,44 @@
         <b style="font-size:18px; color:var(--primary);" id="wdAvailableDisplayNgn">₦0.00</b>
       </div>
       
-      <!-- FIXED: Bank Selection Dropdown added -->
-      <label>Select Bank / Payment Provider</label>
-      <select id="wdBankSelect" onchange="toggleCustomBankInput()">
-        <option value="OPay">OPay Digital Services</option>
-        <option value="PalmPay">PalmPay</option>
-        <option value="Kuda">Kuda Bank</option>
-        <option value="Access Bank">Access Bank</option>
-        <option value="First Bank">First Bank of Nigeria</option>
-        <option value="GTBank">Guaranty Trust Bank (GTB)</option>
-        <option value="UBA">United Bank for Africa (UBA)</option>
-        <option value="Zenith Bank">Zenith Bank</option>
-        <option value="Other">Other Bank (Type Below)</option>
+      <!-- FIXED: Choice between Bank Transfer or USDT -->
+      <label>Choose Cashout Method</label>
+      <select id="cashoutTypeSelect" onchange="toggleCashoutMethodFields()">
+        <option value="bank">Bank Transfer</option>
+        <option value="usdt">USDT Crypto Wallet</option>
       </select>
 
-      <div id="customBankBox" style="display:none; margin-top:8px;">
-        <label>Enter Bank Name</label>
-        <input type="text" id="wdBankNameCustom" placeholder="e.g. Fidelity Bank">
+      <!-- Bank Transfer Fields -->
+      <div id="bankTransferFieldsContainer">
+        <label style="margin-top:10px;">Select Bank / Payment Provider</label>
+        <select id="wdBankSelect" onchange="toggleCustomBankInput()">
+          <option value="OPay">OPay Digital Services</option>
+          <option value="PalmPay">PalmPay</option>
+          <option value="Kuda">Kuda Bank</option>
+          <option value="Access Bank">Access Bank</option>
+          <option value="First Bank">First Bank of Nigeria</option>
+          <option value="GTBank">Guaranty Trust Bank (GTB)</option>
+          <option value="UBA">United Bank for Africa (UBA)</option>
+          <option value="Zenith Bank">Zenith Bank</option>
+          <option value="Other">Other Bank (Type Below)</option>
+        </select>
+
+        <div id="customBankBox" style="display:none; margin-top:8px;">
+          <label>Enter Bank Name</label>
+          <input type="text" id="wdBankNameCustom" placeholder="e.g. Fidelity Bank">
+        </div>
+
+        <label style="margin-top:10px;">10-Digit Account Number</label>
+        <input type="text" id="wdAccountNum" placeholder="10-Digit Account Number" maxlength="10">
       </div>
 
-      <label style="margin-top:10px;">10-Digit Account Number</label>
-      <input type="text" id="wdAccountNum" placeholder="10-Digit Account Number" maxlength="10">
+      <!-- USDT Fields -->
+      <div id="usdtFieldsContainer" style="display:none;">
+        <label style="margin-top:10px;">USDT Wallet Address (TRC20)</label>
+        <input type="text" id="wdUsdtAddress" placeholder="Enter your TRC20 wallet address">
+      </div>
       
-      <label>Withdrawal Amount (₦)</label>
+      <label style="margin-top:10px;">Withdrawal Amount (₦)</label>
       <input type="number" id="wdAmountInput" placeholder="Enter Cashout Amount">
       
       <label>4-Digit Withdrawal PIN</label>
@@ -708,20 +650,15 @@
     let pendingPaymentProofs = JSON.parse(localStorage.getItem('earnplanet_pending_payments') || '[]');
     let pendingSocialTasks = JSON.parse(localStorage.getItem('earnplanet_pending_social') || '[]');
     
-    // FIXED: Enhanced default payment instructions explaining OPay, PalmPay, and Kuda deposits clearly
+    // FIXED: Detailed OPay / PalmPay / Kuda Apple Gift Card instructions
     let defaultPaymentMethods = [
       {
         id: 1, 
-        name: "OPay / PalmPay / Kuda Direct Transfer", 
-        details: "<b>Transfer to OPay/PalmPay/Kuda Merchant:</b><br>Account Number: <b>8123456789</b><br>Account Name: <b>EarnPlanet Digital Tech</b><br>Bank: <b>OPay / PalmPay / Kuda</b><br><i>(Send exact Naira amount corresponding to USD value. Upload receipt & TxID below)</i>"
+        name: "Apple Gift Card via OPay / PalmPay / Kuda", 
+        details: "1. Login to your OPay / PalmPay / Kuda app.<br>2. Click on <b>More</b> to view listed services.<br>3. Click on <b>Gift Card</b>.<br>4. Click on <b>Apple Gift Card</b>.<br>5. Buy the exact amount needed, then upload the screenshot and card code below."
       },
       {
         id: 2, 
-        name: "Apple Gift Card (Via OPay/PalmPay/Kuda App)", 
-        details: "Open your OPay, PalmPay, or Kuda mobile app. Go to <b>More -> Services -> Buy Gift Card -> Apple Store Gift Card</b>. Purchase the exact USD value, copy the digital claim code / redeem code, and upload the screenshot here."
-      },
-      {
-        id: 3, 
         name: "USDT Crypto (Binance / Bybit)", 
         details: "Transfer TRC20 USDT to official platform wallet address: <br><code>TEP90124EarnPlanetOfficialUsdtAddr</code>"
       }
@@ -738,6 +675,14 @@
       {id:1, platform:"Telegram Channel", url:"https://t.me/earnplanetofficial"},
       {id:2, platform:"Facebook Page", url:"https://facebook.com/earnplanet"}
     ]));
+
+    // All available membership plans definition
+    const availablePlans = [
+      { name: "Starter", priceUsd: 15, cashbackUsd: 6.00, cashbackNgn: 9000, dailyDriveUsd: 0.15 },
+      { name: "Silver", priceUsd: 25, cashbackUsd: 10.00, cashbackNgn: 15000, dailyDriveUsd: 0.25 },
+      { name: "Gold", priceUsd: 50, cashbackUsd: 20.00, cashbackNgn: 30000, dailyDriveUsd: 0.35 },
+      { name: "Platinum", priceUsd: 100, cashbackUsd: 40.00, cashbackNgn: 60000, dailyDriveUsd: 0.50 }
+    ];
 
     function saveState() {
       localStorage.setItem('earnplanet_users', JSON.stringify(usersDb));
@@ -785,6 +730,7 @@
       document.getElementById('headerTier').innerText = currentUser.tier === "None" ? "No Active Plan" : `${currentUser.tier} Plan`;
       document.getElementById('refLinkInput').value = `https://earnplanet.com.ng/?ref=${currentUser.refCode}`;
 
+      renderMembershipPlansSection();
       renderPaymentMethodDropdowns();
       renderPendingApprovals();
       renderPendingSocialTasks();
@@ -793,6 +739,59 @@
       renderUserStoreProducts();
       renderUserActiveFlips();
       renderUserSocialLinks();
+    }
+
+    // Dynamic Membership Plan & Upgrade Rendering
+    function renderMembershipPlansSection() {
+      const container = document.getElementById('plansContainer');
+      if (!container) return;
+
+      const hasActivePlan = currentUser.tier && currentUser.tier !== "None";
+      const currentPlanObj = availablePlans.find(p => p.name === currentUser.tier);
+
+      if (!hasActivePlan) {
+        // Show all subscribe buttons
+        container.innerHTML = availablePlans.map(plan => `
+          <div class="plan-card">
+            <div>
+              <div class="plan-bonus">₦${plan.cashbackNgn.toLocaleString()} ($${plan.cashbackUsd.toFixed(2)}) Cashback</div>
+              <div class="plan-title">${plan.name}</div>
+              <div class="plan-price-ngn">₦${(plan.priceUsd * NGN_RATE).toLocaleString()}</div>
+              <div class="plan-price-usd">$${plan.priceUsd.toFixed(2)} USD</div>
+              <div class="plan-perks">Earn $${plan.dailyDriveUsd.toFixed(2)} per drive<br>4 Drives Daily</div>
+            </div>
+            <button class="btn" onclick="openCheckoutModal('${plan.name}', ${plan.priceUsd}, false)">Subscribe</button>
+          </div>
+        `).join('');
+      } else {
+        // Only show higher plans for upgrading
+        const upgradePlans = availablePlans.filter(p => !currentPlanObj || p.priceUsd > currentPlanObj.priceUsd);
+        
+        if (upgradePlans.length === 0) {
+          container.innerHTML = `<div class="stat-card" style="grid-column: 1/-1;"><p style="color:var(--gold);">You are currently on the highest plan (${currentUser.tier})!</p></div>`;
+          return;
+        }
+
+        container.innerHTML = upgradePlans.map(plan => {
+          const priceDiffUsd = plan.priceUsd - currentPlanObj.priceUsd;
+          const surchargeUsd = 5000 / NGN_RATE;
+          const totalUpgradeUsd = priceDiffUsd + surchargeUsd;
+          const totalUpgradeNgn = totalUpgradeUsd * NGN_RATE;
+
+          return `
+            <div class="plan-card">
+              <div>
+                <div class="plan-bonus">Upgrade to ${plan.name}</div>
+                <div class="plan-title">${plan.name}</div>
+                <div class="plan-price-ngn">₦${totalUpgradeNgn.toLocaleString()}</div>
+                <div class="plan-price-usd">($${priceDiffUsd} diff + ₦5,000 fee)</div>
+                <div class="plan-perks">New Perks: Earn $${plan.dailyDriveUsd.toFixed(2)} per drive<br>4 Drives Daily</div>
+              </div>
+              <button class="btn" onclick="openCheckoutModal('${plan.name}', ${totalUpgradeUsd}, true)">Upgrade Plan</button>
+            </div>
+          `;
+        }).join('');
+      }
     }
 
     function renderPaymentMethodDropdowns() {
@@ -817,7 +816,7 @@
       if (activeCheckoutPlan) {
         const payableNgn = activeCheckoutPlan.priceUsd * NGN_RATE;
         const pText = document.getElementById('checkoutPayableText');
-        if (pText) pText.innerText = `Payable Amount: ₦${payableNgn.toLocaleString()} ($${activeCheckoutPlan.priceUsd}.00 USD)`;
+        if (pText) pText.innerText = `Payable Amount: ₦${payableNgn.toLocaleString()} ($${activeCheckoutPlan.priceUsd.toFixed(2)} USD)`;
       }
     }
 
@@ -835,7 +834,21 @@
       if (dText) dText.innerText = `Payable Amount: ₦${amtNgn.toLocaleString()} ($${amtUsd.toFixed(2)} USD)`;
     }
 
-    // Toggle custom bank input field in cashout modal
+    // Toggle cashout fields between Bank and USDT
+    function toggleCashoutMethodFields() {
+      const method = document.getElementById('cashoutTypeSelect').value;
+      const bankContainer = document.getElementById('bankTransferFieldsContainer');
+      const usdtContainer = document.getElementById('usdtFieldsContainer');
+
+      if (method === 'bank') {
+        bankContainer.style.display = 'block';
+        usdtContainer.style.display = 'none';
+      } else {
+        bankContainer.style.display = 'none';
+        usdtContainer.style.display = 'block';
+      }
+    }
+
     function toggleCustomBankInput() {
       const val = document.getElementById('wdBankSelect').value;
       const customBox = document.getElementById('customBankBox');
@@ -936,22 +949,22 @@
       }
     }
 
-    // Submit Plan Payment Proof
+    // Submit Plan Payment / Upgrade Proof
     function submitPlanPaymentProof() {
       const code = document.getElementById('userPaymentCodeInput').value.trim();
       const fileInput = document.getElementById('userPaymentProofFile');
       const methodId = document.getElementById('checkoutMethodSelect').value;
       const pm = paymentMethods.find(m => m.id == methodId);
 
-      if (!code) { alert("Please enter your transaction Code or TxID!"); return; }
-      if (!fileInput.files || !fileInput.files[0]) { alert("Please upload your payment screenshot/receipt!"); return; }
+      if (!code) { alert("Please enter your transaction Code, TxID or Apple Card code!"); return; }
+      if (!fileInput.files || !fileInput.files[0]) { alert("Please upload your payment receipt or screenshot!"); return; }
 
       const reader = new FileReader();
       reader.onload = function(e) {
         pendingPaymentProofs.push({
           id: Date.now(),
           userEmail: currentUser.email,
-          planName: activeCheckoutPlan.name,
+          planName: activeCheckoutPlan.isUpgrade ? `${activeCheckoutPlan.name} (Upgrade)` : activeCheckoutPlan.name,
           amountUsd: activeCheckoutPlan.priceUsd,
           methodName: pm ? pm.name : "Direct Transfer",
           code: code,
@@ -962,11 +975,11 @@
         closeCheckoutModal();
 
         sendAdminTelegramAlert(
-          `🚨 <b>NEW PLAN SUBSCRIPTION PAYMENT!</b>\n\n` +
+          `🚨 <b>NEW PLAN ${activeCheckoutPlan.isUpgrade ? 'UPGRADE' : 'SUBSCRIPTION'} PAYMENT!</b>\n\n` +
           `👤 <b>User:</b> ${currentUser.email}\n` +
           `💳 <b>Plan:</b> ${activeCheckoutPlan.name} ($${activeCheckoutPlan.priceUsd} / ₦${(activeCheckoutPlan.priceUsd * NGN_RATE).toLocaleString()})\n` +
           `🏦 <b>Method:</b> ${pm ? pm.name : 'Transfer'}\n` +
-          `🔑 <b>TxID/Code:</b> ${code}\n\n` +
+          `🔑 <b>Code/TxID:</b> ${code}\n\n` +
           `Review in Admin Panel at earnplanet.com.ng`
         );
 
@@ -985,8 +998,8 @@
       const pm = paymentMethods.find(m => m.id == methodId);
 
       if (!amtUsd || amtUsd < 10) { alert("Minimum deposit amount is $10 USD!"); return; }
-      if (!code) { alert("Please enter your transaction Code or TxID!"); return; }
-      if (!fileInput.files || !fileInput.files[0]) { alert("Please upload your payment receipt!"); return; }
+      if (!code) { alert("Please enter your transaction Code, TxID or Apple Card code!"); return; }
+      if (!fileInput.files || !fileInput.files[0]) { alert("Please upload your payment receipt or screenshot!"); return; }
 
       const reader = new FileReader();
       reader.onload = function(e) {
@@ -1008,7 +1021,7 @@
           `👤 <b>User:</b> ${currentUser.email}\n` +
           `💵 <b>Amount:</b> $${amtUsd.toFixed(2)} (₦${(amtUsd * NGN_RATE).toLocaleString()})\n` +
           `🏦 <b>Method:</b> ${pm ? pm.name : 'Transfer'}\n` +
-          `🔑 <b>TxID/Code:</b> ${code}\n\n` +
+          `🔑 <b>Code/TxID:</b> ${code}\n\n` +
           `Review in Admin Panel at earnplanet.com.ng`
         );
 
@@ -1054,7 +1067,9 @@
       const targetUser = usersDb.find(u => u.email === item.userEmail);
       if (targetUser) {
         if (item.type === "subscription") {
-          targetUser.tier = item.planName;
+          // Clean base plan name if it had (Upgrade) attached
+          const cleanName = item.planName.replace(" (Upgrade)", "");
+          targetUser.tier = cleanName;
         } else if (item.type === "deposit") {
           targetUser.storeBalanceUsd = (targetUser.storeBalanceUsd || 0) + item.amountUsd;
         }
@@ -1243,22 +1258,36 @@
       `).join('');
     }
 
-    // Withdrawal submission handling bank dropdown selection
+    // Withdrawal submission handling Bank vs USDT
     function submitWithdrawal() {
       if (!currentUser) return;
-      const bankSelectVal = document.getElementById('wdBankSelect').value;
-      const bankName = bankSelectVal === 'Other' ? document.getElementById('wdBankNameCustom').value.trim() : bankSelectVal;
-      const accountNum = document.getElementById('wdAccountNum').value.trim();
+      const cashoutType = document.getElementById('cashoutTypeSelect').value;
       const amountNgn = parseFloat(document.getElementById('wdAmountInput').value);
       const pin = document.getElementById('wdPinInput').value;
 
-      if (!bankName || !accountNum || isNaN(amountNgn) || !pin) {
-        alert("Please fill out all cashout details completely!");
-        return;
+      let destinationInfo = "";
+
+      if (cashoutType === 'bank') {
+        const bankSelectVal = document.getElementById('wdBankSelect').value;
+        const bankName = bankSelectVal === 'Other' ? document.getElementById('wdBankNameCustom').value.trim() : bankSelectVal;
+        const accountNum = document.getElementById('wdAccountNum').value.trim();
+
+        if (!bankName || !accountNum || accountNum.length !== 10) {
+          alert("Please fill out valid bank details and a 10-digit account number!");
+          return;
+        }
+        destinationInfo = `Bank: ${bankName} (${accountNum})`;
+      } else {
+        const usdtAddr = document.getElementById('wdUsdtAddress').value.trim();
+        if (!usdtAddr) {
+          alert("Please enter your USDT TRC20 wallet address!");
+          return;
+        }
+        destinationInfo = `USDT TRC20 Address: ${usdtAddr}`;
       }
 
-      if (accountNum.length !== 10) {
-        alert("Please enter a valid 10-digit account number!");
+      if (isNaN(amountNgn) || !pin) {
+        alert("Please fill out amount and PIN!");
         return;
       }
 
@@ -1283,12 +1312,11 @@
         `💸 <b>NEW CASHOUT REQUEST!</b>\n\n` +
         `👤 <b>User:</b> ${currentUser.email}\n` +
         `💵 <b>Amount:</b> ₦${amountNgn.toLocaleString()} ($${amountUsd.toFixed(2)})\n` +
-        `🏦 <b>Bank:</b> ${bankName}\n` +
-        `🔢 <b>Account:</b> ${accountNum}\n\n` +
+        `📍 <b>Destination:</b> ${destinationInfo}\n\n` +
         `Process payout immediately.`
       );
 
-      alert(`Cashout request of ₦${amountNgn.toLocaleString()} to ${bankName} (${accountNum}) submitted successfully!`);
+      alert(`Cashout request of ₦${amountNgn.toLocaleString()} submitted successfully!`);
     }
 
     // Auth & Navigation
@@ -1353,9 +1381,9 @@
       document.getElementById('adminTab').style.display = t === 'admin' ? 'block' : 'none';
     }
 
-    function openCheckoutModal(name, priceUsd) {
-      activeCheckoutPlan = { name, priceUsd };
-      document.getElementById('checkoutTitle').innerText = `${name} Plan Checkout`;
+    function openCheckoutModal(name, priceUsd, isUpgrade) {
+      activeCheckoutPlan = { name, priceUsd, isUpgrade };
+      document.getElementById('checkoutTitle').innerText = isUpgrade ? `Upgrade to ${name} Plan` : `Subscribe ${name} Plan`;
       document.getElementById('checkoutModal').style.display = 'flex';
       renderCheckoutInstructions();
     }
@@ -1369,6 +1397,7 @@
 
     function openWithdrawModal() {
       document.getElementById('withdrawModal').style.display = 'flex';
+      toggleCashoutMethodFields();
     }
     function closeWithdrawModal() { document.getElementById('withdrawModal').style.display = 'none'; }
 
