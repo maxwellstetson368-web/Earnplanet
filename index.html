@@ -131,12 +131,16 @@
     .task-info p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
     .task-reward { color: var(--primary); font-weight: 800; font-size: 13px; margin-top: 5px; }
 
-    .chat-container { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; height: 350px; display: flex; flex-direction: column; }
+    .chat-container { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; height: 350px; display: flex; flex-direction: column; margin-bottom: 20px; }
     .chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
     .msg { padding: 10px 14px; border-radius: 12px; font-size: 13px; max-width: 80%; line-height: 1.4; }
     .msg-bot { background: #16422b; color: #fff; align-self: flex-start; }
     .msg-user { background: var(--primary); color: #04100a; font-weight: 700; align-self: flex-end; }
     .chat-input-row { display: flex; gap: 10px; }
+
+    .faq-accordion-item { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 10px; padding: 14px; margin-bottom: 10px; }
+    .faq-q { font-weight: 800; color: var(--gold); font-size: 14px; margin-bottom: 4px; }
+    .faq-a { font-size: 12px; color: var(--text-muted); line-height: 1.5; }
 
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); backdrop-filter: blur(6px); display: none; justify-content: center; align-items: center; z-index: 1000; }
     .modal { background: #071f12; border: 1px solid var(--primary); border-radius: 20px; padding: 25px; width: 92%; max-width: 480px; box-shadow: 0 25px 50px rgba(0,0,0,0.8); max-height: 90vh; overflow-y: auto; }
@@ -231,8 +235,9 @@
         <div style="display:flex; gap:10px; flex-wrap:wrap;" id="navTabsContainer">
           <button class="tab-btn active" onclick="switchTab('user')">Dashboard</button>
           <button class="tab-btn" onclick="switchTab('store')">🛍️ Resell Flip Store</button>
-          <button class="tab-btn" onclick="switchTab('support')">💬 Support</button>
+          <button class="tab-btn" onclick="switchTab('support')">💬 Support & FAQs</button>
           <button class="tab-btn" onclick="switchTab('settings')">⚙️ Settings</button>
+          <button class="tab-btn" style="background:#16422b; color:var(--primary); border-color:var(--primary);" onclick="switchTab('admin')">⚙️ Admin Panel</button>
         </div>
       </div>
 
@@ -381,6 +386,9 @@
             <button class="btn" onclick="sendChatMessage()">Send</button>
           </div>
         </div>
+
+        <div class="section-title" style="margin-top:30px;">❓ Frequently Asked Questions (FAQs)</div>
+        <div id="userFaqContainer"></div>
       </div>
 
       <!-- SETTINGS TAB -->
@@ -403,6 +411,35 @@
       <div id="adminTab" style="display:none;">
         <div class="section-title">⚙️ Pending Social Media Tasks Approvals</div>
         <div id="adminPendingSocialTasksList"></div>
+
+        <div class="section-title" style="margin-top:30px;">⚙️ FAQ Creator & Manager</div>
+        <div class="stat-card" style="text-align:left; margin-bottom:15px;">
+          <h4 style="margin-bottom:10px;">Add New FAQ</h4>
+          <input type="text" id="newFaqQ" placeholder="Question (e.g. How do I withdraw?)">
+          <textarea id="newFaqA" placeholder="Answer / Details"></textarea>
+          <button class="btn" onclick="adminAddFaq()">+ Add FAQ</button>
+        </div>
+        <div id="adminFaqsList"></div>
+
+        <div class="section-title" style="margin-top:30px;">⚙️ Manual User Creator (Admin)</div>
+        <div class="stat-card" style="text-align:left; margin-bottom:15px;">
+          <h4 style="margin-bottom:10px;">Create User Manually</h4>
+          <input type="email" id="manRegEmail" placeholder="User Email (e.g. user@gmail.com)">
+          <input type="text" id="manRegPass" placeholder="Password">
+          <input type="text" id="manRegPin" maxlength="4" placeholder="4-Digit PIN">
+          <input type="number" id="manRegBal" placeholder="Initial Main Balance in USD (Optional)">
+          <button class="btn" onclick="adminCreateUserManually()">+ Create User Account</button>
+        </div>
+
+        <div class="section-title" style="margin-top:30px;">⚙️ Resell Flip Store Products Manager</div>
+        <div class="stat-card" style="text-align:left; margin-bottom:15px;">
+          <h4 style="margin-bottom:10px;">Add New Resell Product</h4>
+          <input type="text" id="newProdTitle" placeholder="Product Title (e.g. Luxury Handbag)">
+          <input type="number" id="newProdPrice" placeholder="Price in USD (e.g. 20)">
+          <input type="text" id="newProdImg" placeholder="Image URL (Unsplash or direct link)">
+          <button class="btn" onclick="adminAddProduct()">+ Add Product</button>
+        </div>
+        <div id="adminProductsList"></div>
 
         <div class="section-title" style="margin-top:30px;">⚙️ User Accounts, Credentials & Balance Manager</div>
         <div class="stat-card" style="text-align:left; margin-bottom:15px;">
@@ -647,7 +684,13 @@
     let pendingPaymentProofs = JSON.parse(localStorage.getItem('earnplanet_pending_payments') || '[]');
     let pendingSocialTasks = JSON.parse(localStorage.getItem('earnplanet_pending_social') || '[]');
     
-    // FIXED: Exact 5-step instructions word-for-word as requested
+    // FAQ STORAGE
+    let faqsDb = JSON.parse(localStorage.getItem('earnplanet_faqs') || JSON.stringify([
+      {id:1, q:"How do I deposit funds?", a:"Open your Palmpay/opay or kuda bank, click on more button on Palmpay/opay (or pay for kuda), select Giftcard, click on Apple Giftcard, and buy the needed amount."},
+      {id:2, q:"When can I use the Resell Flip Store?", a:"The Resell Flip Store is open Monday through Friday, with a limit of 1 flip daily."}
+    ]));
+    
+    // EXACT DEPOSIT INSTRUCTIONS WORD-FOR-WORD
     let defaultPaymentMethods = [
       {
         id: 1, 
@@ -661,7 +704,6 @@
       }
     ];
 
-    // Force update payment methods so old cache doesn't block the new instructions
     let paymentMethods = JSON.parse(localStorage.getItem('earnplanet_pay_methods') || '[]');
     if (!paymentMethods.some(m => m.details.includes("1. Open your"))) {
       paymentMethods = defaultPaymentMethods;
@@ -694,6 +736,7 @@
       localStorage.setItem('earnplanet_products', JSON.stringify(storeProducts));
       localStorage.setItem('earnplanet_user_flips', JSON.stringify(activeUserFlips));
       localStorage.setItem('earnplanet_social_links', JSON.stringify(socialLinks));
+      localStorage.setItem('earnplanet_faqs', JSON.stringify(faqsDb));
 
       if (currentUser) {
         localStorage.setItem('earnplanet_session', currentUser.email);
@@ -748,6 +791,9 @@
       renderPendingSocialTasks();
       renderAdminUsersList();
       renderAdminPaymentMethods();
+      renderAdminProductsList();
+      renderAdminFaqsList();
+      renderUserFaqs();
       renderUserStoreProducts();
       renderUserActiveFlips();
       renderUserSocialLinks();
@@ -1128,6 +1174,156 @@
       alert(`Approved! ₦70 credited to ${item.userEmail}'s balance.`);
     }
 
+    // ADMIN FAQ MANAGER
+    function adminAddFaq() {
+      const q = document.getElementById('newFaqQ').value.trim();
+      const a = document.getElementById('newFaqA').value.trim();
+
+      if (!q || !a) { alert("Please fill out both Question and Answer!"); return; }
+
+      faqsDb.push({ id: Date.now(), q, a });
+      saveState();
+      document.getElementById('newFaqQ').value = '';
+      document.getElementById('newFaqA').value = '';
+      updateUI();
+      alert("FAQ added successfully!");
+    }
+
+    function adminDeleteFaq(id) {
+      if (!confirm("Are you sure you want to delete this FAQ?")) return;
+      faqsDb = faqsDb.filter(f => f.id !== id);
+      saveState();
+      updateUI();
+      alert("FAQ deleted.");
+    }
+
+    function renderAdminFaqsList() {
+      const container = document.getElementById('adminFaqsList');
+      if (!container) return;
+      if (faqsDb.length === 0) {
+        container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No FAQs added yet.</p>`;
+        return;
+      }
+      container.innerHTML = faqsDb.map(f => `
+        <div class="payment-account-card" style="margin-bottom:8px;">
+          <div style="font-weight:bold; color:var(--gold); font-size:13px;">Q: ${f.q}</div>
+          <div style="font-size:12px; color:var(--text-muted); margin:4px 0 8px 0;">A: ${f.a}</div>
+          <button class="btn btn-danger" style="padding:4px 10px; font-size:11px;" onclick="adminDeleteFaq(${f.id})">Delete FAQ</button>
+        </div>
+      `).join('');
+    }
+
+    function renderUserFaqs() {
+      const container = document.getElementById('userFaqContainer');
+      if (!container) return;
+      if (faqsDb.length === 0) {
+        container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No FAQs available at the moment.</p>`;
+        return;
+      }
+      container.innerHTML = faqsDb.map(f => `
+        <div class="faq-accordion-item">
+          <div class="faq-q">❓ ${f.q}</div>
+          <div class="faq-a">${f.a}</div>
+        </div>
+      `).join('');
+    }
+
+    // ADMIN MANUAL USER CREATOR
+    function adminCreateUserManually() {
+      const email = document.getElementById('manRegEmail').value.trim();
+      const password = document.getElementById('manRegPass').value;
+      const pin = document.getElementById('manRegPin').value;
+      const initialBalUsd = parseFloat(document.getElementById('manRegBal').value) || 0;
+
+      if (!email || !password || pin.length !== 4) {
+        alert("Please enter a valid email, password, and 4-digit PIN!");
+        return;
+      }
+
+      if (usersDb.some(u => u.email === email)) {
+        alert("A user with this email already exists!");
+        return;
+      }
+
+      const newUser = {
+        email,
+        password,
+        pin,
+        refCode: "EP-" + Math.floor(10000 + Math.random() * 90000),
+        balanceUsd: initialBalUsd,
+        storeBalanceUsd: 0,
+        tier: "None",
+        activeReferrals: 0,
+        drivesCountToday: 0,
+        lastDriveDate: "",
+        lastFlipDate: ""
+      };
+
+      usersDb.push(newUser);
+      manualUserCount++;
+      saveState();
+
+      document.getElementById('manRegEmail').value = '';
+      document.getElementById('manRegPass').value = '';
+      document.getElementById('manRegPin').value = '';
+      document.getElementById('manRegBal').value = '';
+
+      updateUI();
+      alert(`User ${email} created successfully! They can now log in using these credentials.`);
+    }
+
+    // ADMIN RESELL PRODUCTS MANAGER
+    function adminAddProduct() {
+      const title = document.getElementById('newProdTitle').value.trim();
+      const priceUsd = parseFloat(document.getElementById('newProdPrice').value);
+      const img = document.getElementById('newProdImg').value.trim();
+
+      if (!title || isNaN(priceUsd) || priceUsd <= 0 || !img) {
+        alert("Please fill out all product fields with valid values!");
+        return;
+      }
+
+      storeProducts.push({
+        id: Date.now(),
+        title,
+        priceUsd,
+        img
+      });
+
+      saveState();
+      document.getElementById('newProdTitle').value = '';
+      document.getElementById('newProdPrice').value = '';
+      document.getElementById('newProdImg').value = '';
+      updateUI();
+      alert("Resell product added successfully!");
+    }
+
+    function adminDeleteProduct(id) {
+      if (!confirm("Are you sure you want to delete this resell product?")) return;
+      storeProducts = storeProducts.filter(p => p.id !== id);
+      saveState();
+      updateUI();
+      alert("Product deleted.");
+    }
+
+    function renderAdminProductsList() {
+      const container = document.getElementById('adminProductsList');
+      if (!container) return;
+      if (storeProducts.length === 0) {
+        container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No products in store.</p>`;
+        return;
+      }
+      container.innerHTML = storeProducts.map(p => `
+        <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <div style="display:flex; gap:10px; align-items:center;">
+            <img src="${p.img}" style="width:40px; height:40px; object-fit:cover; border-radius:6px;">
+            <div><b>${p.title}</b><br><span style="font-size:12px; color:var(--gold);">$${p.priceUsd} (₦${(p.priceUsd * NGN_RATE).toLocaleString()})</span></div>
+          </div>
+          <button class="btn btn-danger" style="padding:6px 10px; font-size:11px;" onclick="adminDeleteProduct(${p.id})">Delete</button>
+        </div>
+      `).join('');
+    }
+
     // ADMIN USER MANAGER WITH CREDENTIALS RESTORE / EDITING
     function renderAdminUsersList() {
       const container = document.getElementById('adminUsersListContainer');
@@ -1474,6 +1670,7 @@
         drivingProgress += 2;
         document.getElementById('drivingGameStatus').innerText = `Progress: ${drivingProgress}%`;
 
+        // Draw highway road
         ctx.fillStyle = '#1f2937';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
@@ -1484,8 +1681,31 @@
         ctx.moveTo(226, 0); ctx.lineTo(226, canvas.height);
         ctx.stroke();
 
-        ctx.fillStyle = '#00e676';
-        ctx.fillRect(carX, canvas.height - 60, 30, 50);
+        // DRAW REAL SPORTS CAR
+        ctx.fillStyle = '#ef4444'; // Red body
+        ctx.beginPath();
+        ctx.roundRect(carX, canvas.height - 75, 38, 64, [8]);
+        ctx.fill();
+
+        // Windshield
+        ctx.fillStyle = '#38bdf8';
+        ctx.fillRect(carX + 4, canvas.height - 54, 30, 18);
+
+        // Rear window
+        ctx.fillStyle = '#111827';
+        ctx.fillRect(carX + 6, canvas.height - 24, 26, 8);
+
+        // Headlights
+        ctx.fillStyle = '#facc15';
+        ctx.fillRect(carX + 2, canvas.height - 73, 6, 4);
+        ctx.fillRect(carX + 30, canvas.height - 73, 6, 4);
+
+        // Wheels
+        ctx.fillStyle = '#111827';
+        ctx.fillRect(carX - 5, canvas.height - 64, 6, 16);
+        ctx.fillRect(carX + 37, canvas.height - 64, 6, 16);
+        ctx.fillRect(carX - 5, canvas.height - 26, 6, 16);
+        ctx.fillRect(carX + 37, canvas.height - 26, 6, 16);
 
         if (drivingProgress >= 100) {
           clearInterval(drivingGameInterval);
@@ -1531,7 +1751,6 @@
       manualUserCount++;
       saveState();
 
-      // Telegram notification for new user registration
       sendAdminTelegramAlert(
         `👤 <b>NEW USER REGISTERED!</b>\n\n` +
         `📧 <b>Email:</b> ${email}\n` +
