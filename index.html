@@ -5,6 +5,10 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>EarnPlanet - Premium Earning & Resell Platform</title>
 
+  <!-- FIREBASE SDKs -->
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore-compat.js"></script>
+
   <!-- PROPELLERADS MULTITAG SCRIPT -->
   <script src="https://alwingulla.com/88/tag.min.js" data-zone="YOUR_ZONE_ID" async data-cfasync="false"></script>
 
@@ -695,6 +699,18 @@
   </div>
 
   <script>
+    // --- FIREBASE INITIALIZATION ---
+    const firebaseConfig = {
+      apiKey: "AIzaSyDHPHdaPRxr-yEAWXUqZpYAIqiic...",
+      authDomain: "earnplanet-9918a.firebaseapp.com",
+      projectId: "earnplanet-9918a",
+      storageBucket: "earnplanet-9918a.firebasestorage.app",
+      messagingSenderId: "1234567890",
+      appId: "1:1234567890:web:abc123xyz"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const db = firebase.firestore();
+
     const NGN_RATE = 1500;
     const SOCIAL_REWARD_USD = 70 / NGN_RATE;
 
@@ -716,7 +732,7 @@
     }
 
     let currentUser = null;
-    let usersDb = JSON.parse(localStorage.getItem('earnplanet_users') || '[]');
+    let usersDb = [];
     let activeSessionEmail = localStorage.getItem('earnplanet_session');
     let activeCheckoutPlan = null;
     let activeSocialPlatform = null;
@@ -724,24 +740,24 @@
     let showAllAdminWdPops = false;
     let showAllAdminApproved = false;
 
-    let manualUserCount = parseInt(localStorage.getItem('earnplanet_manual_users') || '1280');
-    let pendingPaymentProofs = JSON.parse(localStorage.getItem('earnplanet_pending_payments') || '[]');
-    let approvedPaymentsHistory = JSON.parse(localStorage.getItem('earnplanet_approved_history') || '[]');
-    let pendingSocialTasks = JSON.parse(localStorage.getItem('earnplanet_pending_social') || '[]');
+    let manualUserCount = 1280;
+    let pendingPaymentProofs = [];
+    let approvedPaymentsHistory = [];
+    let pendingSocialTasks = [];
     
     // WITHDRAWAL POPUPS STORAGE
-    let withdrawalPopsDb = JSON.parse(localStorage.getItem('earnplanet_withdrawal_pops') || JSON.stringify([
+    let withdrawalPopsDb = [
       {id: 1, name: "Femi45", amount: "₦500,000", method: "Palmpay"},
       {id: 2, name: "Chinedu99", amount: "₦180,000", method: "OPay"},
       {id: 3, name: "Amina_H", amount: "₦350,000", method: "Kuda Bank"},
       {id: 4, name: "Tunde_B", amount: "₦220,000", method: "Access Bank"}
-    ]));
+    ];
 
     // FAQ STORAGE
-    let faqsDb = JSON.parse(localStorage.getItem('earnplanet_faqs') || JSON.stringify([
+    let faqsDb = [
       {id:1, q:"How do I deposit funds?", a:"Open your Palmpay/opay or kuda bank, click on more button on Palmpay/opay (or pay for kuda), select Giftcard, click on Apple Giftcard, and buy the needed amount."},
       {id:2, q:"When can I use the Resell Flip Store?", a:"The Resell Flip Store is open Monday through Friday, with a limit of 1 flip daily."}
-    ]));
+    ];
     
     let defaultPaymentMethods = [
       {
@@ -756,20 +772,17 @@
       }
     ];
 
-    let paymentMethods = JSON.parse(localStorage.getItem('earnplanet_pay_methods') || '[]');
-    if (!paymentMethods.some(m => m.details.includes("1. Open your"))) {
-      paymentMethods = defaultPaymentMethods;
-    }
+    let paymentMethods = defaultPaymentMethods;
 
-    let storeProducts = JSON.parse(localStorage.getItem('earnplanet_products') || JSON.stringify([
+    let storeProducts = [
       {id:1, title:"Luxury Leather Tote Bag", priceUsd:20, img:"https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=400&q=80"},
       {id:2, title:"Designer Chronograph Watch", priceUsd:35, img:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=400&q=80"}
-    ]));
+    ];
 
-    let socialLinks = JSON.parse(localStorage.getItem('earnplanet_social_links') || JSON.stringify([
+    let socialLinks = [
       {id:1, platform:"Telegram Channel", url:"https://t.me/earnplanetofficial"},
       {id:2, platform:"Facebook Page", url:"https://facebook.com/earnplanet"}
-    ]));
+    ];
 
     const availablePlans = [
       { name: "Starter", priceUsd: 15, cashbackUsd: 6.00, cashbackNgn: 9000, dailyDriveUsd: 0.15 },
@@ -778,32 +791,78 @@
       { name: "Platinum", priceUsd: 100, cashbackUsd: 40.00, cashbackNgn: 60000, dailyDriveUsd: 0.50 }
     ];
 
-    function saveState() {
-      localStorage.setItem('earnplanet_users', JSON.stringify(usersDb));
-      localStorage.setItem('earnplanet_manual_users', manualUserCount.toString());
-      localStorage.setItem('earnplanet_pending_payments', JSON.stringify(pendingPaymentProofs));
-      localStorage.setItem('earnplanet_approved_history', JSON.stringify(approvedPaymentsHistory));
-      localStorage.setItem('earnplanet_pending_social', JSON.stringify(pendingSocialTasks));
-      localStorage.setItem('earnplanet_pay_methods', JSON.stringify(paymentMethods));
-      localStorage.setItem('earnplanet_products', JSON.stringify(storeProducts));
-      localStorage.setItem('earnplanet_faqs', JSON.stringify(faqsDb));
-      localStorage.setItem('earnplanet_withdrawal_pops', JSON.stringify(withdrawalPopsDb));
+    // --- FIRESTORE REAL-TIME SYNC ---
+    function initFirebaseSync() {
+      // 1. Sync Users Collection
+      db.collection("users").onSnapshot((snapshot) => {
+        usersDb = [];
+        snapshot.forEach((doc) => {
+          usersDb.push(doc.data());
+        });
+        if (activeSessionEmail) {
+          currentUser = usersDb.find(u => u.email === activeSessionEmail) || null;
+        }
+        updateUI();
+      });
 
+      // 2. Sync Platform Data (Pending Payments, History, Social Tasks, etc.)
+      db.collection("platform_data").doc("state").onSnapshot((doc) => {
+        if (doc.exists) {
+          const data = doc.data();
+          if (data.pendingPayments) pendingPaymentProofs = data.pendingPayments;
+          if (data.approvedHistory) approvedPaymentsHistory = data.approvedHistory;
+          if (data.pendingSocial) pendingSocialTasks = data.pendingSocial;
+          if (data.withdrawalPops) withdrawalPopsDb = data.withdrawalPops;
+          if (data.faqs) faqsDb = data.faqs;
+          if (data.paymentMethods) paymentMethods = data.paymentMethods;
+          if (data.storeProducts) storeProducts = data.storeProducts;
+          if (data.manualUserCount) manualUserCount = data.manualUserCount;
+          updateUI();
+        }
+      });
+    }
+
+    function saveState() {
       if (currentUser) {
         localStorage.setItem('earnplanet_session', currentUser.email);
+        db.collection("users").doc(currentUser.email).set(currentUser, { merge: true }).catch(err => console.error(err));
       } else {
         localStorage.removeItem('earnplanet_session');
       }
+
+      // Save platform data to Firestore document
+      db.collection("platform_data").doc("state").set({
+        pendingPayments: pendingPaymentProofs,
+        approvedHistory: approvedPaymentsHistory,
+        pendingSocial: pendingSocialTasks,
+        withdrawalPops: withdrawalPopsDb,
+        faqs: faqsDb,
+        paymentMethods: paymentMethods,
+        storeProducts: storeProducts,
+        manualUserCount: manualUserCount
+      }, { merge: true }).catch(err => console.error("Firestore Save Error:", err));
     }
 
-    if (activeSessionEmail) {
-      const found = usersDb.find(u => u.email === activeSessionEmail);
-      if (found) {
-        currentUser = found;
-        document.getElementById('authContainer').style.display = 'none';
-        document.getElementById('mainAppContainer').style.display = 'block';
+    window.addEventListener('DOMContentLoaded', () => {
+      initFirebaseSync();
+      const urlParams = new URLSearchParams(window.location.search);
+      const refParam = urlParams.get('ref');
+      if (refParam) {
+        const refInput = document.getElementById('regRefCode');
+        if (refInput) refInput.value = refParam;
+        switchAuthView('register');
       }
-    }
+      if (activeSessionEmail) {
+        setTimeout(() => {
+          currentUser = usersDb.find(u => u.email === activeSessionEmail);
+          if (currentUser) {
+            document.getElementById('authContainer').style.display = 'none';
+            document.getElementById('mainAppContainer').style.display = 'block';
+            updateUI();
+          }
+        }, 800);
+      }
+    });
 
     // LIVE WITHDRAWAL POPUP TICKER LOOP
     let popIndex = 0;
@@ -1233,7 +1292,7 @@
       `).join('');
     }
 
-    function approvePaymentProof(id) {
+    async function approvePaymentProof(id) {
       const item = pendingPaymentProofs.find(p => p.id === id);
       if (!item) return;
 
@@ -1245,6 +1304,7 @@
         } else if (item.type === "deposit") {
           targetUser.storeBalanceUsd = (targetUser.storeBalanceUsd || 0) + item.amountUsd;
         }
+        await db.collection("users").doc(targetUser.email).set(targetUser, { merge: true });
       }
 
       approvedPaymentsHistory.unshift({
@@ -1321,13 +1381,14 @@
       `).join('');
     }
 
-    function approveSocialTask(id) {
+    async function approveSocialTask(id) {
       const item = pendingSocialTasks.find(t => t.id === id);
       if (!item) return;
 
       const user = usersDb.find(u => u.email === item.userEmail);
       if (user) {
         user.balanceUsd = (user.balanceUsd || 0) + SOCIAL_REWARD_USD;
+        await db.collection("users").doc(user.email).set(user, { merge: true });
       }
 
       pendingSocialTasks = pendingSocialTasks.filter(t => t.id !== id);
@@ -1483,7 +1544,7 @@
       `).join('');
     }
 
-    function adminCreateUserManually() {
+    async function adminCreateUserManually() {
       const email = document.getElementById('manRegEmail').value.trim();
       const password = document.getElementById('manRegPass').value;
       const pin = document.getElementById('manRegPin').value;
@@ -1515,7 +1576,7 @@
         activeFlips: []
       };
 
-      usersDb.push(newUser);
+      await db.collection("users").doc(email).set(newUser);
       manualUserCount++;
       saveState();
 
@@ -1646,7 +1707,7 @@
       renderAdminUsersList();
     }
 
-    function adminUpdateUserCreds(oldEmail) {
+    async function adminUpdateUserCreds(oldEmail) {
       const user = usersDb.find(u => u.email === oldEmail);
       if (!user) return;
 
@@ -1664,16 +1725,20 @@
         return;
       }
 
-      user.email = newEmail;
+      if (newEmail !== oldEmail) {
+        await db.collection("users").doc(oldEmail).delete();
+        user.email = newEmail;
+      }
       user.password = newPass;
       user.pin = newPin;
 
+      await db.collection("users").doc(newEmail).set(user);
       saveState();
       updateUI();
       alert("User credentials restored/updated successfully!");
     }
 
-    function adminAdjustBalance(email, walletType) {
+    async function adminAdjustBalance(email, walletType) {
       const user = usersDb.find(u => u.email === email);
       if (!user) return;
       const inputId = walletType === 'main' ? `adminAdjMain_${CSS.escape(email)}` : `adminAdjStore_${CSS.escape(email)}`;
@@ -1687,14 +1752,15 @@
         user.storeBalanceUsd = (user.storeBalanceUsd || 0) + val;
       }
 
+      await db.collection("users").doc(email).set(user, { merge: true });
       saveState();
       updateUI();
       alert(`Successfully updated ${walletType} balance for ${email}!`);
     }
 
-    function adminDeleteUser(email) {
+    async function adminDeleteUser(email) {
       if (!confirm(`Are you sure you want to delete user ${email}?`)) return;
-      usersDb = usersDb.filter(u => u.email !== email);
+      await db.collection("users").doc(email).delete();
       saveState();
       updateUI();
       alert("User deleted successfully.");
@@ -2052,12 +2118,13 @@
       }, 100);
     }
 
-    // SETTINGS TAB HANDLERS (FIXED)
-    function updateUserEmail() {
+    // SETTINGS TAB HANDLERS
+    async function updateUserEmail() {
       const newEmail = document.getElementById('settingsNewEmail').value.trim();
       if (!newEmail) { alert("Please enter a new email address!"); return; }
       if (usersDb.some(u => u.email === newEmail)) { alert("This email is already in use by another account!"); return; }
 
+      await db.collection("users").doc(currentUser.email).delete();
       currentUser.email = newEmail;
       saveState();
       document.getElementById('settingsNewEmail').value = '';
@@ -2079,7 +2146,7 @@
       alert("Password updated successfully!");
     }
 
-    // CHATBOT SUPPORT HANDLER (FIXED)
+    // CHATBOT SUPPORT HANDLER
     function sendChatMessage() {
       const input = document.getElementById('chatInput');
       const text = input.value.trim();
@@ -2105,7 +2172,7 @@
       list.scrollTop = list.scrollHeight;
     }
 
-    // FORGOT PASSWORD HANDLER (FIXED)
+    // FORGOT PASSWORD HANDLER
     function handlePasswordReset() {
       const email = document.getElementById('forgotEmail').value.trim();
       const newPass = document.getElementById('forgotNewPassword').value;
@@ -2120,7 +2187,7 @@
       switchAuthView('login');
     }
 
-    function handleRegister() {
+    async function handleRegister() {
       const email = document.getElementById('regEmail').value.trim();
       const password = document.getElementById('regPassword').value;
       const pin = document.getElementById('regPin').value;
@@ -2148,7 +2215,8 @@
         withdrawalCount: 0,
         activeFlips: []
       };
-      usersDb.push(newUser);
+
+      await db.collection("users").doc(email).set(newUser);
       manualUserCount++;
       saveState();
 
@@ -2168,7 +2236,7 @@
       const email = document.getElementById('loginEmail').value.trim();
       const password = document.getElementById('loginPassword').value;
       const user = usersDb.find(u => u.email === email && u.password === password);
-      if (!user) { alert("Invalid credentials!"); return; }
+      if (!user) { alert("Invalid credentials or user not synced yet!"); return; }
 
       currentUser = user;
       saveState();
@@ -2189,16 +2257,6 @@
       document.getElementById('registerView').style.display = v === 'register' ? 'block' : 'none';
       document.getElementById('forgotView').style.display = v === 'forgot' ? 'block' : 'none';
     }
-
-    window.addEventListener('DOMContentLoaded', () => {
-      const urlParams = new URLSearchParams(window.location.search);
-      const refParam = urlParams.get('ref');
-      if (refParam) {
-        const refInput = document.getElementById('regRefCode');
-        if (refInput) refInput.value = refParam;
-        switchAuthView('register');
-      }
-    });
 
     function openAdminAuthModal() { document.getElementById('adminAuthModal').style.display = 'flex'; }
     function closeAdminAuthModal() { document.getElementById('adminAuthModal').style.display = 'none'; }
@@ -2249,8 +2307,6 @@
 
     function openTransferModal() { document.getElementById('transferModal').style.display = 'flex'; }
     function closeTransferModal() { document.getElementById('transferModal').style.display = 'none'; }
-
-    if (currentUser) updateUI();
   </script>
 </body>
 </html>
