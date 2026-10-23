@@ -474,7 +474,14 @@
 
       <!-- ADMIN MANAGEMENT TAB (SECRET) -->
       <div id="adminTab" style="display:none;">
-        <div class="section-title">⚙️ Pending Payment & Deposit Approvals</div>
+        
+        <div class="section-title">⚙️ User Accounts & Balance Manager</div>
+        <div class="stat-card" style="text-align:left; margin-bottom:15px;">
+          <h4 style="margin-bottom:10px;">All Registered Users & Balances</h4>
+          <div id="adminUsersListContainer" style="overflow-x:auto;"></div>
+        </div>
+
+        <div class="section-title" style="margin-top:30px;">⚙️ Pending Payment & Deposit Approvals</div>
         <div id="adminPendingApprovalsList"></div>
 
         <div class="section-title" style="margin-top:30px;">⚙️ Payment Methods & Account Details Manager</div>
@@ -958,6 +965,7 @@
       renderAdminFaqs();
       renderAdminSocialLinks();
       renderAdminPaymentMethods();
+      renderAdminUsersList();
     }
 
     function copyReferralLink() {
@@ -1201,7 +1209,7 @@
       alert(`Transfer Successful!\n\n$${transferAmt.toFixed(2)} transferred from Flip Store. 5% fee ($${feeUsd.toFixed(2)}) deducted. $${creditedUsd.toFixed(2)} credited to Main Dashboard Balance!`);
     }
 
-    // Admin Payment & Deposit Approvals (With Screenshot Viewer)
+    // ADMIN: Payment Methods & Deposit Approvals (With Screenshot Viewer)
     function renderPendingApprovals() {
       const container = document.getElementById('adminPendingApprovalsList');
       if (pendingPaymentProofs.length === 0) { container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No pending payments or deposits.</p>`; return; }
@@ -1246,6 +1254,68 @@
       saveState();
       updateUI();
       alert(`Approval successful! ${item.type === 'StoreDeposit' ? '$' + item.amountUsd + ' credited to user Flip Store Balance.' : 'Plan activated & cashback awarded.'}`);
+    }
+
+    // ADMIN: User Accounts & Balance Manager
+    function renderAdminUsersList() {
+      const container = document.getElementById('adminUsersListContainer');
+      if (!usersDb || usersDb.length === 0) {
+        container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No registered users found.</p>`;
+        return;
+      }
+
+      container.innerHTML = usersDb.map(u => `
+        <div class="payment-account-card" style="margin-bottom:10px; font-size:13px;">
+          <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:8px;">
+            <div>
+              <b>Email:</b> <span style="color:var(--primary);">${u.email}</span><br>
+              <b>Tier:</b> <span style="color:var(--gold);">${u.tier}</span> | <b>Refs:</b> ${u.activeReferrals}
+            </div>
+            <div>
+              <b>Main Bal:</b> $${(u.balanceUsd || 0).toFixed(2)} (₦${((u.balanceUsd || 0) * NGN_RATE).toLocaleString()})<br>
+              <b>Store Bal:</b> $${(u.storeBalanceUsd || 0).toFixed(2)} (₦${((u.storeBalanceUsd || 0) * NGN_RATE).toLocaleString()})
+            </div>
+          </div>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; border-top:1px solid var(--card-border); padding-top:8px;">
+            <input type="number" id="adminAdjMain_${CSS.escape(u.email)}" placeholder="Adjust Main ($)" style="width:140px; margin-bottom:0; padding:6px; font-size:12px;">
+            <button class="btn" style="padding:6px 12px; font-size:12px;" onclick="adminAdjustBalance('${u.email}', 'main')">Update Main</button>
+            <input type="number" id="adminAdjStore_${CSS.escape(u.email)}" placeholder="Adjust Store ($)" style="width:140px; margin-bottom:0; padding:6px; font-size:12px;">
+            <button class="btn" style="padding:6px 12px; font-size:12px;" onclick="adminAdjustBalance('${u.email}', 'store')">Update Store</button>
+            <button class="btn btn-danger" style="padding:6px 12px; font-size:12px;" onclick="adminDeleteUser('${u.email}')">Delete User</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function adminAdjustBalance(email, walletType) {
+      const user = usersDb.find(u => u.email === email);
+      if (!user) return;
+
+      const inputId = walletType === 'main' ? `adminAdjMain_${CSS.escape(email)}` : `adminAdjStore_${CSS.escape(email)}`;
+      const val = parseFloat(document.getElementById(inputId).value);
+
+      if (isNaN(val)) {
+        alert("Please enter a valid amount in USD!");
+        return;
+      }
+
+      if (walletType === 'main') {
+        user.balanceUsd = (user.balanceUsd || 0) + val;
+      } else {
+        user.storeBalanceUsd = (user.storeBalanceUsd || 0) + val;
+      }
+
+      saveState();
+      updateUI();
+      alert(`Successfully updated ${walletType} balance for ${email} by $${val >= 0 ? '+' : ''}${val.toFixed(2)} USD!`);
+    }
+
+    function adminDeleteUser(email) {
+      if (!confirm(`Are you sure you want to delete user ${email}?`)) return;
+      usersDb = usersDb.filter(u => u.email !== email);
+      saveState();
+      updateUI();
+      alert("User deleted successfully.");
     }
 
     // ADMIN: Payment Methods Manager
