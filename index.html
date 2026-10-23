@@ -48,14 +48,14 @@
       font-weight: 800;
     }
 
-    .container { max-width: 850px; margin: 20px auto; padding: 0 15px; }
+    .container { max-width: 900px; margin: 20px auto; padding: 0 15px; }
 
     .planetians-welcome {
       background: linear-gradient(90deg, #16422b, #0d281a);
       border: 1px solid var(--primary);
       border-radius: 12px;
-      padding: 12px 20px;
-      margin-bottom: 15px;
+      padding: 14px 20px;
+      margin-bottom: 20px;
       font-size: 18px;
       font-weight: 900;
       color: var(--primary);
@@ -65,7 +65,7 @@
     }
 
     .tabs-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px solid var(--card-border); padding-bottom: 10px; flex-wrap: wrap; gap: 10px; }
-    .tab-btn { background: var(--card-bg); color: var(--text-muted); border: 1px solid var(--card-border); padding: 10px 16px; font-size: 13px; font-weight: 700; cursor: pointer; border-radius: 8px; }
+    .tab-btn { background: var(--card-bg); color: var(--text-muted); border: 1px solid var(--card-border); padding: 10px 16px; font-size: 13px; font-weight: 700; cursor: pointer; border-radius: 8px; transition: 0.2s; }
     .tab-btn.active { background: var(--primary); color: #04100a; font-weight: 900; }
 
     .wallet-card {
@@ -79,24 +79,25 @@
       align-items: center;
       gap: 15px;
       box-shadow: 0 10px 25px rgba(0, 230, 118, 0.15);
+      margin-bottom: 25px;
     }
     .wallet-info h3 { font-size: 12px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px; }
     .wallet-info .balance-ngn { font-size: 36px; font-weight: 900; color: var(--primary); margin-top: 4px; }
     .wallet-info .balance-usd { font-size: 16px; font-weight: 700; color: var(--gold); margin-top: 2px; }
+    .wallet-actions { display: flex; gap: 10px; flex-wrap: wrap; }
 
     .btn { background: var(--primary); color: #04100a; border: none; padding: 12px 20px; border-radius: 10px; font-weight: 900; cursor: pointer; transition: 0.2s; font-size: 14px; display: inline-flex; align-items: center; justify-content: center; text-decoration: none; }
     .btn:hover { background: var(--primary-hover); transform: translateY(-2px); }
     .btn-secondary { background: var(--card-bg); color: #fff; border: 1px solid var(--card-border); }
     .btn-secondary:hover { background: #16422b; }
     .btn-danger { background: rgba(239, 68, 68, 0.2); color: var(--danger); border: 1px solid var(--danger); }
-    .btn-danger:hover { background: var(--danger); color: #fff; }
 
     .section-title { font-size: 18px; font-weight: 800; margin: 25px 0 15px 0; color: #fff; border-left: 4px solid var(--primary); padding-left: 10px; }
 
     .social-task-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 25px; }
     .social-task-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 16px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; }
 
-    .plans-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 15px; margin-bottom: 25px; }
+    .plans-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
     .plan-card {
       background: var(--card-bg);
       border: 1px solid var(--card-border);
@@ -106,7 +107,14 @@
       display: flex;
       flex-direction: column;
       justify-content: space-between;
+      gap: 15px;
     }
+    .plan-card h3 { color: var(--gold); font-size: 18px; }
+    .plan-card p { font-size: 13px; color: var(--text-muted); }
+
+    .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px; }
+    .product-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; text-align: center; }
+    .product-img { width: 100%; height: 130px; object-fit: cover; border-radius: 10px; margin-bottom: 10px; background: #04100a; border: 1px solid var(--card-border); }
 
     .admin-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 12px; padding: 15px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; }
 
@@ -133,7 +141,7 @@
         <button class="btn" style="width:100%; margin-top:5px;" onclick="handleLogin()">Login</button>
         
         <div style="display:flex; justify-content:space-between; margin-top:15px; font-size:13px;">
-          <a href="#" style="color:var(--primary);" onclick="switchAuthView('register')">Create Account</a>
+          <a href="#" style="color:var(--primary);" onclick="switchAuthView('register')">Create New Account</a>
         </div>
       </div>
 
@@ -174,17 +182,21 @@
         <div style="display:flex; gap:10px; flex-wrap:wrap;">
           <button class="tab-btn active" id="btnUserTab" onclick="switchTab('user')">Dashboard</button>
           <button class="tab-btn" id="btnStoreTab" onclick="switchTab('store')">🛍️ Resell Flip Store</button>
+          <button class="tab-btn" id="btnGameTab" onclick="switchTab('game')">🚗 Driving Game</button>
           <button class="tab-btn" id="btnAdminTab" style="display:none;" onclick="switchTab('admin')">⚙️ Management</button>
         </div>
       </div>
 
-      <!-- USER TAB -->
+      <!-- USER TAB (DASHBOARD) -->
       <div id="userTab">
         <div class="wallet-card">
           <div class="wallet-info">
             <h3>Main Available Balance</h3>
             <div class="balance-ngn" id="walletBalanceNgn">₦0.00</div>
             <div class="balance-usd" id="walletBalanceUsd">≈ $0.00 USD</div>
+          </div>
+          <div class="wallet-actions">
+            <button class="btn btn-secondary" onclick="openWithdrawModal()">Withdraw Funds</button>
           </div>
         </div>
 
@@ -204,27 +216,65 @@
           </div>
           <div class="social-task-card">
             <b>WhatsApp Status</b>
-            <button class="btn" style="font-size:11px;" onclick="openSocialTaskModal('WhatsApp')">Upload Proof</button>
+            <button class="btn" style="font-size:11px;" onclick="openSocialTaskModal('WhatsApp')">Submit Proof</button>
           </div>
         </div>
 
         <div class="section-title">Select Membership Plan</div>
         <div class="plans-grid">
           <div class="plan-card">
-            <h3>Starter Plan ($15)</h3>
-            <button class="btn" style="margin-top:12px;" onclick="openCheckoutModal('Starter', 15)">Subscribe</button>
+            <h3>Bronze Plan</h3>
+            <p>$10 Subscription</p>
+            <button class="btn" onclick="openCheckoutModal('Bronze', 10)">Subscribe</button>
           </div>
           <div class="plan-card">
-            <h3>Silver Plan ($25)</h3>
-            <button class="btn" style="margin-top:12px;" onclick="openCheckoutModal('Silver', 25)">Subscribe</button>
+            <h3>Silver Plan</h3>
+            <p>$25 Subscription</p>
+            <button class="btn" onclick="openCheckoutModal('Silver', 25)">Subscribe</button>
+          </div>
+          <div class="plan-card">
+            <h3>Gold Plan</h3>
+            <p>$50 Subscription</p>
+            <button class="btn" onclick="openCheckoutModal('Gold', 50)">Subscribe</button>
           </div>
         </div>
       </div>
 
       <!-- STORE TAB -->
       <div id="storeTab" style="display:none;">
-        <div class="section-title">🛍️ Merchandise Flip Store</div>
-        <button class="btn" onclick="openDepositModal()">+ Deposit to Store</button>
+        <div class="section-title">🛍️ Merchandise Resell Flip Store</div>
+        <div style="margin-bottom: 15px; display:flex; justify-content:space-between; align-items:center;">
+          <span style="color:var(--text-muted); font-size:14px;">Store Balance: <b id="storeBalanceDisplay" style="color:var(--gold);">$0.00</b></span>
+          <button class="btn" onclick="openDepositModal()">+ Deposit to Store</button>
+        </div>
+
+        <div class="products-grid">
+          <div class="product-card">
+            <div class="product-img" style="display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-weight:700;">Smart Watch Series 9</div>
+            <b>Smart Watch Series 9</b>
+            <p style="font-size:12px; color:var(--text-muted); margin: 5px 0;">Resell Price: $35.00</p>
+            <button class="btn" style="font-size:12px;" onclick="buyProduct('Smart Watch Series 9', 35)">Flip / Purchase</button>
+          </div>
+          <div class="product-card">
+            <div class="product-img" style="display:flex; align-items:center; justify-content:center; color:var(--text-muted); font-weight:700;">Wireless Earbuds Pro</div>
+            <b>Wireless Earbuds Pro</b>
+            <p style="font-size:12px; color:var(--text-muted); margin: 5px 0;">Resell Price: $20.00</p>
+            <button class="btn" style="font-size:12px;" onclick="buyProduct('Wireless Earbuds Pro', 20)">Flip / Purchase</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- GAME TAB -->
+      <div id="gameTab" style="display:none;">
+        <div class="section-title">🚗 Driving Mini-Game Task</div>
+        <div style="background:var(--card-bg); border:1px solid var(--card-border); border-radius:16px; padding:25px; text-align:center;">
+          <h3 style="color:var(--primary); margin-bottom:10px;">Daily Driving Challenge</h3>
+          <p style="color:var(--text-muted); font-size:14px; margin-bottom:20px;">Complete today's driving session to earn bonus rewards on EarnPlanet.</p>
+          <div id="gameScreen" style="background:#04100a; border:1px solid var(--primary); border-radius:12px; height:180px; display:flex; align-items:center; justify-content:center; margin-bottom:20px; font-size:24px;">
+            🚘 🛣️ 🌲 🌳
+          </div>
+          <button class="btn" onclick="playDrivingGame()">Play & Claim Reward</button>
+        </div>
       </div>
 
       <!-- ADMIN TAB -->
@@ -270,6 +320,23 @@
       <input type="text" id="socialTaskLinkInput" placeholder="https://...">
       <button class="btn" style="width:100%;" onclick="submitSocialTask()">Submit Task (Earn ₦70)</button>
       <button class="btn btn-secondary" style="width:100%; margin-top:8px;" onclick="closeSocialTaskModal()">Cancel</button>
+    </div>
+  </div>
+
+  <!-- WITHDRAWAL MODAL -->
+  <div class="modal-overlay" id="withdrawModal">
+    <div class="modal">
+      <h3>Withdraw Funds</h3>
+      <label>Amount in NGN (₦)</label>
+      <input type="number" id="withdrawAmountNgn" placeholder="e.g. 5000">
+      <label>Bank Name</label>
+      <input type="text" id="withdrawBank" placeholder="e.g. Opay / Access Bank">
+      <label>Account Number</label>
+      <input type="text" id="withdrawAcctNo" placeholder="0123456789">
+      <label>4-Digit PIN</label>
+      <input type="password" id="withdrawPin" maxlength="4" placeholder="••••">
+      <button class="btn" style="width:100%;" onclick="submitWithdrawal()">Request Withdrawal</button>
+      <button class="btn btn-secondary" style="width:100%; margin-top:8px;" onclick="closeWithdrawModal()">Cancel</button>
     </div>
   </div>
 
@@ -321,8 +388,10 @@
     function updateUI() {
       if (!currentUser) return;
       const usdBal = currentUser.balanceUsd || 0;
+      const storeBal = currentUser.storeBalanceUsd || 0;
       document.getElementById('walletBalanceNgn').innerText = `₦${(usdBal * NGN_RATE).toLocaleString('en-NG', {minimumFractionDigits: 2})}`;
       document.getElementById('walletBalanceUsd').innerText = `≈ $${usdBal.toFixed(2)} USD`;
+      document.getElementById('storeBalanceDisplay').innerText = `$${storeBal.toFixed(2)}`;
       document.getElementById('headerTier').innerText = currentUser.tier || "No Active Plan";
     }
 
@@ -423,6 +492,18 @@
       alert("Deposit submitted! Admin notified.");
     }
 
+    function buyProduct(name, price) {
+      if ((currentUser.storeBalanceUsd || 0) < price) {
+        alert("Insufficient Store Balance! Please deposit to your store balance first.");
+        return;
+      }
+      currentUser.storeBalanceUsd -= price;
+      currentUser.balanceUsd = (currentUser.balanceUsd || 0) + (price * 1.3); // Resell profit markup
+      saveState();
+      updateUI();
+      alert(`Successfully flipped ${name}! Profit added to your main balance.`);
+    }
+
     function openSocialTaskModal(platform) {
       activeSocialPlatform = platform;
       document.getElementById('socialTaskModalTitle').innerText = `Submit ${platform} Post`;
@@ -452,6 +533,41 @@
       alert(`${activeSocialPlatform} task submitted! Pending admin approval.`);
     }
 
+    function playDrivingGame() {
+      const rewardUsd = 100 / NGN_RATE; // ₦100 game reward
+      currentUser.balanceUsd = (currentUser.balanceUsd || 0) + rewardUsd;
+      saveState();
+      updateUI();
+      alert("🚗 Driving challenge completed! ₦100 added to your balance.");
+    }
+
+    function openWithdrawModal() { document.getElementById('withdrawModal').style.display = 'flex'; }
+    function closeWithdrawModal() { document.getElementById('withdrawModal').style.display = 'none'; }
+
+    function submitWithdrawal() {
+      const amt = parseFloat(document.getElementById('withdrawAmountNgn').value);
+      const bank = document.getElementById('withdrawBank').value.trim();
+      const acct = document.getElementById('withdrawAcctNo').value.trim();
+      const pin = document.getElementById('withdrawPin').value;
+
+      if (!amt || !bank || !acct || pin !== currentUser.pin) {
+        alert("Invalid withdrawal details or incorrect PIN!");
+        return;
+      }
+
+      const amtUsd = amt / NGN_RATE;
+      if ((currentUser.balanceUsd || 0) < amtUsd) {
+        alert("Insufficient balance!");
+        return;
+      }
+
+      currentUser.balanceUsd -= amtUsd;
+      saveState();
+      updateUI();
+      closeWithdrawModal();
+      alert("Withdrawal request submitted successfully!");
+    }
+
     function openAdminAuthModal() { document.getElementById('adminAuthModal').style.display = 'flex'; }
     function closeAdminAuthModal() { document.getElementById('adminAuthModal').style.display = 'none'; }
 
@@ -469,10 +585,12 @@
     function switchTab(t) {
       document.getElementById('userTab').style.display = t === 'user' ? 'block' : 'none';
       document.getElementById('storeTab').style.display = t === 'store' ? 'block' : 'none';
+      document.getElementById('gameTab').style.display = t === 'game' ? 'block' : 'none';
       document.getElementById('adminTab').style.display = t === 'admin' ? 'block' : 'none';
 
       document.getElementById('btnUserTab').className = t === 'user' ? 'tab-btn active' : 'tab-btn';
       document.getElementById('btnStoreTab').className = t === 'store' ? 'tab-btn active' : 'tab-btn';
+      document.getElementById('btnGameTab').className = t === 'game' ? 'tab-btn active' : 'tab-btn';
       if (isAdminLoggedIn) {
         document.getElementById('btnAdminTab').className = t === 'admin' ? 'tab-btn active' : 'tab-btn';
       }
@@ -483,7 +601,6 @@
     }
 
     function renderAdminLists() {
-      // Render Pending Payments
       const payListEl = document.getElementById('adminPendingApprovalsList');
       if (pendingPaymentProofs.length === 0) {
         payListEl.innerHTML = `<p style="color:var(--text-muted); font-size:13px;">No pending payments found.</p>`;
@@ -499,7 +616,6 @@
         `).join('');
       }
 
-      // Render Pending Social Tasks
       const socialListEl = document.getElementById('adminPendingSocialTasksList');
       if (pendingSocialTasks.length === 0) {
         socialListEl.innerHTML = `<p style="color:var(--text-muted); font-size:13px;">No pending social tasks found.</p>`;
@@ -543,7 +659,6 @@
 
       const targetUser = usersDb.find(u => u.email === item.userEmail);
       if (targetUser) {
-        // ₦70 converted to USD roughly for balance tracking
         const rewardUsd = 70 / NGN_RATE;
         targetUser.balanceUsd = (targetUser.balanceUsd || 0) + rewardUsd;
       }
