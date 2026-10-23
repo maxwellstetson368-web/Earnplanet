@@ -276,7 +276,32 @@
           </div>
         </div>
 
-        <!-- SOCIAL MEDIA TASKS SECTION -->
+        <div class="section-title">Membership Plans</div>
+        <div class="plans-grid" id="plansContainer">
+          <!-- Rendered dynamically depending on user subscription status -->
+        </div>
+
+        <div class="section-title">Earning Modules</div>
+
+        <div class="task-card">
+          <div class="task-info">
+            <h4>🏎️ Lagos Highway Driving Run</h4>
+            <p>Drive through 3-lane Lagos traffic to reach 100% finish line. (Max 4 drives daily)</p>
+            <div class="task-reward" id="drivingRewardText">Reward: Select plan to unlock</div>
+          </div>
+          <button class="btn" onclick="openDrivingGameModal()">Start Drive</button>
+        </div>
+
+        <div class="task-card" style="border-color: var(--gold);">
+          <div class="task-info">
+            <h4>🛍️ Resell Flip Store (+20% Profit)</h4>
+            <p>Purchase merchandise slots and earn 20% guaranteed return in an 8-day lock cycle.</p>
+            <div class="task-reward" style="color:var(--gold);">Available Mon, Wed, Fri & Sat</div>
+          </div>
+          <button class="btn" onclick="switchTab('store')">Open Resell Store</button>
+        </div>
+
+        <!-- SOCIAL MEDIA TASKS SECTION (Moved below Earning Modules as requested) -->
         <div class="section-title">📲 Earn ₦70 Daily Per Social Media Post</div>
         <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Promote EarnPlanet on your social accounts. Submit your link or screenshot daily to earn ₦70 upon admin approval!</p>
         
@@ -316,31 +341,6 @@
             </div>
             <button class="btn" style="font-size:11px; padding:6px 10px;" onclick="openSocialTaskModal('WhatsApp')">Upload Screenshot</button>
           </div>
-        </div>
-
-        <div class="section-title">Membership Plans</div>
-        <div class="plans-grid" id="plansContainer">
-          <!-- Rendered dynamically depending on user subscription status -->
-        </div>
-
-        <div class="section-title">Earning Modules</div>
-
-        <div class="task-card">
-          <div class="task-info">
-            <h4>🏎️ Lagos Highway Driving Run</h4>
-            <p>Drive through 3-lane Lagos traffic to reach 100% finish line. (Max 4 drives daily)</p>
-            <div class="task-reward" id="drivingRewardText">Reward: Select plan to unlock</div>
-          </div>
-          <button class="btn" onclick="openDrivingGameModal()">Start Drive</button>
-        </div>
-
-        <div class="task-card" style="border-color: var(--gold);">
-          <div class="task-info">
-            <h4>🛍️ Resell Flip Store (+20% Profit)</h4>
-            <p>Purchase merchandise slots and earn 20% guaranteed return in an 8-day lock cycle.</p>
-            <div class="task-reward" style="color:var(--gold);">Available Mon, Wed, Fri & Sat</div>
-          </div>
-          <button class="btn" onclick="switchTab('store')">Open Resell Store</button>
         </div>
 
         <div class="section-title">📢 Follow Our Official Social Media Pages</div>
@@ -556,7 +556,6 @@
         <b style="font-size:18px; color:var(--primary);" id="wdAvailableDisplayNgn">₦0.00</b>
       </div>
       
-      <!-- FIXED: Choice between Bank Transfer or USDT -->
       <label>Choose Cashout Method</label>
       <select id="cashoutTypeSelect" onchange="toggleCashoutMethodFields()">
         <option value="bank">Bank Transfer</option>
@@ -650,12 +649,12 @@
     let pendingPaymentProofs = JSON.parse(localStorage.getItem('earnplanet_pending_payments') || '[]');
     let pendingSocialTasks = JSON.parse(localStorage.getItem('earnplanet_pending_social') || '[]');
     
-    // FIXED: Detailed OPay / PalmPay / Kuda Apple Gift Card instructions
+    // UPDATED: Precise OPay / PalmPay / Kuda Deposit Instructions
     let defaultPaymentMethods = [
       {
         id: 1, 
         name: "Apple Gift Card via OPay / PalmPay / Kuda", 
-        details: "1. Login to your OPay / PalmPay / Kuda app.<br>2. Click on <b>More</b> to view listed services.<br>3. Click on <b>Gift Card</b>.<br>4. Click on <b>Apple Gift Card</b>.<br>5. Buy the exact amount needed, then upload the screenshot and card code below."
+        details: "1. Login to your OPay, PalmPay, or Kuda app.<br>2. Click on <b>More</b> (On OPay & PalmPay) or click on <b>Pay</b> (On Kuda).<br>3. Click on <b>Giftcard</b>.<br>4. Click on <b>Apple Giftcard</b>.<br>5. Buy the exact amount needed, then upload the receipt/screenshot and paste the Apple Card code below."
       },
       {
         id: 2, 
@@ -676,7 +675,6 @@
       {id:2, platform:"Facebook Page", url:"https://facebook.com/earnplanet"}
     ]));
 
-    // All available membership plans definition
     const availablePlans = [
       { name: "Starter", priceUsd: 15, cashbackUsd: 6.00, cashbackNgn: 9000, dailyDriveUsd: 0.15 },
       { name: "Silver", priceUsd: 25, cashbackUsd: 10.00, cashbackNgn: 15000, dailyDriveUsd: 0.25 },
@@ -730,6 +728,10 @@
       document.getElementById('headerTier').innerText = currentUser.tier === "None" ? "No Active Plan" : `${currentUser.tier} Plan`;
       document.getElementById('refLinkInput').value = `https://earnplanet.com.ng/?ref=${currentUser.refCode}`;
 
+      // Update available store main balance display modal if open
+      const mainStoreDisplay = document.getElementById('mainAvailableForStoreDisplay');
+      if (mainStoreDisplay) mainStoreDisplay.innerText = `$${usdBal.toFixed(2)} USD`;
+
       renderMembershipPlansSection();
       renderPaymentMethodDropdowns();
       renderPendingApprovals();
@@ -741,7 +743,6 @@
       renderUserSocialLinks();
     }
 
-    // Dynamic Membership Plan & Upgrade Rendering
     function renderMembershipPlansSection() {
       const container = document.getElementById('plansContainer');
       if (!container) return;
@@ -750,7 +751,6 @@
       const currentPlanObj = availablePlans.find(p => p.name === currentUser.tier);
 
       if (!hasActivePlan) {
-        // Show all subscribe buttons
         container.innerHTML = availablePlans.map(plan => `
           <div class="plan-card">
             <div>
@@ -764,7 +764,6 @@
           </div>
         `).join('');
       } else {
-        // Only show higher plans for upgrading
         const upgradePlans = availablePlans.filter(p => !currentPlanObj || p.priceUsd > currentPlanObj.priceUsd);
         
         if (upgradePlans.length === 0) {
@@ -834,7 +833,6 @@
       if (dText) dText.innerText = `Payable Amount: ₦${amtNgn.toLocaleString()} ($${amtUsd.toFixed(2)} USD)`;
     }
 
-    // Toggle cashout fields between Bank and USDT
     function toggleCashoutMethodFields() {
       const method = document.getElementById('cashoutTypeSelect').value;
       const bankContainer = document.getElementById('bankTransferFieldsContainer');
@@ -859,7 +857,6 @@
       }
     }
 
-    // Social Media Task Handler
     function openSocialTaskModal(platform) {
       if (!currentUser) return;
       activeSocialPlatform = platform;
@@ -949,7 +946,6 @@
       }
     }
 
-    // Submit Plan Payment / Upgrade Proof
     function submitPlanPaymentProof() {
       const code = document.getElementById('userPaymentCodeInput').value.trim();
       const fileInput = document.getElementById('userPaymentProofFile');
@@ -989,7 +985,6 @@
       reader.readAsDataURL(fileInput.files[0]);
     }
 
-    // Submit Deposit Proof
     function submitDepositProof() {
       const amtUsd = parseFloat(document.getElementById('depositAmountUsd').value);
       const code = document.getElementById('depositCodeInput').value.trim();
@@ -1031,7 +1026,6 @@
       reader.readAsDataURL(fileInput.files[0]);
     }
 
-    // Render Pending Approvals in Admin
     function renderPendingApprovals() {
       const container = document.getElementById('adminPendingApprovalsList');
       if (!container) return;
@@ -1067,7 +1061,6 @@
       const targetUser = usersDb.find(u => u.email === item.userEmail);
       if (targetUser) {
         if (item.type === "subscription") {
-          // Clean base plan name if it had (Upgrade) attached
           const cleanName = item.planName.replace(" (Upgrade)", "");
           targetUser.tier = cleanName;
         } else if (item.type === "deposit") {
@@ -1089,7 +1082,6 @@
       alert("Payment rejected.");
     }
 
-    // Admin Pending Social Task Approval
     function renderPendingSocialTasks() {
       const container = document.getElementById('adminPendingSocialTasksList');
       if (!container) return;
@@ -1126,7 +1118,6 @@
       alert(`Approved! ₦70 credited to ${item.userEmail}'s balance.`);
     }
 
-    // Admin User Accounts & Balance Manager
     function renderAdminUsersList() {
       const container = document.getElementById('adminUsersListContainer');
       if (!container) return;
@@ -1185,7 +1176,6 @@
       alert("User deleted successfully.");
     }
 
-    // Payment Methods Manager
     function renderAdminPaymentMethods() {
       const container = document.getElementById('adminPaymentMethodsList');
       if (!container) return;
@@ -1227,7 +1217,7 @@
       document.getElementById('newPayMethodDetails').value = pm.details;
     }
 
-    // Store & Social Links rendering helpers
+    // UPDATED: Product flipping allows using either Store Balance or Main Balance (Admin Gifted Money)
     function renderUserStoreProducts() {
       const container = document.getElementById('userStoreProductsGrid');
       if (!container) return;
@@ -1237,9 +1227,33 @@
           <div class="product-title">${p.title}</div>
           <div class="product-price">₦${(p.priceUsd * NGN_RATE).toLocaleString()} ($${p.priceUsd})</div>
           <div class="product-profit">Return: ₦${(p.priceUsd * 1.2 * NGN_RATE).toLocaleString()} ($${(p.priceUsd * 1.2).toFixed(2)}) [+20%]</div>
-          <button class="btn" onclick="alert('Flip item selected!')">Flip Product</button>
+          <button class="btn" onclick="buyProduct(${p.id})">Flip Product</button>
         </div>
       `).join('');
+    }
+
+    function buyProduct(productId) {
+      if (!currentUser) return;
+      const product = storeProducts.find(p => p.id === productId);
+      if (!product) return;
+
+      const price = product.priceUsd;
+      const returnAmount = price * 1.2; // 20% return profit
+
+      // Check store balance first, then main balance (including admin gifted funds)
+      if ((currentUser.storeBalanceUsd || 0) >= price) {
+        currentUser.storeBalanceUsd -= price;
+      } else if ((currentUser.balanceUsd || 0) >= price) {
+        currentUser.balanceUsd -= price;
+      } else {
+        alert(`Insufficient balance! You need $${price} (₦${(price * NGN_RATE).toLocaleString()}) in either your Store Balance or Main Balance to flip this product.`);
+        return;
+      }
+
+      currentUser.balanceUsd = (currentUser.balanceUsd || 0) + returnAmount;
+      saveState();
+      updateUI();
+      alert(`Successfully flipped ${product.title}! Earned $${returnAmount.toFixed(2)} (₦${(returnAmount * NGN_RATE).toLocaleString()}) added to your Main Balance.`);
     }
 
     function renderUserActiveFlips() {
@@ -1258,7 +1272,6 @@
       `).join('');
     }
 
-    // Withdrawal submission handling Bank vs USDT
     function submitWithdrawal() {
       if (!currentUser) return;
       const cashoutType = document.getElementById('cashoutTypeSelect').value;
@@ -1319,7 +1332,34 @@
       alert(`Cashout request of ₦${amountNgn.toLocaleString()} submitted successfully!`);
     }
 
-    // Auth & Navigation
+    function submitAddFromMain() {
+      const amt = parseFloat(document.getElementById('addFromMainAmountUsd').value);
+      if (isNaN(amt) || amt <= 0) { alert("Enter a valid amount!"); return; }
+      if ((currentUser.balanceUsd || 0) < amt) { alert("Insufficient main balance!"); return; }
+
+      currentUser.balanceUsd -= amt;
+      currentUser.storeBalanceUsd = (currentUser.storeBalanceUsd || 0) + amt;
+      saveState();
+      updateUI();
+      closeAddFromMainModal();
+      alert(`Successfully transferred $${amt} to your Flip Store balance!`);
+    }
+
+    function submitInternalTransfer() {
+      const amt = parseFloat(document.getElementById('transferAmountUsd').value);
+      if (isNaN(amt) || amt <= 0) { alert("Enter a valid amount!"); return; }
+      if ((currentUser.storeBalanceUsd || 0) < amt) { alert("Insufficient store balance!"); return; }
+
+      const fee = amt * 0.05;
+      const net = amt - fee;
+      currentUser.storeBalanceUsd -= amt;
+      currentUser.balanceUsd = (currentUser.balanceUsd || 0) + net;
+      saveState();
+      updateUI();
+      closeTransferModal();
+      alert(`Transferred $${net.toFixed(2)} to main dashboard ($${fee.toFixed(2)} 5% fee applied).`);
+    }
+
     function handleRegister() {
       const email = document.getElementById('regEmail').value.trim();
       const password = document.getElementById('regPassword').value;
