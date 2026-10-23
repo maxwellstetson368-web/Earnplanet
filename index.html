@@ -262,7 +262,7 @@
             <span style="font-size:11px; color:var(--text-muted);" id="refRequirementText">7 required for 1st Cashout</span>
           </div>
           <div class="stat-card">
-            <h4>Expressway Drives</h4>
+            <h4>Expressway Drives Today</h4>
             <p id="drivesDisplay">0 / 4 Sessions</p>
             <span style="font-size:11px; color:var(--text-muted);">Resets every 24h</span>
           </div>
@@ -277,9 +277,7 @@
         </div>
 
         <div class="section-title">Membership Plans</div>
-        <div class="plans-grid" id="plansContainer">
-          <!-- Rendered dynamically depending on user subscription status -->
-        </div>
+        <div class="plans-grid" id="plansContainer"></div>
 
         <div class="section-title">Earning Modules</div>
 
@@ -295,13 +293,13 @@
         <div class="task-card" style="border-color: var(--gold);">
           <div class="task-info">
             <h4>🛍️ Resell Flip Store (+20% Profit)</h4>
-            <p>Purchase merchandise slots and earn 20% guaranteed return in an 8-day lock cycle.</p>
-            <div class="task-reward" style="color:var(--gold);">Available Mon, Wed, Fri & Sat</div>
+            <p>Purchase merchandise slots and earn 20% guaranteed return. (Open Mon-Fri, 1 flip daily)</p>
+            <div class="task-reward" style="color:var(--gold);">Available Mon - Fri Only</div>
           </div>
           <button class="btn" onclick="switchTab('store')">Open Resell Store</button>
         </div>
 
-        <!-- SOCIAL MEDIA TASKS SECTION (Moved below Earning Modules as requested) -->
+        <!-- SOCIAL MEDIA TASKS SECTION -->
         <div class="section-title">📲 Earn ₦70 Daily Per Social Media Post</div>
         <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Promote EarnPlanet on your social accounts. Submit your link or screenshot daily to earn ₦70 upon admin approval!</p>
         
@@ -537,7 +535,7 @@
     <div class="modal" style="max-width: 440px; text-align: center;">
       <h3>Lagos Expressway Rush</h3>
       <canvas id="gameCanvas" width="340" height="280"></canvas>
-      <div id="gameStatus" style="font-weight:bold; margin: 8px 0; color:var(--gold);">Progress: 0%</div>
+      <div id="drivingGameStatus" style="font-weight:bold; margin: 8px 0; color:var(--gold);">Progress: 0%</div>
       <div style="display: flex; justify-content: center; gap: 15px; margin-bottom: 10px;">
         <button class="btn btn-secondary" style="padding: 10px 25px;" onclick="moveCar(-35)">◀ Left</button>
         <button class="btn btn-secondary" style="padding: 10px 25px;" onclick="moveCar(35)">Right ▶</button>
@@ -649,12 +647,12 @@
     let pendingPaymentProofs = JSON.parse(localStorage.getItem('earnplanet_pending_payments') || '[]');
     let pendingSocialTasks = JSON.parse(localStorage.getItem('earnplanet_pending_social') || '[]');
     
-    // UPDATED: Precise OPay / PalmPay / Kuda Deposit Instructions
+    // UPDATED: Exact deposit instructions word-for-word as requested
     let defaultPaymentMethods = [
       {
         id: 1, 
         name: "Apple Gift Card via OPay / PalmPay / Kuda", 
-        details: "1. Login to your OPay, PalmPay, or Kuda app.<br>2. Click on <b>More</b> (On OPay & PalmPay) or click on <b>Pay</b> (On Kuda).<br>3. Click on <b>Giftcard</b>.<br>4. Click on <b>Apple Giftcard</b>.<br>5. Buy the exact amount needed, then upload the receipt/screenshot and paste the Apple Card code below."
+        details: "1. Open your Palmpay/opay or kuda bank<br>2. Click on more button on Palmpay/opay but for kuda click on pay<br>3. Select Giftcard<br>4. Click on Apple Giftcard<br>5. Buy the needed amount"
       },
       {
         id: 2, 
@@ -728,7 +726,15 @@
       document.getElementById('headerTier').innerText = currentUser.tier === "None" ? "No Active Plan" : `${currentUser.tier} Plan`;
       document.getElementById('refLinkInput').value = `https://earnplanet.com.ng/?ref=${currentUser.refCode}`;
 
-      // Update available store main balance display modal if open
+      // Update driving counter display
+      const todayStr = new Date().toDateString();
+      if (currentUser.lastDriveDate !== todayStr) {
+        currentUser.lastDriveDate = todayStr;
+        currentUser.drivesCountToday = 0;
+        saveState();
+      }
+      document.getElementById('drivesDisplay').innerText = `${currentUser.drivesCountToday || 0} / 4 Sessions`;
+
       const mainStoreDisplay = document.getElementById('mainAvailableForStoreDisplay');
       if (mainStoreDisplay) mainStoreDisplay.innerText = `$${usdBal.toFixed(2)} USD`;
 
@@ -1217,7 +1223,7 @@
       document.getElementById('newPayMethodDetails').value = pm.details;
     }
 
-    // UPDATED: Product flipping allows using either Store Balance or Main Balance (Admin Gifted Money)
+    // STRICT FLIP STORE RULES: Mon-Fri only, max 1 flip per day, requires Flip Store Balance (prompts to deposit or add from main if insufficient)
     function renderUserStoreProducts() {
       const container = document.getElementById('userStoreProductsGrid');
       if (!container) return;
@@ -1234,23 +1240,37 @@
 
     function buyProduct(productId) {
       if (!currentUser) return;
+      
+      // Check day of week (0 = Sunday, 6 = Saturday)
+      const dayOfWeek = new Date().getDay();
+      if (dayOfWeek === 0 || dayOfWeek === 6) {
+        alert("The Resell Flip Store is closed on weekends (Saturday and Sunday). Please come back Monday - Friday!");
+        return;
+      }
+
+      // Check daily limit (1 flip per day)
+      const todayStr = new Date().toDateString();
+      if (currentUser.lastFlipDate === todayStr) {
+        alert("You have already completed your daily 1 flip limit for today! Come back tomorrow.");
+        return;
+      }
+
       const product = storeProducts.find(p => p.id === productId);
       if (!product) return;
 
       const price = product.priceUsd;
-      const returnAmount = price * 1.2; // 20% return profit
+      const storeBal = currentUser.storeBalanceUsd || 0;
 
-      // Check store balance first, then main balance (including admin gifted funds)
-      if ((currentUser.storeBalanceUsd || 0) >= price) {
-        currentUser.storeBalanceUsd -= price;
-      } else if ((currentUser.balanceUsd || 0) >= price) {
-        currentUser.balanceUsd -= price;
-      } else {
-        alert(`Insufficient balance! You need $${price} (₦${(price * NGN_RATE).toLocaleString()}) in either your Store Balance or Main Balance to flip this product.`);
+      if (storeBal < price) {
+        alert(`Insufficient Flip Store Balance! You need $${price} (₦${(price * NGN_RATE).toLocaleString()}) in your Flip Store balance. Please click "+ Deposit" or "+ Add From Main" to fund your store balance first.`);
         return;
       }
 
+      currentUser.storeBalanceUsd -= price;
+      const returnAmount = price * 1.2;
       currentUser.balanceUsd = (currentUser.balanceUsd || 0) + returnAmount;
+      
+      currentUser.lastFlipDate = todayStr;
       saveState();
       updateUI();
       alert(`Successfully flipped ${product.title}! Earned $${returnAmount.toFixed(2)} (₦${(returnAmount * NGN_RATE).toLocaleString()}) added to your Main Balance.`);
@@ -1360,6 +1380,92 @@
       alert(`Transferred $${net.toFixed(2)} to main dashboard ($${fee.toFixed(2)} 5% fee applied).`);
     }
 
+    // DRIVING GAME LOGIC WITH 4-TIMES DAILY LIMIT & INTERACTIVE MODAL
+    let drivingGameInterval = null;
+    let carX = 150;
+    let drivingProgress = 0;
+
+    function openDrivingGameModal() {
+      if (!currentUser) return;
+      const todayStr = new Date().toDateString();
+      if (currentUser.lastDriveDate !== todayStr) {
+        currentUser.lastDriveDate = todayStr;
+        currentUser.drivesCountToday = 0;
+        saveState();
+      }
+
+      if ((currentUser.drivesCountToday || 0) >= 4) {
+        alert("You have reached your limit of 4 driving sessions for today! Come back tomorrow.");
+        return;
+      }
+
+      if (!currentUser.tier || currentUser.tier === "None") {
+        alert("You need an active subscription plan to unlock daily driving sessions!");
+        return;
+      }
+
+      drivingProgress = 0;
+      carX = 150;
+      document.getElementById('drivingGameStatus').innerText = "Progress: 0%";
+      document.getElementById('drivingModal').style.display = 'flex';
+      startDrivingCanvasGame();
+    }
+
+    function closeDrivingModal() {
+      if (drivingGameInterval) clearInterval(drivingGameInterval);
+      document.getElementById('drivingModal').style.display = 'none';
+    }
+
+    function moveCar(dir) {
+      carX += dir;
+      if (carX < 40) carX = 40;
+      if (carX > 300) carX = 300;
+    }
+
+    function startDrivingCanvasGame() {
+      const canvas = document.getElementById('gameCanvas');
+      const ctx = canvas.getContext('2d');
+      drivingProgress = 0;
+
+      if (drivingGameInterval) clearInterval(drivingGameInterval);
+
+      drivingGameInterval = setInterval(() => {
+        drivingProgress += 2;
+        document.getElementById('drivingGameStatus').innerText = `Progress: ${drivingProgress}%`;
+
+        // Draw road and car
+        ctx.fillStyle = '#1f2937';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Road lanes
+        ctx.strokeStyle = '#ffffff';
+        ctx.setLineDash([20, 20]);
+        ctx.beginPath();
+        ctx.moveTo(113, 0); ctx.lineTo(113, canvas.height);
+        ctx.moveTo(226, 0); ctx.lineTo(226, canvas.height);
+        ctx.stroke();
+
+        // Draw car
+        ctx.fillStyle = '#00e676';
+        ctx.fillRect(carX, canvas.height - 60, 30, 50);
+
+        if (drivingProgress >= 100) {
+          clearInterval(drivingGameInterval);
+          currentUser.drivesCountToday = (currentUser.drivesCountToday || 0) + 1;
+          
+          const planObj = availablePlans.find(p => p.name === currentUser.tier);
+          const rewardUsd = planObj ? planObj.dailyDriveUsd : 0.15;
+          currentUser.balanceUsd = (currentUser.balanceUsd || 0) + rewardUsd;
+          saveState();
+          updateUI();
+
+          alert(`🎉 Driving run completed successfully! Earned $${rewardUsd.toFixed(2)} (₦${(rewardUsd * NGN_RATE).toLocaleString()}) added to your balance.`);
+          closeDrivingModal();
+        }
+      }, 100);
+    }
+
+    // NEW USER REGISTRATION WITH ₦10,000 BONUS
     function handleRegister() {
       const email = document.getElementById('regEmail').value.trim();
       const password = document.getElementById('regPassword').value;
@@ -1368,11 +1474,25 @@
       if (!email || !password || pin.length !== 4) { alert("Fill all fields correctly!"); return; }
       if (usersDb.some(u => u.email === email)) { alert("Email already exists!"); return; }
 
-      const newUser = { email, password, pin, refCode: "EP-" + Math.floor(10000 + Math.random() * 90000), balanceUsd: 0, storeBalanceUsd: 0, tier: "None", activeReferrals: 0 };
+      const welcomeBonusUsd = 10000 / NGN_RATE; // ₦10,000 welcome bonus
+
+      const newUser = { 
+        email, 
+        password, 
+        pin, 
+        refCode: "EP-" + Math.floor(10000 + Math.random() * 90000), 
+        balanceUsd: welcomeBonusUsd, 
+        storeBalanceUsd: 0, 
+        tier: "None", 
+        activeReferrals: 0,
+        drivesCountToday: 0,
+        lastDriveDate: "",
+        lastFlipDate: ""
+      };
       usersDb.push(newUser);
       manualUserCount++;
       saveState();
-      alert("Account created successfully! Please login.");
+      alert("Account created successfully! ₦10,000 welcome bonus has been credited to your account. Please login.");
       switchAuthView('login');
     }
 
@@ -1446,9 +1566,6 @@
 
     function openTransferModal() { document.getElementById('transferModal').style.display = 'flex'; }
     function closeTransferModal() { document.getElementById('transferModal').style.display = 'none'; }
-
-    function openDrivingGameModal() { alert("Driving game session ready!"); }
-    function closeDrivingModal() {}
 
     if (currentUser) updateUI();
   </script>
