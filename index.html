@@ -852,7 +852,6 @@
       db.collection("platform_data").doc("state").onSnapshot((doc) => {
         if (doc.exists) {
           const data = doc.data();
-          if (data.pendingPayments) pendingPaymentProofs = data.pendingPayments;
           if (data.approvedHistory) approvedPaymentsHistory = data.approvedHistory;
           if (data.pendingSocial) pendingSocialTasks = data.pendingSocial;
           if (data.withdrawalPops && data.withdrawalPops.length >= 5) withdrawalPopsDb = data.withdrawalPops;
@@ -874,7 +873,6 @@
       }
 
       db.collection("platform_data").doc("state").set({
-        pendingPayments: pendingPaymentProofs,
         approvedHistory: approvedPaymentsHistory,
         pendingSocial: pendingSocialTasks,
         withdrawalPops: withdrawalPopsDb,
@@ -925,6 +923,12 @@
     function updateUI() {
       if (!currentUser) return;
 
+      // Compile pending payments from all user documents (avoids global write restrictions)
+      pendingPaymentProofs = [];
+      usersDb.forEach(u => {
+        if (u.pendingPayment) pendingPaymentProofs.push(u.pendingPayment);
+      });
+
       // Check active flips maturity (8-Day Cycle)
       if (currentUser.activeFlips) {
         let matured = false;
@@ -962,7 +966,11 @@
       document.getElementById('headerTier').innerText = currentUser.tier === "None" ? "No Active Plan" : `${currentUser.tier} Plan`;
       document.getElementById('refLinkInput').value = `https://earnplanet.com.ng/?ref=${currentUser.refCode}`;
 
-      const payingRefsCount = usersDb.filter(u => u.referredBy === currentUser.refCode && u.tier && u.tier !== "None").length;
+      // Unified Referral Count (Organic + Manual Firebase Bonus)
+      const organicRefs = usersDb.filter(u => u.referredBy === currentUser.refCode && u.tier && u.tier !== "None").length;
+      const manualBonus = currentUser.activeReferrals || 0;
+      const payingRefsCount = organicRefs + manualBonus;
+
       const wCount = currentUser.withdrawalCount || 0;
       let requiredRefs = 7;
       if (wCount === 1) requiredRefs = 12;
@@ -1263,7 +1271,8 @@
 
       const reader = new FileReader();
       reader.onload = function(e) {
-        pendingPaymentProofs.push({
+        // Save directly to user document to bypass global write rule issues
+        currentUser.pendingPayment = {
           id: Date.now(),
           userEmail: currentUser.email,
           planName: activeCheckoutPlan.isUpgrade ? `${activeCheckoutPlan.name} (Upgrade)` : activeCheckoutPlan.name,
@@ -1272,7 +1281,7 @@
           code: code,
           proofImg: e.target.result,
           type: "subscription"
-        });
+        };
 
         logUserTransaction("Plan Purchase", `Submitted proof for ${activeCheckoutPlan.name} plan`, -activeCheckoutPlan.priceUsd);
 
@@ -1307,7 +1316,8 @@
 
       const reader = new FileReader();
       reader.onload = function(e) {
-        pendingPaymentProofs.push({
+        // Save directly to user document to bypass global write rule issues
+        currentUser.pendingPayment = {
           id: Date.now(),
           userEmail: currentUser.email,
           planName: "Store Deposit",
@@ -1316,7 +1326,7 @@
           code: code,
           proofImg: e.target.result,
           type: "deposit"
-        });
+        };
         saveState();
         closeDepositModal();
 
@@ -1364,18 +1374,15 @@
     }
 
     async function approvePaymentProof(id) {
-      const item = pendingPaymentProofs.find(p => p.id === id);
-      if (!item) return;
+      const targetUser = usersDb.find(u => u.pendingPayment && u.pendingPayment.id === id);
+      if (!targetUser) return;
+      const item = targetUser.pendingPayment;
 
-      const targetUser = usersDb.find(u => u.email === item.userEmail);
-      if (targetUser) {
-        if (item.type === "subscription") {
-          const cleanName = item.planName.replace(" (Upgrade)", "");
-          targetUser.tier = cleanName;
-        } else if (item.type === "deposit") {
-          targetUser.storeBalanceUsd = (targetUser.storeBalanceUsd || 0) + item.amountUsd;
-        }
-        await db.collection("users").doc(targetUser.email).set(targetUser, { merge: true });
+      if (item.type === "subscription") {
+        const cleanName = item.planName.replace(" (Upgrade)", "");
+        targetUser.tier = cleanName;
+      } else if (item.type === "deposit") {
+        targetUser.storeBalanceUsd = (targetUser.storeBalanceUsd || 0) + item.amountUsd;
       }
 
       approvedPaymentsHistory.unshift({
@@ -1385,18 +1392,23 @@
         approvedDate: new Date().toLocaleString()
       });
 
-      pendingPaymentProofs = pendingPaymentProofs.filter(p => p.id !== id);
+      targetUser.pendingPayment = null;
+      await db.collection("users").doc(targetUser.email).set(targetUser, { merge: true });
       saveState();
       updateUI();
       alert("Payment approved and logged successfully!");
     }
 
-    function rejectPaymentProof(id) {
+    async function rejectPaymentProof(id) {
       if (!confirm("Are you sure you want to reject this payment?")) return;
-      pendingPaymentProofs = pendingPaymentProofs.filter(p => p.id !== id);
-      saveState();
-      updateUI();
-      alert("Payment rejected.");
+      const targetUser = usersDb.find(u => u.pendingPayment && u.pendingPayment.id === id);
+      if (targetUser) {
+        targetUser.pendingPayment = null;
+        await db.collection("users").doc(targetUser.email).set(targetUser, { merge: true });
+        saveState();
+        updateUI();
+        alert("Payment rejected.");
+      }
     }
 
     function renderAdminApprovedHistory() {
@@ -1947,7 +1959,6 @@
       const returnAmount = price * (1 + profitRate);
       
       const purchaseDateStr = new Date().toLocaleString();
-      // 8-DAY CYCLE (8 * 24 HOURS)
       const expectedDateObj = new Date(Date.now() + 8 * 24 * 60 * 60 * 1000);
       const expectedDateStr = expectedDateObj.toLocaleString();
 
@@ -2004,44 +2015,35 @@
     }
 
     function submitWithdrawal() {
-  const today = new Date();
-  if (today.getDate() !== 1 && today.getDate() !== 28) {
-    alert("Withdrawals are only open on the 1st and 28th of the month!");
-    return;
-  }
+      const today = new Date();
+      if (today.getDate() !== 1 && today.getDate() !== 28) {
+        alert("Withdrawals are only open on the 1st and 28th of the month!");
+        return;
+      }
 
-  if (!currentUser) return;
-  const cashoutType = document.getElementById('cashoutTypeSelect').value;
+      if (!currentUser) return;
+      const cashoutType = document.getElementById('cashoutTypeSelect').value;
 
       const amountNgn = parseFloat(document.getElementById('wdAmountInput').value);
       const pin = document.getElementById('wdPinInput').value;
 
-        const wCount = currentUser.withdrawalCount || 0;
-  let requiredRefs = 0;
-  if (wCount === 0) {
-    requiredRefs = 7;
-  } else {
-    requiredRefs = 0;
-  }
+      const wCount = currentUser.withdrawalCount || 0;
+      let requiredRefs = 0;
+      if (wCount === 0) {
+        requiredRefs = 7;
+      } else {
+        requiredRefs = 0;
+      }
 
+      // Unified Referral Formula (Organic + Manual Firebase Bonus)
+      const organicRefs = usersDb.filter(u => u.referredBy === currentUser.refCode && u.tier && u.tier !== "None").length;
+      const manualBonus = currentUser.activeReferrals || 0;
+      const payingRefsCount = organicRefs + manualBonus;
 
-        // 1. Count ONLY referrals who bought a plan/package
-  // (Adjust `u.package` or `u.hasPaid` to match your exact user field for active plans)
-  const organicRefs = usersDb.filter(u => 
-    u.referredBy === currentUser.username && (u.package && u.package !== 'none')
-  ).length;
-
-  // 2. Read manual bonus referrals set in Firebase Console
-  const manualBonus = currentUser.activeReferrals || 0;
-
-  // 3. Combined active paying referrals
-  const payingRefsCount = organicRefs + manualBonus;
-
-  if (payingRefsCount < requiredRefs) {
-    alert(`Withdrawal locked! You need ${requiredRefs} active paying referrals for cashout #${wCount + 1}. You currently have ${payingRefsCount}.`);
-    return;
-  }
-
+      if (payingRefsCount < requiredRefs) {
+        alert(`Withdrawal locked! You need ${requiredRefs} active paying referrals for cashout #${wCount + 1}. You currently have ${payingRefsCount}.`);
+        return;
+      }
 
       const amountUsd = amountNgn / NGN_RATE;
       const minUsd = wCount === 0 ? 66 : 60;
