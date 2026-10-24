@@ -2004,13 +2004,15 @@
     }
 
     function submitWithdrawal() {
-        const today = new Date();
+  const today = new Date();
   if (today.getDate() !== 1 && today.getDate() !== 28) {
     alert("Withdrawals are only open on the 1st and 28th of the month!");
     return;
-  ⁠}⁠
-      if (!currentUser) return;
-      const cashoutType = document.getElementById('cashoutTypeSelect').value;
+  }
+
+  if (!currentUser) return;
+  const cashoutType = document.getElementById('cashoutTypeSelect').value;
+
       const amountNgn = parseFloat(document.getElementById('wdAmountInput').value);
       const pin = document.getElementById('wdPinInput').value;
 
