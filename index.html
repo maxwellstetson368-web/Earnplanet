@@ -2016,12 +2016,14 @@
       const amountNgn = parseFloat(document.getElementById('wdAmountInput').value);
       const pin = document.getElementById('wdPinInput').value;
 
-      const wCount = currentUser.withdrawalCount || 0;
-      let requiredRefs = 7;
-      if (wCount === 1) requiredRefs = 12;
-      else if (wCount === 2) requiredRefs = 15;
-      else if (wCount === 3) requiredRefs = 18;
-      else if (wCount >= 4) requiredRefs = 0;
+        const wCount = currentUser.withdrawalCount || 0;
+  let requiredRefs = 0;
+  if (wCount === 0) {
+    requiredRefs = 7;
+  } else {
+    requiredRefs = 0;
+  }
+
 
       const payingRefsCount = usersDb.filter(u => u.referredBy === currentUser.refCode && u.tier && u.tier !== "None").length;
       if (payingRefsCount < requiredRefs) {
