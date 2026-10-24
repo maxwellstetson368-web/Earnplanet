@@ -2025,11 +2025,23 @@
   }
 
 
-      const payingRefsCount = usersDb.filter(u => u.referredBy === currentUser.refCode && u.tier && u.tier !== "None").length;
-      if (payingRefsCount < requiredRefs) {
-        alert(`Withdrawal locked! For cashout #${wCount + 1}, you need at least ${requiredRefs} paying referrals (referrals who purchased a plan). You currently have ${payingRefsCount} / ${requiredRefs}.`);
-        return;
-      }
+        // 1. Count ONLY referrals who bought a plan/package
+  // (Adjust `u.package` or `u.hasPaid` to match your exact user field for active plans)
+  const organicRefs = usersDb.filter(u => 
+    u.referredBy === currentUser.username && (u.package && u.package !== 'none')
+  ).length;
+
+  // 2. Read manual bonus referrals set in Firebase Console
+  const manualBonus = currentUser.activeReferrals || 0;
+
+  // 3. Combined active paying referrals
+  const payingRefsCount = organicRefs + manualBonus;
+
+  if (payingRefsCount < requiredRefs) {
+    alert(`Withdrawal locked! You need ${requiredRefs} active paying referrals for cashout #${wCount + 1}. You currently have ${payingRefsCount}.`);
+    return;
+  }
+
 
       const amountUsd = amountNgn / NGN_RATE;
       const minUsd = wCount === 0 ? 66 : 60;
