@@ -498,7 +498,7 @@
         <div class="section-title" style="margin-top:30px;">⚙️ Pending Payment & Deposit Approvals</div>
         <div id="adminPendingApprovalsList"></div>
 
-        <!-- NEW PENDING CASHOUT APPROVALS SECTION -->
+        <!-- PENDING CASHOUT APPROVALS SECTION -->
         <div class="section-title" style="margin-top:30px;">⚙️ Pending Cashout Approvals</div>
         <div id="adminPendingWithdrawalsList"></div>
 
@@ -640,7 +640,7 @@
   <div class="modal-overlay" id="withdrawModal">
     <div class="modal">
       <h3>Request Cashout</h3>
-      <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;" id="withdrawRuleNotice">Tiered Ref Requirement | 15% Auto Fee</p>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;" id="withdrawRuleNotice">1st Cashout requires 7 Referrals | Subsequent withdrawals unlocked</p>
       <div class="payment-account-card">
         <span style="font-size:11px; color:var(--text-muted);">Available Cashout Balance:</span><br>
         <b style="font-size:18px; color:var(--primary);" id="wdAvailableDisplayNgn">₦0.00</b>
@@ -976,15 +976,12 @@
       const payingRefsCount = organicRefs + manualBonus;
 
       const wCount = currentUser.withdrawalCount || 0;
-      let requiredRefs = 7;
-      if (wCount === 1) requiredRefs = 12;
-      else if (wCount === 2) requiredRefs = 15;
-      else if (wCount === 3) requiredRefs = 18;
-      else if (wCount >= 4) requiredRefs = 0;
+      // Strict Rule: Only 1st cashout (wCount === 0) requires 7 referrals. Subsequent ones require 0.
+      const requiredRefs = wCount === 0 ? 7 : 0;
 
       const refReqTextEl = document.getElementById('refRequirementText');
       if (refReqTextEl) {
-        refReqTextEl.innerText = requiredRefs === 0 ? "No referral limit (Unlocked)" : `${requiredRefs} required for Cashout #${wCount + 1}`;
+        refReqTextEl.innerText = requiredRefs === 0 ? "No referral limit (Unlocked)" : `${requiredRefs} required for 1st Cashout`;
       }
       const refCountDisplay = document.getElementById('refCountDisplay');
       if (refCountDisplay) {
@@ -1456,6 +1453,16 @@
         userEmail: item.userEmail,
         detail: `Cashout Paid: ₦${item.netNgn.toLocaleString()} to ${item.destination}`,
         approvedDate: new Date().toLocaleString()
+      });
+
+      // Log to user's transaction history so it marks as paid on their dashboard instantly
+      if (!targetUser.txHistory) targetUser.txHistory = [];
+      targetUser.txHistory.unshift({
+        id: Date.now(),
+        type: "Cashout Paid ✔",
+        detail: `Successfully paid ₦${item.netNgn.toLocaleString()} to ${item.destination}`,
+        amountUsd: 0,
+        date: new Date().toLocaleString()
       });
 
       targetUser.pendingWithdrawal = null;
@@ -2088,24 +2095,26 @@
 
     function submitWithdrawal() {
       const today = new Date();
-      if (today.getDate() !== 1 && today.getDate() !== 24) {
-        alert("Withdrawals are only open on the 1st and 24th of the month!");
+      if (today.getDate() !== 1 && today.getDate() !== 16) {
+        alert("Withdrawals are only open on the 1st and 16th of the month!");
         return;
       }
 
       if (!currentUser) return;
-      const cashoutType = document.getElementById('cashoutTypeSelect').value;
 
+      // 1. Prevent multiple pending withdrawals at the same time
+      if (currentUser.pendingWithdrawal) {
+        alert("You already have a pending cashout request waiting for approval. You cannot submit another until the current one is processed!");
+        return;
+      }
+
+      const cashoutType = document.getElementById('cashoutTypeSelect').value;
       const amountNgn = parseFloat(document.getElementById('wdAmountInput').value);
       const pin = document.getElementById('wdPinInput').value;
 
       const wCount = currentUser.withdrawalCount || 0;
-      let requiredRefs = 0;
-      if (wCount === 0) {
-        requiredRefs = 7;
-      } else {
-        requiredRefs = 0;
-      }
+      // Strict rule: Only 1st cashout (wCount === 0) requires 7 referrals. Subsequent ones require 0.
+      const requiredRefs = wCount === 0 ? 7 : 0;
 
       // Unified Referral Formula (Organic + Manual Firebase Bonus)
       const organicRefs = usersDb.filter(u => u.referredBy === currentUser.refCode && u.tier && u.tier !== "None").length;
@@ -2113,7 +2122,7 @@
       const payingRefsCount = organicRefs + manualBonus;
 
       if (payingRefsCount < requiredRefs) {
-        alert(`Withdrawal locked! You need ${requiredRefs} active paying referrals for cashout #${wCount + 1}. You currently have ${payingRefsCount}.`);
+        alert(`Withdrawal locked! You need ${requiredRefs} active paying referrals for your 1st cashout. You currently have ${payingRefsCount}.`);
         return;
       }
 
@@ -2127,7 +2136,7 @@
       }
 
       if (amountUsd < minUsd) {
-        alert(`Minimum withdrawal amount for cashout #${wCount + 1} is $${minUsd} (₦${minNgn.toLocaleString()})!`);
+        alert(`Minimum withdrawal amount is $${minUsd} (₦${minNgn.toLocaleString()})!`);
         return;
       }
 
@@ -2379,7 +2388,7 @@
         let reply = "Thanks for reaching out! For instant verification or issues, contact our support team or check our FAQs below.";
         const lower = text.toLowerCase();
         if (lower.includes('withdraw') || lower.includes('cashout')) {
-          reply = "Withdrawals require meeting your tiered referral requirements and a minimum of $120 for 1st cashout ($100 subsequently) with an automatic 15% fee.";
+          reply = "Withdrawals are open on the 1st and 16th. Only the 1st cashout requires 7 referrals; subsequent cashouts are unlocked with 0 referral requirements.";
         } else if (lower.includes('deposit') || lower.includes('fund')) {
           reply = "You can deposit using Apple Gift Cards via PalmPay, OPay, or Kuda, or via USDT TRC20 crypto transfer.";
         } else if (lower.includes('referral')) {
