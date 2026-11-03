@@ -411,17 +411,16 @@
         <div class="section-title">💬 Forum Creator & 25% High-Yield Referral Program</div>
         <div class="stat-card" style="text-align:left; margin-bottom:20px;" id="forumSetupBox">
           <h4 style="margin-bottom:8px; color:var(--gold);">Create Your Unique Discussion Forum</h4>
-          <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Create a forum topic to get a dedicated Forum Referral ID. Refer members here to earn an automatic **25% commission** per subscribed referral!</p>
-          <input type="text" id="forumTitleInput" placeholder="Forum Title (e.g. Crypto & Agro Wealth Hub)">
-          <textarea id="forumDescInput" placeholder="Brief discussion topic or description..."></textarea>
+          <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Create a forum name to get a dedicated Forum Referral ID. Refer members here to earn an automatic **25% commission** per subscribed referral!</p>
+          <label>Forum Name</label>
+          <input type="text" id="forumTitleInput" placeholder="e.g. Crypto & Agro Wealth Hub">
           <button class="btn" onclick="createForum()">Create Forum & Generate ID</button>
         </div>
 
         <div id="forumActiveContainer" style="display:none;">
           <div class="stat-card" style="text-align:left; border-color:var(--gold); margin-bottom:20px;">
             <h4 style="color:var(--gold);">Your Active Forum: <span id="displayForumTitle" style="color:#fff;"></span></h4>
-            <p style="font-size:12px; color:var(--text-muted); margin:4px 0 12px 0;" id="displayForumDesc"></p>
-            <label style="font-size:11px; color:var(--gold);">Your Forum Referral Link / ID</label>
+            <label style="font-size:11px; color:var(--gold); margin-top:8px;">Your Forum Referral Link / ID</label>
             <div style="display:flex; gap:10px; margin-bottom:12px;">
               <input type="text" id="forumLinkInput" readonly style="margin-bottom:0; font-size:12px; color:var(--gold);">
               <button class="btn" style="padding:8px 14px; font-size:11px;" onclick="copyForumLink()">Copy Forum Link</button>
@@ -455,7 +454,7 @@
         </div>
 
         <div id="pendingDepositNotice" style="display:none; background:rgba(251,191,36,0.15); border:1px solid var(--gold); padding:12px; border-radius:10px; margin-bottom:15px; color:var(--gold); font-size:13px; font-weight:bold;">
-          ⏳ You have a pending deposit verification waiting for admin approval. You cannot submit a new deposit until approved.
+          ⏳ You have a pending deposit verification waiting for admin approval. You cannot submit a new one until approved.
         </div>
 
         <div class="products-grid" id="userStoreProductsGrid"></div>
@@ -466,13 +465,13 @@
 
       <!-- SUPPORT & CHATBOT TAB -->
       <div id="supportTab" style="display:none;">
-        <div class="section-title">💬 EarnPlanet Instant Assistant</div>
+        <div class="section-title">💬 EarnPlanet Support Assistant</div>
         <div class="chat-container">
           <div class="chat-messages" id="chatMessagesList">
-            <div class="msg msg-bot">Hello Planetian! I am the EarnPlanet Support Bot. How can I assist you today?</div>
+            <div class="msg msg-bot">Hello Planetian! Send your message here and our support admin will reply to you directly. <br><br><b>Notice:</b> If you cannot wait for admin response, please contact us via email at <b>Support@earnplanet.com</b></div>
           </div>
           <div class="chat-input-row">
-            <input type="text" id="chatInput" placeholder="Type your question..." style="margin-bottom:0;" onkeypress="if(event.key==='Enter') sendChatMessage()">
+            <input type="text" id="chatInput" placeholder="Type your message to support..." style="margin-bottom:0;" onkeypress="if(event.key==='Enter') sendChatMessage()">
             <button class="btn" onclick="sendChatMessage()">Send</button>
           </div>
         </div>
@@ -499,6 +498,18 @@
 
       <!-- ADMIN MANAGEMENT TAB -->
       <div id="adminTab" style="display:none;">
+        <div class="section-title">⚙️ Live User Support Chat Inbox</div>
+        <div id="adminSupportInboxList" style="margin-bottom:30px;"></div>
+
+        <div class="section-title">⚙️ Social Media Links Manager</div>
+        <div class="stat-card" style="text-align:left; margin-bottom:15px;">
+          <h4 style="margin-bottom:10px;">Add Official Social Media Page</h4>
+          <input type="text" id="newSocialPlatformName" placeholder="Platform Name (e.g. Telegram Channel)">
+          <input type="text" id="newSocialPlatformUrl" placeholder="URL (e.g. https://t.me/earnplanetofficial)">
+          <button class="btn" onclick="adminAddSocialLink()">+ Add Social Link</button>
+        </div>
+        <div id="adminSocialLinksList" style="margin-bottom:30px;"></div>
+
         <div class="section-title">⚙️ Platform Statistics & Counters Manager</div>
         <div class="stat-card" style="text-align:left; margin-bottom:15px;">
           <h4 style="margin-bottom:10px;">Update Total Registered Site Users Counter</h4>
@@ -824,6 +835,7 @@
     let pendingPaymentProofs = [];
     let approvedPaymentsHistory = [];
     let pendingSocialTasks = [];
+    let supportChatsDb = [];
     
     let withdrawalPopsDb = [
       {id: 1, name: "Femi45", amount: "₦500,000", method: "Palmpay"},
@@ -907,10 +919,11 @@
           if (data.faqs && data.faqs.length > 0) faqsDb = data.faqs;
           if (data.paymentMethods && data.paymentMethods.length > 0) paymentMethods = data.paymentMethods;
           if (data.storeProducts && data.storeProducts.length > 0) storeProducts = data.storeProducts;
+          if (data.socialLinks && data.socialLinks.length > 0) socialLinks = data.socialLinks;
+          if (data.supportChats) supportChatsDb = data.supportChats;
           if (typeof data.manualUserCount === 'number') manualUserCount = data.manualUserCount;
           updateUI();
         } else {
-          // Initialize state document safely if missing
           saveState();
         }
       });
@@ -931,6 +944,8 @@
         faqs: faqsDb,
         paymentMethods: paymentMethods,
         storeProducts: storeProducts,
+        socialLinks: socialLinks,
+        supportChats: supportChatsDb,
         manualUserCount: manualUserCount
       }, { merge: true }).catch(err => console.error("Firestore Save Error:", err));
     }
@@ -1025,7 +1040,6 @@
       document.getElementById('headerTier').innerText = currentUser.tier === "None" ? "No Active Plan" : `${currentUser.tier} Plan`;
       document.getElementById('refLinkInput').value = `https://earnplanet.com.ng/?ref=${currentUser.refCode}`;
 
-      // Referral counting logic (Excluding forum referrals from normal counter until unlocked)
       const organicRefs = usersDb.filter(u => u.referredBy === currentUser.refCode && (!u.joinedViaForum) && u.tier && u.tier !== "None").length;
       const manualBonus = currentUser.activeReferrals || 0;
       const forumUnlockedBonus = currentUser.forumUnlockedReferralBonus || 0;
@@ -1081,20 +1095,20 @@
       renderUserSocialLinks();
       renderMainTransactionHistory();
       renderForumUI();
+      renderUserChatMessages();
+      renderAdminSupportInbox();
+      renderAdminSocialLinksManager();
     }
 
-    // --- FORUM & 25% REFERRAL SYSTEM ---
+    // --- FORUM CREATION & REFERRAL SYSTEM ---
     function createForum() {
       const title = document.getElementById('forumTitleInput').value.trim();
-      const desc = document.getElementById('forumDescInput').value.trim();
-
-      if (!title || !desc) { alert("Please provide a title and description for your forum!"); return; }
+      if (!title) { alert("Please provide a forum name!"); return; }
 
       const forumId = "FRM-" + Math.floor(100000 + Math.random() * 900000);
       currentUser.forum = {
         id: forumId,
         title: title,
-        desc: desc,
         subscribedCount: 0,
         milestoneTier: 0
       };
@@ -1118,7 +1132,6 @@
 
         const f = currentUser.forum;
         document.getElementById('displayForumTitle').innerText = f.title;
-        document.getElementById('displayForumDesc').innerText = f.desc;
         document.getElementById('forumLinkInput').value = `https://earnplanet.com.ng/?forum_ref=${f.id}`;
 
         const subCount = f.subscribedCount || 0;
@@ -1202,6 +1215,148 @@
 
     function closeReferralsListModal() {
       document.getElementById('referralsListModal').style.display = 'none';
+    }
+
+    // --- SUPPORT CHAT SYSTEM ---
+    function sendChatMessage() {
+      const input = document.getElementById('chatInput');
+      const text = input.value.trim();
+      if (!text) return;
+
+      if (!currentUser.chatMessages) currentUser.chatMessages = [];
+      currentUser.chatMessages.push({
+        id: Date.now(),
+        sender: 'user',
+        text: text,
+        date: new Date().toLocaleTimeString()
+      });
+
+      supportChatsDb = supportChatsDb.filter(c => c.userEmail !== currentUser.email);
+      supportChatsDb.unshift({
+        userEmail: currentUser.email,
+        lastMessage: text,
+        date: new Date().toLocaleString(),
+        messages: currentUser.chatMessages
+      });
+
+      saveState();
+      input.value = '';
+      updateUI();
+
+      sendAdminTelegramAlert(
+        `💬 <b>NEW SUPPORT MESSAGE!</b>\n\n` +
+        `👤 <b>User:</b> ${currentUser.email}\n` +
+        `✉️ <b>Message:</b> ${text}\n\n` +
+        `Login to Admin Panel to reply.`
+      );
+    }
+
+    function renderUserChatMessages() {
+      const list = document.getElementById('chatMessagesList');
+      if (!list || !currentUser) return;
+
+      let html = `<div class="msg msg-bot">Hello Planetian! Send your message here and our support admin will reply to you directly. <br><br><b>Notice:</b> If you cannot wait for admin response, please contact us via email at <b>Support@earnplanet.com</b></div>`;
+
+      if (currentUser.chatMessages) {
+        currentUser.chatMessages.forEach(m => {
+          if (m.sender === 'user') {
+            html += `<div class="msg msg-user">${m.text}</div>`;
+          } else {
+            html += `<div class="msg msg-bot"><b>Admin Support:</b> ${m.text}</div>`;
+          }
+        });
+      }
+      list.innerHTML = html;
+      list.scrollTop = list.scrollHeight;
+    }
+
+    function renderAdminSupportInbox() {
+      const container = document.getElementById('adminSupportInboxList');
+      if (!container) return;
+
+      if (!supportChatsDb || supportChatsDb.length === 0) {
+        container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No support messages from users yet.</p>`;
+        return;
+      }
+
+      container.innerHTML = supportChatsDb.map(chat => `
+        <div class="payment-account-card" style="margin-bottom:12px; font-size:13px;">
+          <div><b>User: <span style="color:var(--primary);">${chat.userEmail}</span></b></div>
+          <div style="font-size:12px; color:var(--text-muted); margin:4px 0 10px 0;">Latest: "${chat.lastMessage}" (${chat.date})</div>
+          
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="adminReply_${CSS.escape(chat.userEmail)}" placeholder="Type reply..." style="margin-bottom:0; font-size:12px; padding:6px;">
+            <button class="btn" style="padding:6px 14px; font-size:12px; white-space:nowrap;" onclick="adminSendReply('${chat.userEmail}')">Send Reply</button>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    async function adminSendReply(userEmail) {
+      const replyInput = document.getElementById(`adminReply_${CSS.escape(userEmail)}`);
+      const text = replyInput.value.trim();
+      if (!text) return;
+
+      const targetUser = usersDb.find(u => u.email === userEmail);
+      if (!targetUser) return;
+
+      if (!targetUser.chatMessages) targetUser.chatMessages = [];
+      targetUser.chatMessages.push({
+        id: Date.now(),
+        sender: 'admin',
+        text: text,
+        date: new Date().toLocaleTimeString()
+      });
+
+      const chatSession = supportChatsDb.find(c => c.userEmail === userEmail);
+      if (chatSession) {
+        chatSession.lastMessage = `[Admin Reply]: ${text}`;
+        chatSession.messages = targetUser.chatMessages;
+      }
+
+      await db.collection("users").doc(userEmail).set(targetUser, { merge: true });
+      saveState();
+      updateUI();
+      alert("Reply sent successfully to user!");
+    }
+
+    // --- SOCIAL LINKS MANAGER ---
+    function adminAddSocialLink() {
+      const platform = document.getElementById('newSocialPlatformName').value.trim();
+      const url = document.getElementById('newSocialPlatformUrl').value.trim();
+
+      if (!platform || !url) { alert("Fill platform name and URL!"); return; }
+
+      socialLinks.push({ id: Date.now(), platform, url });
+      saveState();
+      document.getElementById('newSocialPlatformName').value = '';
+      document.getElementById('newSocialPlatformUrl').value = '';
+      updateUI();
+      alert("Social link added successfully!");
+    }
+
+    function adminDeleteSocialLink(id) {
+      if (!confirm("Delete this social link?")) return;
+      socialLinks = socialLinks.filter(s => s.id !== id);
+      saveState();
+      updateUI();
+      alert("Social link deleted.");
+    }
+
+    function renderAdminSocialLinksManager() {
+      const container = document.getElementById('adminSocialLinksList');
+      if (!container) return;
+      if (socialLinks.length === 0) {
+        container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No social links added yet.</p>`;
+        return;
+      }
+
+      container.innerHTML = socialLinks.map(s => `
+        <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:13px;">
+          <div><b>${s.platform}</b><br><span style="font-size:11px; color:var(--text-muted);">${s.url}</span></div>
+          <button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="adminDeleteSocialLink(${s.id})">Delete</button>
+        </div>
+      `).join('');
     }
 
     function renderMainTransactionHistory() {
@@ -1469,8 +1624,7 @@
           `👤 <b>User:</b> ${currentUser.email}\n` +
           `💳 <b>Plan:</b> ${activeCheckoutPlan.name} ($${activeCheckoutPlan.priceUsd} / ₦${(activeCheckoutPlan.priceUsd * NGN_RATE).toLocaleString()})\n` +
           `🏦 <b>Method:</b> ${pm ? pm.name : 'Transfer'}\n` +
-          `🔑 <b>Code/TxID:</b> ${code}\n\n` +
-          `Review in Admin Panel at earnplanet.com.ng`
+          `🔑 <b>Code/TxID:</b> ${code}`
         );
 
         alert("Payment proof submitted successfully! Pending admin approval.");
@@ -1510,8 +1664,7 @@
           `👤 <b>User:</b> ${currentUser.email}\n` +
           `💵 <b>Amount:</b> $${amtUsd.toFixed(2)} (₦${(amtUsd * NGN_RATE).toLocaleString()})\n` +
           `🏦 <b>Method:</b> ${pm ? pm.name : 'Transfer'}\n` +
-          `🔑 <b>Code/TxID:</b> ${code}\n\n` +
-          `Review in Admin Panel at earnplanet.com.ng`
+          `🔑 <b>Code/TxID:</b> ${code}`
         );
 
         alert("Deposit verification submitted! Pending admin approval.");
@@ -1557,7 +1710,6 @@
         const cleanName = item.planName.replace(" (Upgrade)", "");
         targetUser.tier = cleanName;
 
-        // Process Normal Referral 10% Bonus
         if (targetUser.referredBy) {
           const referrer = usersDb.find(u => u.refCode === targetUser.referredBy);
           if (referrer) {
@@ -1578,9 +1730,7 @@
           }
         }
 
-        // Process Forum Referral & 25% High-Yield Logic
         if (targetUser.forumReferredBy) {
-          // Find owner of this forum
           const forumOwner = usersDb.find(u => u.forum && u.forum.id === targetUser.forumReferredBy);
           if (forumOwner) {
             if (!forumOwner.forum) forumOwner.forum = { subscribedCount: 0, milestoneTier: 0 };
@@ -1591,10 +1741,9 @@
             const threshold = milestoneTier === 0 ? 20 : 10;
 
             if (subCount % threshold === 0) {
-              // Calculate 25% of the subscribed plans or standard reward pool
               const planObj = availablePlans.find(p => p.name === cleanName);
               const planCost = planObj ? planObj.priceUsd : 25;
-              const bonus25Pct = planCost * 0.25 * threshold; // 25% pool for the threshold batch
+              const bonus25Pct = planCost * 0.25 * threshold;
 
               forumOwner.balanceUsd = (forumOwner.balanceUsd || 0) + bonus25Pct;
               if (!forumOwner.txHistory) forumOwner.txHistory = [];
@@ -1607,7 +1756,7 @@
               });
 
               if (milestoneTier === 0) {
-                forumOwner.forumBypassedRefRule = true; // Bypasses normal 7 referral requirement
+                forumOwner.forumBypassedRefRule = true;
               }
               forumOwner.forum.milestoneTier = milestoneTier + 1;
             }
@@ -1682,7 +1831,6 @@
       if (!targetUser) return;
       const item = targetUser.pendingWithdrawal;
 
-      // Update total withdrawn statistics
       targetUser.totalWithdrawnUsd = (targetUser.totalWithdrawnUsd || 0) + item.amountUsd;
 
       approvedPaymentsHistory.unshift({
@@ -2451,28 +2599,6 @@
       alert("Password updated successfully!");
     }
 
-    function sendChatMessage() {
-      const input = document.getElementById('chatInput');
-      const text = input.value.trim();
-      if (!text) return;
-
-      const list = document.getElementById('chatMessagesList');
-      list.innerHTML += `<div class="msg msg-user">${text}</div>`;
-      input.value = '';
-
-      setTimeout(() => {
-        let reply = "Thanks for reaching out! Contact our support team for instant assistance.";
-        const lower = text.toLowerCase();
-        if (lower.includes('withdraw') || lower.includes('cashout')) {
-          reply = "Withdrawals are open on the 1st and 24th.";
-        } else if (lower.includes('forum')) {
-          reply = "You can create a discussion forum and earn 25% referral bonus through your forum link!";
-        }
-        list.innerHTML += `<div class="msg msg-bot">${reply}</div>`;
-        list.scrollTop = list.scrollHeight;
-      }, 600);
-    }
-
     function handlePasswordReset() {
       const email = document.getElementById('forgotEmail').value.trim();
       const newPass = document.getElementById('forgotNewPassword').value;
@@ -2527,6 +2653,12 @@
       manualUserCount++;
       localStorage.removeItem('pending_forum_ref');
       saveState();
+
+      sendAdminTelegramAlert(
+        `👤 <b>NEW USER REGISTERED!</b>\n\n` +
+        `📧 <b>Email:</b> ${email}\n` +
+        `🔗 <b>Referred By:</b> ${refCodeInput || 'None'}`
+      );
 
       alert("Account created successfully! ₦10,000 welcome bonus credited.");
       switchAuthView('login');
