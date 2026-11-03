@@ -117,6 +117,16 @@
     .stat-card h4 { font-size: 12px; color: var(--text-muted); text-transform: uppercase; }
     .stat-card p { font-size: 22px; font-weight: 900; margin-top: 6px; color: var(--gold); }
 
+    /* PULSING GRAPH SIMULATOR */
+    .pulse-graph-box { background: var(--card-bg); border: 1px solid var(--primary); border-radius: 14px; padding: 15px; text-align: center; margin: 20px 0; box-shadow: 0 0 15px rgba(0,230,118,0.1); }
+    .pulse-waves { display: flex; justify-content: center; align-items: flex-end; gap: 6px; height: 35px; margin-top: 10px; }
+    .wave-bar { width: 8px; background: var(--primary); border-radius: 4px; animation: pulseWave 1.2s infinite ease-in-out alternate; }
+    .wave-bar:nth-child(2) { animation-delay: 0.2s; height: 60%; }
+    .wave-bar:nth-child(3) { animation-delay: 0.4s; height: 90%; }
+    .wave-bar:nth-child(4) { animation-delay: 0.1s; height: 40%; }
+    .wave-bar:nth-child(5) { animation-delay: 0.5s; height: 75%; }
+    @keyframes pulseWave { 0% { transform: scaleY(0.3); opacity: 0.5; } 100% { transform: scaleY(1); opacity: 1; } }
+
     .section-title { font-size: 18px; font-weight: 800; margin: 25px 0 15px 0; color: #fff; border-left: 4px solid var(--primary); padding-left: 10px; }
 
     .social-task-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 25px; }
@@ -261,6 +271,7 @@
       <div class="tabs-header">
         <div style="display:flex; gap:10px; flex-wrap:wrap;" id="navTabsContainer">
           <button class="tab-btn active" onclick="switchTab('user')">Dashboard</button>
+          <button class="tab-btn" onclick="switchTab('forum')">💬 Forum & 25% Program</button>
           <button class="tab-btn" onclick="switchTab('store')">🛍️ Resell Flip Store</button>
           <button class="tab-btn" onclick="switchTab('support')">💬 Support & FAQs</button>
           <button class="tab-btn" onclick="switchTab('settings')">⚙️ Settings</button>
@@ -275,18 +286,28 @@
             <h3>Main Available Balance</h3>
             <div class="balance-ngn" id="walletBalanceNgn">₦0.00</div>
             <div class="balance-usd" id="walletBalanceUsd">≈ $0.00 USD</div>
+            <div style="font-size:12px; color:var(--text-muted); margin-top:6px;" id="totalWithdrawnDisplay">Total Withdrawn: ₦0.00 ($0.00 USD)</div>
           </div>
           <div class="wallet-actions">
             <button class="btn btn-secondary" onclick="openWithdrawModal()">Cashout</button>
           </div>
         </div>
 
-        <div class="stats-grid">
-          <div class="stat-card">
-            <h4>Active Platform Users</h4>
-            <p id="activeUsersDisplay" style="color:var(--primary);">1,280</p>
-            <span style="font-size:11px; color:var(--text-muted);">Verified Earners</span>
+        <!-- PULSING GRAPH LIVE USER TICKER -->
+        <div class="pulse-graph-box">
+          <h4 style="font-size:12px; color:var(--text-muted); text-transform:uppercase;">Live Active Platform Community</h4>
+          <p id="activeUsersDisplay" style="font-size:26px; font-weight:900; color:var(--primary); margin:4px 0;">1,280</p>
+          <div style="font-size:11px; color:var(--gold); font-weight:bold;">🟢 Live Registrations Active Now</div>
+          <div class="pulse-waves">
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
           </div>
+        </div>
+
+        <div class="stats-grid">
           <div class="stat-card">
             <h4>Paying Referrals Progress</h4>
             <p id="refCountDisplay">0 / 7</p>
@@ -301,10 +322,11 @@
 
         <div class="stat-card" style="text-align:left; margin-bottom:20px;">
           <h4 style="margin-bottom:6px;">Your Referral Link (Earn 10% on Subscriber Plans)</h4>
-          <div style="display:flex; gap:10px;">
+          <div style="display:flex; gap:10px; margin-bottom:12px;">
             <input type="text" id="refLinkInput" readonly style="margin-bottom:0; font-size:13px; color:var(--gold);">
             <button class="btn" style="padding:8px 16px; font-size:12px; white-space:nowrap;" onclick="copyReferralLink()">Copy Link</button>
           </div>
+          <button class="btn btn-secondary" style="font-size:12px; padding:6px 14px; width:100%;" onclick="openReferralsListModal()">👥 View My Referred People & Status</button>
         </div>
 
         <div class="section-title">Membership Plans</div>
@@ -384,6 +406,37 @@
 
       </div>
 
+      <!-- FORUM & 25% PROGRAM TAB -->
+      <div id="forumTab" style="display:none;">
+        <div class="section-title">💬 Forum Creator & 25% High-Yield Referral Program</div>
+        <div class="stat-card" style="text-align:left; margin-bottom:20px;" id="forumSetupBox">
+          <h4 style="margin-bottom:8px; color:var(--gold);">Create Your Unique Discussion Forum</h4>
+          <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Create a forum topic to get a dedicated Forum Referral ID. Refer members here to earn an automatic **25% commission** per subscribed referral!</p>
+          <input type="text" id="forumTitleInput" placeholder="Forum Title (e.g. Crypto & Agro Wealth Hub)">
+          <textarea id="forumDescInput" placeholder="Brief discussion topic or description..."></textarea>
+          <button class="btn" onclick="createForum()">Create Forum & Generate ID</button>
+        </div>
+
+        <div id="forumActiveContainer" style="display:none;">
+          <div class="stat-card" style="text-align:left; border-color:var(--gold); margin-bottom:20px;">
+            <h4 style="color:var(--gold);">Your Active Forum: <span id="displayForumTitle" style="color:#fff;"></span></h4>
+            <p style="font-size:12px; color:var(--text-muted); margin:4px 0 12px 0;" id="displayForumDesc"></p>
+            <label style="font-size:11px; color:var(--gold);">Your Forum Referral Link / ID</label>
+            <div style="display:flex; gap:10px; margin-bottom:12px;">
+              <input type="text" id="forumLinkInput" readonly style="margin-bottom:0; font-size:12px; color:var(--gold);">
+              <button class="btn" style="padding:8px 14px; font-size:11px;" onclick="copyForumLink()">Copy Forum Link</button>
+            </div>
+            <div style="background:#04100a; padding:12px; border-radius:8px; font-size:12px; line-height:1.6;">
+              <div><b>Forum Progress Milestone:</b> <span id="forumProgressText" style="color:var(--primary); font-weight:bold;">0 / 20 Subscribed</span></div>
+              <div style="font-size:11px; color:var(--text-muted); margin-top:2px;" id="forumRuleSubText">Rule: 20 subscribed referrals needed for 1st payout (unlocks instant cashouts). Subsequent payouts every 10 subscribed referrals!</div>
+            </div>
+          </div>
+
+          <div class="section-title">📋 Forum Referred Members List</div>
+          <div id="forumReferralsList"></div>
+        </div>
+      </div>
+
       <!-- RESELL FLIP STORE TAB -->
       <div id="storeTab" style="display:none;">
         <div class="section-title">🛍️ Merchandise Flip Store</div>
@@ -446,7 +499,14 @@
 
       <!-- ADMIN MANAGEMENT TAB -->
       <div id="adminTab" style="display:none;">
-        <div class="section-title">⚙️ Pending Social Media Tasks Approvals</div>
+        <div class="section-title">⚙️ Platform Statistics & Counters Manager</div>
+        <div class="stat-card" style="text-align:left; margin-bottom:15px;">
+          <h4 style="margin-bottom:10px;">Update Total Registered Site Users Counter</h4>
+          <input type="number" id="adminSiteUserCountInput" placeholder="e.g. 1540">
+          <button class="btn" onclick="adminSaveSiteUserCount()">Save Active Users Count</button>
+        </div>
+
+        <div class="section-title" style="margin-top:30px;">⚙️ Pending Social Media Tasks Approvals</div>
         <div id="adminPendingSocialTasksList"></div>
 
         <div class="section-title" style="margin-top:30px;">⚙️ Withdrawal Pop-up Ticker Manager</div>
@@ -516,6 +576,16 @@
         <div id="adminPaymentMethodsList"></div>
       </div>
 
+    </div>
+  </div>
+
+  <!-- REFERRALS LIST MODAL -->
+  <div class="modal-overlay" id="referralsListModal">
+    <div class="modal">
+      <h3>👥 Your Referred People</h3>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Track your invited friends and their subscription status below.</p>
+      <div id="userModalReferralsList" style="max-height:300px; overflow-y:auto; margin-bottom:15px;"></div>
+      <button class="btn btn-secondary" style="width:100%;" onclick="closeReferralsListModal()">Close</button>
     </div>
   </div>
 
@@ -755,36 +825,14 @@
     let approvedPaymentsHistory = [];
     let pendingSocialTasks = [];
     
-    // FULL RESTORED 25 WITHDRAWAL POPUPS STORAGE
     let withdrawalPopsDb = [
       {id: 1, name: "Femi45", amount: "₦500,000", method: "Palmpay"},
       {id: 2, name: "Chinedu99", amount: "₦180,000", method: "OPay"},
       {id: 3, name: "Amina_H", amount: "₦350,000", method: "Kuda Bank"},
       {id: 4, name: "Tunde_B", amount: "₦220,000", method: "Access Bank"},
-      {id: 5, name: "Blessing_K", amount: "₦150,000", method: "GTBank"},
-      {id: 6, name: "Emeka_X", amount: "₦420,000", method: "First Bank"},
-      {id: 7, name: "Suleiman_M", amount: "₦280,000", method: "Palmpay"},
-      {id: 8, name: "Rita_P", amount: "₦600,000", method: "USDT TRC20"},
-      {id: 9, name: "Dayo_V", amount: "₦195,000", method: "OPay"},
-      {id: 10, name: "Kemi_S", amount: "₦310,000", method: "Zenith Bank"},
-      {id: 11, name: "David_O", amount: "₦550,000", method: "UBA"},
-      {id: 12, name: "Joy_E", amount: "₦140,000", method: "Kuda Bank"},
-      {id: 13, name: "Usman_A", amount: "₦260,000", method: "Palmpay"},
-      {id: 14, name: "Grace_C", amount: "₦380,000", method: "Access Bank"},
-      {id: 15, name: "Ibrahim_K", amount: "₦720,000", method: "USDT TRC20"},
-      {id: 16, name: "Nkechi_M", amount: "₦210,000", method: "OPay"},
-      {id: 17, name: "Victor_W", amount: "₦490,000", method: "GTBank"},
-      {id: 18, name: "Zainab_H", amount: "₦165,000", method: "Kuda Bank"},
-      {id: 19, name: "Gbenga_R", amount: "₦330,000", method: "First Bank"},
-      {id: 20, name: "Precious_T", amount: "₦240,000", method: "Palmpay"},
-      {id: 21, name: "Daniel_L", amount: "₦580,000", method: "Zenith Bank"},
-      {id: 22, name: "Funke_A", amount: "₦175,000", method: "OPay"},
-      {id: 23, name: "Musa_B", amount: "₦410,000", method: "UBA"},
-      {id: 24, name: "Anietie_U", amount: "₦290,000", method: "Access Bank"},
-      {id: 25, name: "Harrison_G", amount: "₦850,000", method: "USDT TRC20"}
+      {id: 5, name: "Blessing_K", amount: "₦150,000", method: "GTBank"}
     ];
 
-    // FAQ STORAGE
     let faqsDb = [
       {id:1, q:"How do I deposit funds?", a:"Open your Palmpay/opay or kuda bank, click on more button on Palmpay/opay (or pay for kuda), select Giftcard, click on Apple Giftcard, and buy the needed amount."},
       {id:2, q:"When can I use the Resell Flip Store?", a:"The Resell Flip Store is open Monday through Friday, with a limit of 1 flip daily."}
@@ -823,7 +871,6 @@
       { name: "Platinum", priceUsd: 100, cashbackUsd: 40.00, cashbackNgn: 60000, dailyDriveUsd: 0.50 }
     ];
 
-    // LOG TRANSACTION TO USER PROFILE IN FIRESTORE
     function logUserTransaction(type, detail, amountUsd) {
       if (!currentUser) return;
       if (!currentUser.txHistory) currentUser.txHistory = [];
@@ -838,9 +885,8 @@
       saveState();
     }
 
-    // --- FIRESTORE REAL-TIME SYNC ---
+    // --- FIRESTORE REAL-TIME SYNC WITH OVERWRITE GUARD ---
     function initFirebaseSync() {
-      // 1. Sync Users Collection
       db.collection("users").onSnapshot((snapshot) => {
         usersDb = [];
         snapshot.forEach((doc) => {
@@ -852,18 +898,20 @@
         updateUI();
       });
 
-      // 2. Sync Platform Data Document
       db.collection("platform_data").doc("state").onSnapshot((doc) => {
         if (doc.exists) {
           const data = doc.data();
           if (data.approvedHistory) approvedPaymentsHistory = data.approvedHistory;
           if (data.pendingSocial) pendingSocialTasks = data.pendingSocial;
-          if (data.withdrawalPops && data.withdrawalPops.length >= 5) withdrawalPopsDb = data.withdrawalPops;
-          if (data.faqs) faqsDb = data.faqs;
-          if (data.paymentMethods) paymentMethods = data.paymentMethods;
-          if (data.storeProducts && data.storeProducts.length >= 3) storeProducts = data.storeProducts;
-          if (data.manualUserCount) manualUserCount = data.manualUserCount;
+          if (data.withdrawalPops && data.withdrawalPops.length > 0) withdrawalPopsDb = data.withdrawalPops;
+          if (data.faqs && data.faqs.length > 0) faqsDb = data.faqs;
+          if (data.paymentMethods && data.paymentMethods.length > 0) paymentMethods = data.paymentMethods;
+          if (data.storeProducts && data.storeProducts.length > 0) storeProducts = data.storeProducts;
+          if (typeof data.manualUserCount === 'number') manualUserCount = data.manualUserCount;
           updateUI();
+        } else {
+          // Initialize state document safely if missing
+          saveState();
         }
       });
     }
@@ -891,6 +939,12 @@
       initFirebaseSync();
       const urlParams = new URLSearchParams(window.location.search);
       const refParam = urlParams.get('ref');
+      const forumRefParam = urlParams.get('forum_ref');
+
+      if (forumRefParam) {
+        localStorage.setItem('pending_forum_ref', forumRefParam);
+      }
+
       if (refParam) {
         const refInput = document.getElementById('regRefCode');
         if (refInput) refInput.value = refParam;
@@ -908,7 +962,6 @@
       }
     });
 
-    // LIVE WITHDRAWAL POPUP TICKER LOOP
     let popIndex = 0;
     function startWithdrawalTicker() {
       const popEl = document.getElementById('liveWithdrawalPopup');
@@ -927,13 +980,11 @@
     function updateUI() {
       if (!currentUser) return;
 
-      // Compile pending payments from all user documents (avoids global write restrictions)
       pendingPaymentProofs = [];
       usersDb.forEach(u => {
         if (u.pendingPayment) pendingPaymentProofs.push(u.pendingPayment);
       });
 
-      // Check active flips maturity (8-Day Cycle)
       if (currentUser.activeFlips) {
         let matured = false;
         currentUser.activeFlips.forEach(f => {
@@ -952,8 +1003,12 @@
 
       const usdBal = currentUser.balanceUsd || 0;
       const ngnBal = usdBal * NGN_RATE;
+      const totalWdUsd = currentUser.totalWithdrawnUsd || 0;
+      const totalWdNgn = totalWdUsd * NGN_RATE;
+
       document.getElementById('walletBalanceNgn').innerText = `₦${ngnBal.toLocaleString('en-NG', {minimumFractionDigits: 2})}`;
       document.getElementById('walletBalanceUsd').innerText = `≈ $${usdBal.toFixed(2)} USD`;
+      document.getElementById('totalWithdrawnDisplay').innerText = `Total Withdrawn: ₦${totalWdNgn.toLocaleString()} ($${totalWdUsd.toFixed(2)} USD)`;
       
       const wdDisplay = document.getElementById('wdAvailableDisplayNgn');
       if (wdDisplay) wdDisplay.innerText = `₦${ngnBal.toLocaleString('en-NG', {minimumFractionDigits: 2})}`;
@@ -970,14 +1025,15 @@
       document.getElementById('headerTier').innerText = currentUser.tier === "None" ? "No Active Plan" : `${currentUser.tier} Plan`;
       document.getElementById('refLinkInput').value = `https://earnplanet.com.ng/?ref=${currentUser.refCode}`;
 
-      // Unified Referral Formula (Organic + Manual Firebase Bonus)
-      const organicRefs = usersDb.filter(u => u.referredBy === currentUser.refCode && u.tier && u.tier !== "None").length;
+      // Referral counting logic (Excluding forum referrals from normal counter until unlocked)
+      const organicRefs = usersDb.filter(u => u.referredBy === currentUser.refCode && (!u.joinedViaForum) && u.tier && u.tier !== "None").length;
       const manualBonus = currentUser.activeReferrals || 0;
-      const payingRefsCount = organicRefs + manualBonus;
+      const forumUnlockedBonus = currentUser.forumUnlockedReferralBonus || 0;
+      const payingRefsCount = organicRefs + manualBonus + forumUnlockedBonus;
 
       const wCount = currentUser.withdrawalCount || 0;
-      // Strict Rule: Only 1st cashout (wCount === 0) requires 7 referrals. Subsequent ones require 0.
-      const requiredRefs = wCount === 0 ? 7 : 0;
+      const hasBypassedRefRule = currentUser.forumBypassedRefRule || false;
+      const requiredRefs = (wCount === 0 && !hasBypassedRefRule) ? 7 : 0;
 
       const refReqTextEl = document.getElementById('refRequirementText');
       if (refReqTextEl) {
@@ -1024,6 +1080,128 @@
       renderUserActiveFlips();
       renderUserSocialLinks();
       renderMainTransactionHistory();
+      renderForumUI();
+    }
+
+    // --- FORUM & 25% REFERRAL SYSTEM ---
+    function createForum() {
+      const title = document.getElementById('forumTitleInput').value.trim();
+      const desc = document.getElementById('forumDescInput').value.trim();
+
+      if (!title || !desc) { alert("Please provide a title and description for your forum!"); return; }
+
+      const forumId = "FRM-" + Math.floor(100000 + Math.random() * 900000);
+      currentUser.forum = {
+        id: forumId,
+        title: title,
+        desc: desc,
+        subscribedCount: 0,
+        milestoneTier: 0
+      };
+
+      saveState();
+      updateUI();
+      alert("Forum created successfully! Your unique forum referral link is now active.");
+    }
+
+    function renderForumUI() {
+      const setupBox = document.getElementById('forumSetupBox');
+      const activeContainer = document.getElementById('forumActiveContainer');
+      if (!setupBox || !activeContainer) return;
+
+      if (!currentUser.forum) {
+        setupBox.style.display = 'block';
+        activeContainer.style.display = 'none';
+      } else {
+        setupBox.style.display = 'none';
+        activeContainer.style.display = 'block';
+
+        const f = currentUser.forum;
+        document.getElementById('displayForumTitle').innerText = f.title;
+        document.getElementById('displayForumDesc').innerText = f.desc;
+        document.getElementById('forumLinkInput').value = `https://earnplanet.com.ng/?forum_ref=${f.id}`;
+
+        const subCount = f.subscribedCount || 0;
+        const currentMilestoneGoal = f.milestoneTier === 0 ? 20 : 10;
+        const progressInTier = subCount % currentMilestoneGoal;
+
+        document.getElementById('forumProgressText').innerText = `${progressInTier} / ${currentMilestoneGoal} Subscribed (Total: ${subCount})`;
+        document.getElementById('forumRuleSubText').innerText = f.milestoneTier === 0 ? 
+          "Rule: 20 subscribed referrals needed for 1st payout (unlocks instant cashouts & 25% reward). Subsequent payouts every 10 subscribed referrals!" :
+          "Rule: Next payout triggers automatically every 10 subscribed referrals with 25% commission!";
+
+        renderForumReferralsList();
+      }
+    }
+
+    function copyForumLink() {
+      const input = document.getElementById('forumLinkInput');
+      input.select();
+      input.setSelectionRange(0, 99999);
+      navigator.clipboard.writeText(input.value).then(() => {
+        alert("Forum referral link copied to clipboard!");
+      });
+    }
+
+    function renderForumReferralsList() {
+      const container = document.getElementById('forumReferralsList');
+      if (!container || !currentUser.forum) return;
+
+      const forumId = currentUser.forum.id;
+      const referredUsers = usersDb.filter(u => u.forumReferredBy === forumId);
+
+      if (referredUsers.length === 0) {
+        container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No members have joined through your forum link yet.</p>`;
+        return;
+      }
+
+      container.innerHTML = referredUsers.map(u => {
+        const isSubscribed = u.tier && u.tier !== "None";
+        return `
+          <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center; font-size:13px; margin-bottom:8px;">
+            <div>
+              👤 <b>${u.email}</b><br>
+              <span style="font-size:11px; color:var(--text-muted);">Tier: <b style="color:var(--gold);">${u.tier || 'None'}</b></span>
+            </div>
+            <div>
+              <span style="font-size:11px; font-weight:bold; padding:4px 8px; border-radius:6px; background:${isSubscribed ? 'rgba(0,230,118,0.2); color:var(--primary);' : 'rgba(251,191,36,0.2); color:var(--gold);'}">
+                ${isSubscribed ? '✔ Subscribed' : '⏳ Unsubscribed'}
+              </span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    function openReferralsListModal() {
+      const container = document.getElementById('userModalReferralsList');
+      if (!container) return;
+
+      const referredUsers = usersDb.filter(u => u.referredBy === currentUser.refCode);
+      if (referredUsers.length === 0) {
+        container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">You have not referred anyone yet.</p>`;
+      } else {
+        container.innerHTML = referredUsers.map(u => {
+          const isSub = u.tier && u.tier !== "None";
+          return `
+            <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center; font-size:12px; margin-bottom:8px;">
+              <div>
+                <b>${u.email}</b><br>
+                <span style="color:var(--text-muted);">Plan: <span style="color:var(--gold);">${u.tier || 'None'}</span></span>
+              </div>
+              <span style="font-weight:bold; color:${isSub ? 'var(--primary)' : 'var(--text-muted)'};">
+                ${isSub ? '✔ Subscribed (10% Bonus Earned)' : '⏳ Not Subscribed'}
+              </span>
+            </div>
+          `;
+        }).join('');
+      }
+
+      document.getElementById('referralsListModal').style.display = 'flex';
+    }
+
+    function closeReferralsListModal() {
+      document.getElementById('referralsListModal').style.display = 'none';
     }
 
     function renderMainTransactionHistory() {
@@ -1053,8 +1231,6 @@
       input.setSelectionRange(0, 99999);
       navigator.clipboard.writeText(input.value).then(() => {
         alert("Referral link copied to clipboard!");
-      }).catch(err => {
-        alert("Failed to copy referral link.");
       });
     }
 
@@ -1081,7 +1257,6 @@
         `).join('');
       } else {
         const upgradePlans = availablePlans.filter(p => !currentPlanObj || p.priceUsd > currentPlanObj.priceUsd);
-        
         if (upgradePlans.length === 0) {
           container.innerHTML = `<div class="stat-card" style="grid-column: 1/-1;"><p style="color:var(--gold);">You are currently on the highest plan (${currentUser.tier})!</p></div>`;
           return;
@@ -1381,6 +1556,66 @@
       if (item.type === "subscription") {
         const cleanName = item.planName.replace(" (Upgrade)", "");
         targetUser.tier = cleanName;
+
+        // Process Normal Referral 10% Bonus
+        if (targetUser.referredBy) {
+          const referrer = usersDb.find(u => u.refCode === targetUser.referredBy);
+          if (referrer) {
+            const planObj = availablePlans.find(p => p.name === cleanName);
+            if (planObj) {
+              const bonusUsd = planObj.priceUsd * 0.10;
+              referrer.balanceUsd = (referrer.balanceUsd || 0) + bonusUsd;
+              if (!referrer.txHistory) referrer.txHistory = [];
+              referrer.txHistory.unshift({
+                id: Date.now(),
+                type: "Referral Bonus (10%)",
+                detail: `10% bonus from referral plan purchase (${targetUser.email})`,
+                amountUsd: bonusUsd,
+                date: new Date().toLocaleString()
+              });
+              await db.collection("users").doc(referrer.email).set(referrer, { merge: true });
+            }
+          }
+        }
+
+        // Process Forum Referral & 25% High-Yield Logic
+        if (targetUser.forumReferredBy) {
+          // Find owner of this forum
+          const forumOwner = usersDb.find(u => u.forum && u.forum.id === targetUser.forumReferredBy);
+          if (forumOwner) {
+            if (!forumOwner.forum) forumOwner.forum = { subscribedCount: 0, milestoneTier: 0 };
+            forumOwner.forum.subscribedCount = (forumOwner.forum.subscribedCount || 0) + 1;
+
+            const subCount = forumOwner.forum.subscribedCount;
+            const milestoneTier = forumOwner.forum.milestoneTier || 0;
+            const threshold = milestoneTier === 0 ? 20 : 10;
+
+            if (subCount % threshold === 0) {
+              // Calculate 25% of the subscribed plans or standard reward pool
+              const planObj = availablePlans.find(p => p.name === cleanName);
+              const planCost = planObj ? planObj.priceUsd : 25;
+              const bonus25Pct = planCost * 0.25 * threshold; // 25% pool for the threshold batch
+
+              forumOwner.balanceUsd = (forumOwner.balanceUsd || 0) + bonus25Pct;
+              if (!forumOwner.txHistory) forumOwner.txHistory = [];
+              forumOwner.txHistory.unshift({
+                id: Date.now(),
+                type: "Forum 25% Milestone Bonus",
+                detail: `Reached ${threshold} subscribed forum referrals milestone`,
+                amountUsd: bonus25Pct,
+                date: new Date().toLocaleString()
+              });
+
+              if (milestoneTier === 0) {
+                forumOwner.forumBypassedRefRule = true; // Bypasses normal 7 referral requirement
+              }
+              forumOwner.forum.milestoneTier = milestoneTier + 1;
+            }
+
+            await db.collection("users").doc(forumOwner.email).set(forumOwner, { merge: true });
+          }
+        }
+
       } else if (item.type === "deposit") {
         targetUser.storeBalanceUsd = (targetUser.storeBalanceUsd || 0) + item.amountUsd;
       }
@@ -1411,7 +1646,6 @@
       }
     }
 
-    // PENDING CASHOUT APPROVALS FUNCTIONS
     function renderPendingWithdrawals() {
       const container = document.getElementById('adminPendingWithdrawalsList');
       if (!container) return;
@@ -1448,6 +1682,9 @@
       if (!targetUser) return;
       const item = targetUser.pendingWithdrawal;
 
+      // Update total withdrawn statistics
+      targetUser.totalWithdrawnUsd = (targetUser.totalWithdrawnUsd || 0) + item.amountUsd;
+
       approvedPaymentsHistory.unshift({
         id: item.id,
         userEmail: item.userEmail,
@@ -1455,13 +1692,12 @@
         approvedDate: new Date().toLocaleString()
       });
 
-      // Log to user's transaction history so it marks as paid on their dashboard instantly
       if (!targetUser.txHistory) targetUser.txHistory = [];
       targetUser.txHistory.unshift({
         id: Date.now(),
         type: "Cashout Paid ✔",
         detail: `Successfully paid ₦${item.netNgn.toLocaleString()} to ${item.destination}`,
-        amountUsd: 0,
+        amountUsd: -item.amountUsd,
         date: new Date().toLocaleString()
       });
 
@@ -1591,26 +1827,6 @@
       alert("Withdrawal pop-up deleted.");
     }
 
-    function adminEditWithdrawalPop(id) {
-      const p = withdrawalPopsDb.find(item => item.id === id);
-      if (!p) return;
-      const newName = prompt("Edit Name / Username:", p.name);
-      if (newName === null) return;
-      const newAmount = prompt("Edit Amount (e.g. ₦500,000):", p.amount);
-      if (newAmount === null) return;
-      const newMethod = prompt("Edit Method (e.g. Palmpay):", p.method);
-      if (newMethod === null) return;
-
-      if (!newName.trim() || !newAmount.trim() || !newMethod.trim()) { alert("Fields cannot be empty!"); return; }
-
-      p.name = newName.trim();
-      p.amount = newAmount.trim();
-      p.method = newMethod.trim();
-      saveState();
-      updateUI();
-      alert("Withdrawal pop-up updated successfully!");
-    }
-
     function renderAdminWithdrawalPops() {
       const container = document.getElementById('adminWithdrawalPopsList');
       if (!container) return;
@@ -1623,10 +1839,7 @@
       let html = displayedPops.map(p => `
         <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; font-size:13px;">
           <div><b>${p.name}</b> withdrew <span style="color:var(--primary);">${p.amount}</span> through <span style="color:var(--gold);">${p.method}</span></div>
-          <div style="display:flex; gap:6px;">
-            <button class="btn btn-secondary" style="padding:4px 8px; font-size:11px;" onclick="adminEditWithdrawalPop(${p.id})">Edit</button>
-            <button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="adminDeleteWithdrawalPop(${p.id})">Delete</button>
-          </div>
+          <button class="btn btn-danger" style="padding:4px 8px; font-size:11px;" onclick="adminDeleteWithdrawalPop(${p.id})">Delete</button>
         </div>
       `).join('');
 
@@ -1663,23 +1876,6 @@
       alert("FAQ deleted.");
     }
 
-    function adminEditFaq(id) {
-      const f = faqsDb.find(item => item.id === id);
-      if (!f) return;
-      const newQ = prompt("Edit FAQ Question:", f.q);
-      if (newQ === null) return;
-      const newA = prompt("Edit FAQ Answer:", f.a);
-      if (newA === null) return;
-
-      if (!newQ.trim() || !newA.trim()) { alert("Question and answer cannot be empty!"); return; }
-
-      f.q = newQ.trim();
-      f.a = newA.trim();
-      saveState();
-      updateUI();
-      alert("FAQ updated successfully!");
-    }
-
     function renderAdminFaqsList() {
       const container = document.getElementById('adminFaqsList');
       if (!container) return;
@@ -1691,10 +1887,7 @@
         <div class="payment-account-card" style="margin-bottom:8px;">
           <div style="font-weight:bold; color:var(--gold); font-size:13px;">Q: ${f.q}</div>
           <div style="font-size:12px; color:var(--text-muted); margin:4px 0 8px 0;">A: ${f.a}</div>
-          <div style="display:flex; gap:8px;">
-            <button class="btn btn-secondary" style="padding:4px 10px; font-size:11px;" onclick="adminEditFaq(${f.id})">Edit</button>
-            <button class="btn btn-danger" style="padding:4px 10px; font-size:11px;" onclick="adminDeleteFaq(${f.id})">Delete</button>
-          </div>
+          <button class="btn btn-danger" style="padding:4px 10px; font-size:11px;" onclick="adminDeleteFaq(${f.id})">Delete</button>
         </div>
       `).join('');
     }
@@ -1712,6 +1905,15 @@
           <div class="faq-a">${f.a}</div>
         </div>
       `).join('');
+    }
+
+    function adminSaveSiteUserCount() {
+      const val = parseInt(document.getElementById('adminSiteUserCountInput').value);
+      if (isNaN(val) || val <= 0) { alert("Please enter a valid user count number!"); return; }
+      manualUserCount = val;
+      saveState();
+      updateUI();
+      alert(`Active site users count updated to ${val.toLocaleString()} successfully!`);
     }
 
     async function adminCreateUserManually() {
@@ -1737,6 +1939,7 @@
         refCode: "EP-" + Math.floor(10000 + Math.random() * 90000),
         balanceUsd: initialBalUsd,
         storeBalanceUsd: 0,
+        totalWithdrawnUsd: 0,
         tier: "None",
         activeReferrals: 0,
         drivesCountToday: 0,
@@ -1753,20 +1956,13 @@
       manualUserCount++;
       saveState();
 
-      sendAdminTelegramAlert(
-        `👤 <b>ADMIN CREATED NEW USER!</b>\n\n` +
-        `📧 <b>Email:</b> ${email}\n` +
-        `💰 <b>Initial Bal:</b> $${initialBalUsd.toFixed(2)}\n` +
-        `👥 <b>Total Users:</b> ${manualUserCount}`
-      );
-
       document.getElementById('manRegEmail').value = '';
       document.getElementById('manRegPass').value = '';
       document.getElementById('manRegPin').value = '';
       document.getElementById('manRegBal').value = '';
 
       updateUI();
-      alert(`User ${email} created successfully and added to platform total!`);
+      alert(`User ${email} created successfully!`);
     }
 
     function adminAddProduct() {
@@ -1793,7 +1989,7 @@
         document.getElementById('newProdPrice').value = '';
         fileInput.value = '';
         updateUI();
-        alert("Resell product added successfully with uploaded image!");
+        alert("Resell product added successfully!");
       };
       reader.readAsDataURL(fileInput.files[0]);
     }
@@ -1847,27 +2043,18 @@
               <b>Password:</b> <span style="color:var(--text-muted);">${u.password}</span> | <b>PIN:</b> <span style="color:var(--text-muted);">${u.pin}</span>
             </div>
             <div>
-              <b>Main Bal:</b> $${(u.balanceUsd || 0).toFixed(2)} (₦${((u.balanceUsd || 0) * NGN_RATE).toLocaleString()})<br>
-              <b>Store Bal:</b> $${(u.storeBalanceUsd || 0).toFixed(2)} (₦${((u.storeBalanceUsd || 0) * NGN_RATE).toLocaleString()})
+              <b>Main Bal:</b> $${(u.balanceUsd || 0).toFixed(2)}<br>
+              <b>Store Bal:</b> $${(u.storeBalanceUsd || 0).toFixed(2)}<br>
+              <b>Total Withdrawn:</b> $${(u.totalWithdrawnUsd || 0).toFixed(2)}
             </div>
           </div>
           
-          <div style="background:#04100a; border:1px solid var(--card-border); padding:8px; border-radius:8px; margin-top:8px;">
-            <div style="font-size:11px; color:var(--gold); margin-bottom:4px; font-weight:bold;">Restore / Edit User Credentials:</div>
-            <div style="display:flex; gap:6px; flex-wrap:wrap; align-items:center;">
-              <input type="email" id="editEmail_${CSS.escape(u.email)}" value="${u.email}" placeholder="Email" style="width:160px; margin-bottom:0; padding:6px; font-size:12px;">
-              <input type="text" id="editPass_${CSS.escape(u.email)}" value="${u.password}" placeholder="Password" style="width:110px; margin-bottom:0; padding:6px; font-size:12px;">
-              <input type="text" id="editPin_${CSS.escape(u.email)}" value="${u.pin}" placeholder="PIN" maxlength="4" style="width:60px; margin-bottom:0; padding:6px; font-size:12px;">
-              <button class="btn" style="padding:6px 10px; font-size:11px;" onclick="adminUpdateUserCreds('${u.email}')">Update Creds</button>
-            </div>
-          </div>
-
           <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center; border-top:1px solid var(--card-border); padding-top:8px; margin-top:8px;">
-            <input type="number" id="adminAdjMain_${CSS.escape(u.email)}" placeholder="Adjust Main ($)" style="width:140px; margin-bottom:0; padding:6px; font-size:12px;">
-            <button class="btn" style="padding:6px 12px; font-size:12px;" onclick="adminAdjustBalance('${u.email}', 'main')">Update Main</button>
-            <input type="number" id="adminAdjStore_${CSS.escape(u.email)}" placeholder="Adjust Store ($)" style="width:140px; margin-bottom:0; padding:6px; font-size:12px;">
-            <button class="btn" style="padding:6px 12px; font-size:12px;" onclick="adminAdjustBalance('${u.email}', 'store')">Update Store</button>
-            <button class="btn btn-danger" style="padding:6px 12px; font-size:12px;" onclick="adminDeleteUser('${u.email}')">Delete User</button>
+            <input type="number" id="adminAdjMain_${CSS.escape(u.email)}" placeholder="Adjust Main ($)" style="width:130px; margin-bottom:0; padding:6px; font-size:12px;">
+            <button class="btn" style="padding:6px 10px; font-size:11px;" onclick="adminAdjustBalance('${u.email}', 'main')">Update Main</button>
+            <input type="number" id="adminAdjWd_${CSS.escape(u.email)}" placeholder="Adjust Withdrawn ($)" style="width:140px; margin-bottom:0; padding:6px; font-size:12px;">
+            <button class="btn" style="padding:6px 10px; font-size:11px;" onclick="adminAdjustBalance('${u.email}', 'withdrawn')">Update Withdrawn</button>
+            <button class="btn btn-danger" style="padding:6px 10px; font-size:11px;" onclick="adminDeleteUser('${u.email}')">Delete</button>
           </div>
         </div>
       `).join('');
@@ -1884,55 +2071,25 @@
       renderAdminUsersList();
     }
 
-    async function adminUpdateUserCreds(oldEmail) {
-      const user = usersDb.find(u => u.email === oldEmail);
-      if (!user) return;
-
-      const newEmail = document.getElementById(`editEmail_${CSS.escape(oldEmail)}`).value.trim();
-      const newPass = document.getElementById(`editPass_${CSS.escape(oldEmail)}`).value;
-      const newPin = document.getElementById(`editPin_${CSS.escape(oldEmail)}`).value;
-
-      if (!newEmail || !newPass || newPin.length !== 4) {
-        alert("Please fill valid email, password, and 4-digit PIN!");
-        return;
-      }
-
-      if (newEmail !== oldEmail && usersDb.some(u => u.email === newEmail)) {
-        alert("Another user already uses this email address!");
-        return;
-      }
-
-      if (newEmail !== oldEmail) {
-        await db.collection("users").doc(oldEmail).delete();
-        user.email = newEmail;
-      }
-      user.password = newPass;
-      user.pin = newPin;
-
-      await db.collection("users").doc(newEmail).set(user);
-      saveState();
-      updateUI();
-      alert("User credentials restored/updated successfully!");
-    }
-
-    async function adminAdjustBalance(email, walletType) {
+    async function adminAdjustBalance(email, type) {
       const user = usersDb.find(u => u.email === email);
       if (!user) return;
-      const inputId = walletType === 'main' ? `adminAdjMain_${CSS.escape(email)}` : `adminAdjStore_${CSS.escape(email)}`;
+      
+      const inputId = type === 'main' ? `adminAdjMain_${CSS.escape(email)}` : `adminAdjWd_${CSS.escape(email)}`;
       const val = parseFloat(document.getElementById(inputId).value);
 
-      if (isNaN(val)) { alert("Please enter a valid amount in USD!"); return; }
+      if (isNaN(val)) { alert("Please enter a valid amount!"); return; }
 
-      if (walletType === 'main') {
+      if (type === 'main') {
         user.balanceUsd = (user.balanceUsd || 0) + val;
       } else {
-        user.storeBalanceUsd = (user.storeBalanceUsd || 0) + val;
+        user.totalWithdrawnUsd = (user.totalWithdrawnUsd || 0) + val;
       }
 
       await db.collection("users").doc(email).set(user, { merge: true });
       saveState();
       updateUI();
-      alert(`Successfully updated ${walletType} balance for ${email}!`);
+      alert(`Successfully updated user records for ${email}!`);
     }
 
     async function adminDeleteUser(email) {
@@ -1949,39 +2106,8 @@
       container.innerHTML = paymentMethods.map(m => `
         <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center;">
           <div><b>${m.name}</b><br><span style="font-size:12px; color:var(--text-muted);">${m.details}</span></div>
-          <button class="btn btn-secondary" style="padding:4px 8px; font-size:11px;" onclick="editAdminPaymentMethod(${m.id})">Edit</button>
         </div>
       `).join('');
-    }
-
-    function saveAdminPaymentMethod() {
-      const id = document.getElementById('editPayMethodId').value;
-      const name = document.getElementById('newPayMethodName').value.trim();
-      const details = document.getElementById('newPayMethodDetails').value.trim();
-
-      if (!name || !details) { alert("Fill name and details!"); return; }
-
-      if (id) {
-        let pm = paymentMethods.find(item => item.id == id);
-        if (pm) { pm.name = name; pm.details = details; }
-      } else {
-        paymentMethods.push({ id: Date.now(), name, details });
-      }
-
-      saveState();
-      document.getElementById('editPayMethodId').value = '';
-      document.getElementById('newPayMethodName').value = '';
-      document.getElementById('newPayMethodDetails').value = '';
-      updateUI();
-      alert("Payment method updated!");
-    }
-
-    function editAdminPaymentMethod(id) {
-      let pm = paymentMethods.find(item => item.id == id);
-      if (!pm) return;
-      document.getElementById('editPayMethodId').value = pm.id;
-      document.getElementById('newPayMethodName').value = pm.name;
-      document.getElementById('newPayMethodDetails').value = pm.details;
     }
 
     function renderUserStoreProducts() {
@@ -2027,7 +2153,7 @@
       const storeBal = currentUser.storeBalanceUsd || 0;
 
       if (storeBal < price) {
-        alert(`Insufficient Flip Store Balance! You need $${price} (₦${(price * NGN_RATE).toLocaleString()}) in your Flip Store balance. Please click "+ Deposit" or "+ Add From Main" to fund your store balance first.`);
+        alert(`Insufficient Flip Store Balance! You need $${price} (₦${(price * NGN_RATE).toLocaleString()}) in your store balance.`);
         return;
       }
 
@@ -2053,12 +2179,11 @@
       });
 
       currentUser.lastFlipDate = todayStr;
-      
       logUserTransaction("Flip Investment", `Purchased slot for ${product.title}`, -price);
 
       saveState();
       updateUI();
-      alert(`Successfully invested in ${product.title}! Expected maturity (8 days): ${expectedDateStr}. Return (${isHighTier ? '25%' : '20%'}) will be credited automatically upon maturity.`);
+      alert(`Successfully invested in ${product.title}! Expected maturity in 8 days.`);
     }
 
     function renderUserActiveFlips() {
@@ -2102,9 +2227,8 @@
 
       if (!currentUser) return;
 
-      // 1. Prevent multiple pending withdrawals at the same time
       if (currentUser.pendingWithdrawal) {
-        alert("You already have a pending cashout request waiting for approval. You cannot submit another until the current one is processed!");
+        alert("You already have a pending cashout request waiting for approval!");
         return;
       }
 
@@ -2113,13 +2237,13 @@
       const pin = document.getElementById('wdPinInput').value;
 
       const wCount = currentUser.withdrawalCount || 0;
-      // Strict rule: Only 1st cashout (wCount === 0) requires 7 referrals. Subsequent ones require 0.
-      const requiredRefs = wCount === 0 ? 7 : 0;
+      const hasBypassedRefRule = currentUser.forumBypassedRefRule || false;
+      const requiredRefs = (wCount === 0 && !hasBypassedRefRule) ? 7 : 0;
 
-      // Unified Referral Formula (Organic + Manual Firebase Bonus)
-      const organicRefs = usersDb.filter(u => u.referredBy === currentUser.refCode && u.tier && u.tier !== "None").length;
+      const organicRefs = usersDb.filter(u => u.referredBy === currentUser.refCode && (!u.joinedViaForum) && u.tier && u.tier !== "None").length;
       const manualBonus = currentUser.activeReferrals || 0;
-      const payingRefsCount = organicRefs + manualBonus;
+      const forumUnlockedBonus = currentUser.forumUnlockedReferralBonus || 0;
+      const payingRefsCount = organicRefs + manualBonus + forumUnlockedBonus;
 
       if (payingRefsCount < requiredRefs) {
         alert(`Withdrawal locked! You need ${requiredRefs} active paying referrals for your 1st cashout. You currently have ${payingRefsCount}.`);
@@ -2130,53 +2254,31 @@
       const minUsd = wCount === 0 ? 66 : 60;
       const minNgn = minUsd * NGN_RATE;
 
-      if (isNaN(amountNgn) || amountNgn <= 0) {
-        alert("Please enter a valid withdrawal amount!");
-        return;
-      }
-
-      if (amountUsd < minUsd) {
-        alert(`Minimum withdrawal amount is $${minUsd} (₦${minNgn.toLocaleString()})!`);
-        return;
-      }
+      if (isNaN(amountNgn) || amountNgn <= 0) { alert("Please enter a valid amount!"); return; }
+      if (amountUsd < minUsd) { alert(`Minimum withdrawal is $${minUsd} (₦${minNgn.toLocaleString()})!`); return; }
 
       let destinationInfo = "";
       if (cashoutType === 'bank') {
-        const bankSelectVal = document.getElementById('wdBankSelect').value;
-        const bankName = bankSelectVal === 'Other' ? document.getElementById('wdBankNameCustom').value.trim() : bankSelectVal;
+        const bankName = document.getElementById('wdBankSelect').value === 'Other' ? document.getElementById('wdBankNameCustom').value.trim() : document.getElementById('wdBankSelect').value;
         const accountNum = document.getElementById('wdAccountNum').value.trim();
-
-        if (!bankName || !accountNum || accountNum.length !== 10) {
-          alert("Please fill out valid bank details and a 10-digit account number!");
-          return;
-        }
+        if (!bankName || !accountNum || accountNum.length !== 10) { alert("Fill valid 10-digit account number!"); return; }
         destinationInfo = `Bank: ${bankName} (${accountNum})`;
       } else {
         const usdtAddr = document.getElementById('wdUsdtAddress').value.trim();
-        if (!usdtAddr) {
-          alert("Please enter your USDT TRC20 wallet address!");
-          return;
-        }
+        if (!usdtAddr) { alert("Enter USDT TRC20 address!"); return; }
         destinationInfo = `USDT TRC20 Address: ${usdtAddr}`;
       }
 
-      if (!pin || pin !== currentUser.pin) {
-        alert("Incorrect 4-digit withdrawal PIN!");
-        return;
-      }
+      if (!pin || pin !== currentUser.pin) { alert("Incorrect 4-digit PIN!"); return; }
 
       const currentNgnBal = (currentUser.balanceUsd || 0) * NGN_RATE;
-      if (amountNgn > currentNgnBal) {
-        alert("Insufficient balance for this cashout request!");
-        return;
-      }
+      if (amountNgn > currentNgnBal) { alert("Insufficient balance!"); return; }
 
       const feeUsd = amountUsd * 0.15;
       const netUsd = amountUsd - feeUsd;
       const feeNgn = feeUsd * NGN_RATE;
       const netNgn = netUsd * NGN_RATE;
 
-      // Save pending withdrawal object directly to user profile
       currentUser.pendingWithdrawal = {
         id: Date.now(),
         userEmail: currentUser.email,
@@ -2197,19 +2299,14 @@
       updateUI();
       closeWithdrawModal();
 
-      const adminPanelUrl = "https://earnplanet.com.ng/";
-
       sendAdminTelegramAlert(
-        `💸 <b>NEW CASHOUT REQUEST #${currentUser.withdrawalCount}!</b>\n\n` +
+        `💸 <b>NEW CASHOUT REQUEST!</b>\n\n` +
         `👤 <b>User:</b> ${currentUser.email}\n` +
-        `💵 <b>Gross Amount:</b> ₦${amountNgn.toLocaleString()} ($${amountUsd.toFixed(2)})\n` +
-        `📉 <b>15% Auto Fee:</b> ₦${feeNgn.toLocaleString()}\n` +
-        `✅ <b>Net Payout:</b> ₦${netNgn.toLocaleString()}\n` +
-        `📍 <b>Destination:</b> ${destinationInfo}\n\n` +
-        `👉 <a href="${adminPanelUrl}">Click Here to Open Admin Panel & Approve</a>`
+        `💵 <b>Amount:</b> ₦${amountNgn.toLocaleString()} ($${amountUsd.toFixed(2)})\n` +
+        `📍 <b>Destination:</b> ${destinationInfo}`
       );
 
-      alert(`Cashout request of ₦${amountNgn.toLocaleString()} submitted successfully! (15% fee applied: ₦${feeNgn.toLocaleString()}). Net payout: ₦${netNgn.toLocaleString()}`);
+      alert(`Cashout request submitted successfully!`);
     }
 
     function submitAddFromMain() {
@@ -2221,11 +2318,10 @@
       currentUser.storeBalanceUsd = (currentUser.storeBalanceUsd || 0) + amt;
 
       logUserTransaction("Store Transfer", `Transferred funds to Resell Flip Store`, -amt);
-
       saveState();
       updateUI();
       closeAddFromMainModal();
-      alert(`Successfully transferred $${amt} to your Flip Store balance!`);
+      alert(`Successfully transferred $${amt} to store!`);
     }
 
     function submitInternalTransfer() {
@@ -2237,11 +2333,10 @@
       currentUser.balanceUsd = (currentUser.balanceUsd || 0) + amt;
 
       logUserTransaction("Store Cashout", `Withdrew earnings from Resell Flip Store to Main`, amt);
-
       saveState();
       updateUI();
       closeTransferModal();
-      alert(`Transferred $${amt.toFixed(2)} to main dashboard with 0% fee!`);
+      alert(`Transferred $${amt.toFixed(2)} to main dashboard!`);
     }
 
     let drivingGameInterval = null;
@@ -2258,7 +2353,7 @@
       }
 
       if ((currentUser.drivesCountToday || 0) >= 4) {
-        alert("You have reached your limit of 4 driving sessions for today! Come back tomorrow.");
+        alert("You have reached your limit of 4 driving sessions for today!");
         return;
       }
 
@@ -2311,22 +2406,6 @@
         ctx.roundRect(carX, canvas.height - 75, 38, 64, [8]);
         ctx.fill();
 
-        ctx.fillStyle = '#38bdf8';
-        ctx.fillRect(carX + 4, canvas.height - 54, 30, 18);
-
-        ctx.fillStyle = '#111827';
-        ctx.fillRect(carX + 6, canvas.height - 24, 26, 8);
-
-        ctx.fillStyle = '#facc15';
-        ctx.fillRect(carX + 2, canvas.height - 73, 6, 4);
-        ctx.fillRect(carX + 30, canvas.height - 73, 6, 4);
-
-        ctx.fillStyle = '#111827';
-        ctx.fillRect(carX - 5, canvas.height - 64, 6, 16);
-        ctx.fillRect(carX + 37, canvas.height - 64, 6, 16);
-        ctx.fillRect(carX - 5, canvas.height - 26, 6, 16);
-        ctx.fillRect(carX + 37, canvas.height - 26, 6, 16);
-
         if (drivingProgress >= 100) {
           clearInterval(drivingGameInterval);
           currentUser.drivesCountToday = (currentUser.drivesCountToday || 0) + 1;
@@ -2339,18 +2418,16 @@
 
           saveState();
           updateUI();
-
-          alert(`🎉 Driving run completed successfully! Earned $${rewardUsd.toFixed(2)} (₦${(rewardUsd * NGN_RATE).toLocaleString()}) added to your balance.`);
+          alert(`🎉 Driving run completed successfully! Earned $${rewardUsd.toFixed(2)}.`);
           closeDrivingModal();
         }
       }, 100);
     }
 
-    // SETTINGS TAB HANDLERS
     async function updateUserEmail() {
       const newEmail = document.getElementById('settingsNewEmail').value.trim();
-      if (!newEmail) { alert("Please enter a new email address!"); return; }
-      if (usersDb.some(u => u.email === newEmail)) { alert("This email is already in use by another account!"); return; }
+      if (!newEmail) { alert("Enter new email!"); return; }
+      if (usersDb.some(u => u.email === newEmail)) { alert("Email already in use!"); return; }
 
       await db.collection("users").doc(currentUser.email).delete();
       currentUser.email = newEmail;
@@ -2364,8 +2441,8 @@
       const oldPass = document.getElementById('settingsOldPass').value;
       const newPass = document.getElementById('settingsNewPass').value;
 
-      if (!oldPass || !newPass) { alert("Please fill both password fields!"); return; }
-      if (oldPass !== currentUser.password) { alert("Current password is incorrect!"); return; }
+      if (!oldPass || !newPass) { alert("Fill password fields!"); return; }
+      if (oldPass !== currentUser.password) { alert("Current password incorrect!"); return; }
 
       currentUser.password = newPass;
       saveState();
@@ -2374,7 +2451,6 @@
       alert("Password updated successfully!");
     }
 
-    // CHATBOT SUPPORT HANDLER
     function sendChatMessage() {
       const input = document.getElementById('chatInput');
       const text = input.value.trim();
@@ -2385,33 +2461,29 @@
       input.value = '';
 
       setTimeout(() => {
-        let reply = "Thanks for reaching out! For instant verification or issues, contact our support team or check our FAQs below.";
+        let reply = "Thanks for reaching out! Contact our support team for instant assistance.";
         const lower = text.toLowerCase();
         if (lower.includes('withdraw') || lower.includes('cashout')) {
-          reply = "Withdrawals are open on the 1st and 16th. Only the 1st cashout requires 7 referrals; subsequent cashouts are unlocked with 0 referral requirements.";
-        } else if (lower.includes('deposit') || lower.includes('fund')) {
-          reply = "You can deposit using Apple Gift Cards via PalmPay, OPay, or Kuda, or via USDT TRC20 crypto transfer.";
-        } else if (lower.includes('referral')) {
-          reply = "Your referral link is on your dashboard. Referrals only count when they purchase an active subscription plan!";
+          reply = "Withdrawals are open on the 1st and 24th.";
+        } else if (lower.includes('forum')) {
+          reply = "You can create a discussion forum and earn 25% referral bonus through your forum link!";
         }
         list.innerHTML += `<div class="msg msg-bot">${reply}</div>`;
         list.scrollTop = list.scrollHeight;
       }, 600);
-      list.scrollTop = list.scrollHeight;
     }
 
-    // FORGOT PASSWORD HANDLER
     function handlePasswordReset() {
       const email = document.getElementById('forgotEmail').value.trim();
       const newPass = document.getElementById('forgotNewPassword').value;
 
-      if (!email || !newPass) { alert("Please enter your email and new password!"); return; }
+      if (!email || !newPass) { alert("Enter email and new password!"); return; }
       const user = usersDb.find(u => u.email === email);
-      if (!user) { alert("No account found with this email address!"); return; }
+      if (!user) { alert("Account not found!"); return; }
 
       user.password = newPass;
       saveState();
-      alert("Password reset successful! You can now login with your new password.");
+      alert("Password reset successful!");
       switchAuthView('login');
     }
 
@@ -2420,6 +2492,7 @@
       const password = document.getElementById('regPassword').value;
       const pin = document.getElementById('regPin').value;
       const refCodeInput = document.getElementById('regRefCode').value.trim();
+      const forumRefParam = localStorage.getItem('pending_forum_ref') || "";
 
       if (!email || !password || pin.length !== 4) { alert("Fill all fields correctly!"); return; }
       if (usersDb.some(u => u.email === email)) { alert("Email already exists!"); return; }
@@ -2433,8 +2506,11 @@
         pin, 
         refCode: uniqueRefCode, 
         referredBy: refCodeInput || "",
+        forumReferredBy: forumRefParam || "",
+        joinedViaForum: !!forumRefParam,
         balanceUsd: welcomeBonusUsd, 
         storeBalanceUsd: 0, 
+        totalWithdrawnUsd: 0,
         tier: "None", 
         activeReferrals: 0,
         drivesCountToday: 0,
@@ -2449,17 +2525,10 @@
 
       await db.collection("users").doc(email).set(newUser);
       manualUserCount++;
+      localStorage.removeItem('pending_forum_ref');
       saveState();
 
-      sendAdminTelegramAlert(
-        `👤 <b>NEW USER REGISTERED!</b>\n\n` +
-        `📧 <b>Email:</b> ${email}\n` +
-        `🔗 <b>Referred By:</b> ${refCodeInput || 'None'}\n` +
-        `🎁 <b>Welcome Bonus:</b> ₦10,000 ($${welcomeBonusUsd.toFixed(2)})\n` +
-        `👥 <b>Total Users:</b> ${manualUserCount}`
-      );
-
-      alert("Account created successfully! ₦10,000 welcome bonus has been credited to your account. Please login.");
+      alert("Account created successfully! ₦10,000 welcome bonus credited.");
       switchAuthView('login');
     }
 
@@ -2467,7 +2536,7 @@
       const email = document.getElementById('loginEmail').value.trim();
       const password = document.getElementById('loginPassword').value;
       const user = usersDb.find(u => u.email === email && u.password === password);
-      if (!user) { alert("Invalid credentials or user not synced yet!"); return; }
+      if (!user) { alert("Invalid credentials!"); return; }
 
       currentUser = user;
       saveState();
@@ -2502,6 +2571,7 @@
 
     function switchTab(t) {
       document.getElementById('userTab').style.display = t === 'user' ? 'block' : 'none';
+      document.getElementById('forumTab').style.display = t === 'forum' ? 'block' : 'none';
       document.getElementById('storeTab').style.display = t === 'store' ? 'block' : 'none';
       document.getElementById('supportTab').style.display = t === 'support' ? 'block' : 'none';
       document.getElementById('settingsTab').style.display = t === 'settings' ? 'block' : 'none';
@@ -2517,11 +2587,6 @@
     function closeCheckoutModal() { document.getElementById('checkoutModal').style.display = 'none'; }
 
     function openDepositModal() {
-      const hasPendingDep = pendingPaymentProofs.some(p => p.userEmail === currentUser.email && p.type === 'deposit');
-      if (hasPendingDep) {
-        alert("You have a pending deposit waiting for admin approval. You cannot submit a new one until approved.");
-        return;
-      }
       document.getElementById('depositModal').style.display = 'flex';
       renderDepositInstructions();
     }
