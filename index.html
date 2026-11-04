@@ -911,7 +911,7 @@
       active: false
     };
 
-        // 400 Default Generated Withdrawal Tickers (fully expandable & manageable via Admin)
+    // 400 Default Generated Withdrawal Tickers (fully expandable & manageable via Admin)
     let withdrawalPopsDb = [
       {id: 1, name: "Ade_99", amount: "₦250,000", method: "OPay"},
       {id: 2, name: "Chinedu_X", amount: "₦180,000", method: "PalmPay"},
@@ -925,7 +925,6 @@
       {id: 10, name: "Ngozi_V", amount: "₦600,000", method: "Kuda Bank"}
     ];
 
-    // Populate remaining 390 if empty or missing
     if (withdrawalPopsDb.length < 400) {
       const extraPops = Array.from({length: 390}, (_, index) => {
         const id = 11 + index;
