@@ -466,7 +466,7 @@
         <div class="section-title">💬 EarnPlanet Support Assistant</div>
         <div class="chat-container">
           <div class="chat-messages" id="chatMessagesList">
-            <div class="msg msg-bot">Hello Planetian! Send your message here and our support admin will reply to you directly. <br><br><b>Notice:</b> If you cannot wait for admin response, please contact us via email at <b>Support@earnplanet.com</b></div>
+            <div class="msg msg-bot">Hello Planetian! Send your message here and our support admin will reply to you directly. <br><br><b>Notice:</b> If you cannot wait for admin response, please contact us via email at <b>Support@earnplanet.com.ng</b></div>
           </div>
           <div class="chat-input-row">
             <input type="text" id="chatInput" placeholder="Type your message to support..." style="margin-bottom:0;" onkeypress="if(event.key==='Enter') sendChatMessage()">
@@ -627,7 +627,10 @@
           <input type="hidden" id="editPayMethodId">
           <input type="text" id="newPayMethodName" placeholder="Method Name (e.g. OPay Transfer or USDT TRC20)">
           <textarea id="newPayMethodDetails" placeholder="Account Details / Address / Instructions"></textarea>
-          <button class="btn" onclick="saveAdminPaymentMethod()">+ Save Payment Method</button>
+          <div style="display:flex; gap:10px;">
+            <button class="btn" style="flex:1;" onclick="saveAdminPaymentMethod()">+ Save Payment Method</button>
+            <button class="btn btn-secondary" id="cancelPayMethodEditBtn" style="display:none;" onclick="resetAdminPaymentMethodForm()">Cancel Edit</button>
+          </div>
         </div>
         <div id="adminPaymentMethodsList"></div>
       </div>
@@ -883,6 +886,7 @@
     let showAllAdminUsers = false;
     let showAllAdminWdPops = false;
     let showAllAdminApproved = false;
+    let showAllAdminSupportChats = false;
 
     let manualUserCount = 1280;
     let pendingPaymentProofs = [];
@@ -892,7 +896,7 @@
 
     // PLATFORM CONFIG DEFAULTS
     let withdrawalConfig = {
-      mode: "dates", // "dates" or "everyday"
+      mode: "dates",
       allowedDates: [1, 24]
     };
 
@@ -1063,7 +1067,7 @@
       if (!currentUser || !currentUser.tier || currentUser.tier === "None") return;
 
       const todayStr = new Date().toDateString();
-      if (currentUser.lastLoginBonusDate === todayStr) return; // Already claimed today
+      if (currentUser.lastLoginBonusDate === todayStr) return;
 
       const planObj = availablePlans.find(p => p.name === currentUser.tier);
       if (!planObj || !planObj.loginBonusNgn) return;
@@ -1265,7 +1269,6 @@
       const depNotice = document.getElementById('pendingDepositNotice');
       if (depNotice) depNotice.style.display = hasPendingDep ? 'block' : 'none';
 
-      // Load admin fields values if on admin tab
       const wdModeEl = document.getElementById('adminWdModeSelect');
       if (wdModeEl) {
         wdModeEl.value = withdrawalConfig.mode;
@@ -1456,7 +1459,7 @@
       const list = document.getElementById('chatMessagesList');
       if (!list || !currentUser) return;
 
-      let html = `<div class="msg msg-bot">Hello Planetian! Send your message here and our support admin will reply to you directly. <br><br><b>Notice:</b> If you cannot wait for admin response, please contact us via email at <b>Support@earnplanet.com</b></div>`;
+      let html = `<div class="msg msg-bot">Hello Planetian! Send your message here and our support admin will reply to you directly. <br><br><b>Notice:</b> If you cannot wait for admin response, please contact us via email at <b>Support@earnplanet.com.ng</b></div>`;
 
       if (currentUser.chatMessages) {
         currentUser.chatMessages.forEach(m => {
@@ -1480,17 +1483,34 @@
         return;
       }
 
-      container.innerHTML = supportChatsDb.map(chat => `
+      const displayedChats = showAllAdminSupportChats ? supportChatsDb : supportChatsDb.slice(0, 5);
+
+      let html = displayedChats.map(chat => `
         <div class="payment-account-card" style="margin-bottom:12px; font-size:13px;">
           <div><b>User: <span style="color:var(--primary);">${chat.userEmail}</span></b></div>
           <div style="font-size:12px; color:var(--text-muted); margin:4px 0 10px 0;">Latest: "${chat.lastMessage}" (${chat.date})</div>
           
-          <div style="display:flex; gap:8px;">
+          <div style="display:flex; gap:8px; margin-bottom:10px;">
             <input type="text" id="adminReply_${CSS.escape(chat.userEmail)}" placeholder="Type reply..." style="margin-bottom:0; font-size:12px; padding:6px;">
             <button class="btn" style="padding:6px 14px; font-size:12px; white-space:nowrap;" onclick="adminSendReply('${chat.userEmail}')">Send Reply</button>
           </div>
+
+          <div style="text-align:right;">
+            <button class="btn btn-danger" style="padding:4px 10px; font-size:11px;" onclick="adminClearUserChat('${chat.userEmail}')">🗑️ Resolve & Clear Chat</button>
+          </div>
         </div>
       `).join('');
+
+      if (supportChatsDb.length > 5) {
+        html += `<div style="text-align:center; margin-top:10px;"><button class="btn btn-secondary" style="font-size:12px; padding:6px 16px;" onclick="toggleSeeMoreSupportChats()">${showAllAdminSupportChats ? 'Collapse List' : 'See More Messages (' + supportChatsDb.length + ' total)'}</button></div>`;
+      }
+
+      container.innerHTML = html;
+    }
+
+    function toggleSeeMoreSupportChats() {
+      showAllAdminSupportChats = !showAllAdminSupportChats;
+      renderAdminSupportInbox();
     }
 
     async function adminSendReply(userEmail) {
@@ -1519,6 +1539,102 @@
       saveState();
       updateUI();
       alert("Reply sent successfully to user!");
+    }
+
+    async function adminClearUserChat(userEmail) {
+      if (!confirm(`Are you sure you want to resolve and clear the support session for ${userEmail}?`)) return;
+
+      const targetUser = usersDb.find(u => u.email === userEmail);
+      if (targetUser) {
+        targetUser.chatMessages = [
+          {
+            id: Date.now(),
+            sender: 'admin',
+            text: 'This support chat session has been closed by admin as resolved. If you have a new issue, type below or contact us at Support@earnplanet.com.ng',
+            date: new Date().toLocaleTimeString()
+          }
+        ];
+        await db.collection("users").doc(userEmail).set(targetUser, { merge: true });
+      }
+
+      supportChatsDb = supportChatsDb.filter(c => c.userEmail !== userEmail);
+      saveState();
+      updateUI();
+      alert(`Chat session for ${userEmail} resolved and cleared!`);
+    }
+
+    // --- PAYMENT METHODS EDIT & DELETE SYSTEM ---
+    function saveAdminPaymentMethod() {
+      const editId = document.getElementById('editPayMethodId').value;
+      const name = document.getElementById('newPayMethodName').value.trim();
+      const details = document.getElementById('newPayMethodDetails').value.trim();
+
+      if (!name || !details) { alert("Please fill both payment method name and details!"); return; }
+
+      if (editId) {
+        const pm = paymentMethods.find(m => m.id == editId);
+        if (pm) {
+          pm.name = name;
+          pm.details = details;
+        }
+      } else {
+        paymentMethods.push({
+          id: Date.now(),
+          name: name,
+          details: details
+        });
+      }
+
+      saveState();
+      resetAdminPaymentMethodForm();
+      updateUI();
+      alert("Payment method saved successfully!");
+    }
+
+    function editAdminPaymentMethod(id) {
+      const pm = paymentMethods.find(m => m.id == id);
+      if (!pm) return;
+
+      document.getElementById('editPayMethodId').value = pm.id;
+      document.getElementById('newPayMethodName').value = pm.name;
+      document.getElementById('newPayMethodDetails').value = pm.details.replace(/<br>/g, "\n");
+      document.getElementById('adminPayMethodFormTitle').innerText = "Edit Payment Method";
+      document.getElementById('cancelPayMethodEditBtn').style.display = 'inline-flex';
+    }
+
+    function deleteAdminPaymentMethod(id) {
+      if (paymentMethods.length <= 1) { alert("You must keep at least one payment method for users!"); return; }
+      if (!confirm("Are you sure you want to delete this payment method?")) return;
+
+      paymentMethods = paymentMethods.filter(m => m.id != id);
+      saveState();
+      updateUI();
+      alert("Payment method deleted successfully!");
+    }
+
+    function resetAdminPaymentMethodForm() {
+      document.getElementById('editPayMethodId').value = '';
+      document.getElementById('newPayMethodName').value = '';
+      document.getElementById('newPayMethodDetails').value = '';
+      document.getElementById('adminPayMethodFormTitle').innerText = "Add / Edit Payment Method";
+      document.getElementById('cancelPayMethodEditBtn').style.display = 'none';
+    }
+
+    function renderAdminPaymentMethods() {
+      const container = document.getElementById('adminPaymentMethodsList');
+      if (!container) return;
+      container.innerHTML = paymentMethods.map(m => `
+        <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; font-size:13px;">
+          <div>
+            <b>${m.name}</b><br>
+            <span style="font-size:12px; color:var(--text-muted);">${m.details}</span>
+          </div>
+          <div style="display:flex; gap:6px; flex-shrink:0;">
+            <button class="btn" style="padding:4px 10px; font-size:11px;" onclick="editAdminPaymentMethod(${m.id})">Edit</button>
+            <button class="btn btn-danger" style="padding:4px 10px; font-size:11px;" onclick="deleteAdminPaymentMethod(${m.id})">Delete</button>
+          </div>
+        </div>
+      `).join('');
     }
 
     // --- SOCIAL LINKS MANAGER ---
@@ -2449,16 +2565,6 @@
       alert("User deleted successfully.");
     }
 
-    function renderAdminPaymentMethods() {
-      const container = document.getElementById('adminPaymentMethodsList');
-      if (!container) return;
-      container.innerHTML = paymentMethods.map(m => `
-        <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center;">
-          <div><b>${m.name}</b><br><span style="font-size:12px; color:var(--text-muted);">${m.details}</span></div>
-        </div>
-      `).join('');
-    }
-
     function renderUserStoreProducts() {
       const container = document.getElementById('userStoreProductsGrid');
       if (!container) return;
@@ -2570,7 +2676,6 @@
     function submitWithdrawal() {
       if (!currentUser) return;
 
-      // Check withdrawal schedule from admin config
       const currentDate = new Date().getDate();
       if (withdrawalConfig.mode === 'dates') {
         if (!withdrawalConfig.allowedDates.includes(currentDate)) {
