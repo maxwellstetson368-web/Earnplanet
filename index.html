@@ -54,7 +54,6 @@
 
     .container { max-width: 850px; margin: 20px auto; padding: 0 15px; }
 
-    /* LIVE WITHDRAWAL POPUP TICKER */
     #liveWithdrawalPopup {
       background: linear-gradient(90deg, #16422b, #0d281a);
       border: 1px solid var(--primary);
@@ -117,7 +116,6 @@
     .stat-card h4 { font-size: 12px; color: var(--text-muted); text-transform: uppercase; }
     .stat-card p { font-size: 22px; font-weight: 900; margin-top: 6px; color: var(--gold); }
 
-    /* PULSING GRAPH SIMULATOR */
     .pulse-graph-box { background: var(--card-bg); border: 1px solid var(--primary); border-radius: 14px; padding: 15px; text-align: center; margin: 20px 0; box-shadow: 0 0 15px rgba(0,230,118,0.1); }
     .pulse-waves { display: flex; justify-content: center; align-items: flex-end; gap: 6px; height: 35px; margin-top: 10px; }
     .wave-bar { width: 8px; background: var(--primary); border-radius: 4px; animation: pulseWave 1.2s infinite ease-in-out alternate; }
@@ -468,7 +466,7 @@
         <div class="section-title">💬 EarnPlanet Support Assistant</div>
         <div class="chat-container">
           <div class="chat-messages" id="chatMessagesList">
-            <div class="msg msg-bot">Hello Planetian! Send your message here and our support admin will reply to you directly. <br><br><b>Notice:</b> If you cannot wait for admin response, please contact us via email at <b>Support@earnplanet.com.ng</b></div>
+            <div class="msg msg-bot">Hello Planetian! Send your message here and our support admin will reply to you directly. <br><br><b>Notice:</b> If you cannot wait for admin response, please contact us via email at <b>Support@earnplanet.com</b></div>
           </div>
           <div class="chat-input-row">
             <input type="text" id="chatInput" placeholder="Type your message to support..." style="margin-bottom:0;" onkeypress="if(event.key==='Enter') sendChatMessage()">
@@ -498,6 +496,53 @@
 
       <!-- ADMIN MANAGEMENT TAB -->
       <div id="adminTab" style="display:none;">
+        
+        <!-- WITHDRAWAL SCHEDULE MANAGER -->
+        <div class="section-title">⚙️ Withdrawal Days Schedule Manager</div>
+        <div class="stat-card" style="text-align:left; margin-bottom:30px;">
+          <h4 style="margin-bottom:10px;">Configure When Users Can Withdraw</h4>
+          <label>Withdrawal Access Mode</label>
+          <select id="adminWdModeSelect" onchange="toggleWdScheduleInputs()">
+            <option value="dates">Specific Dates in Month (e.g. 1 & 24)</option>
+            <option value="everyday">Everyday Open (Always Available)</option>
+          </select>
+
+          <div id="adminWdDatesContainer" style="margin-top:10px;">
+            <label>Allowed Withdrawal Days (Comma separated numbers)</label>
+            <input type="text" id="adminWdDatesInput" placeholder="e.g. 1, 24">
+            <span style="font-size:11px; color:var(--text-muted);">Users can only cash out on these exact dates of the month when mode is set to specific dates.</span>
+          </div>
+
+          <button class="btn" style="margin-top:15px;" onclick="saveAdminWithdrawalSchedule()">Save Withdrawal Schedule</button>
+        </div>
+
+        <!-- GLOBAL BROADCAST NOTIFICATION MANAGER -->
+        <div class="section-title">⚙️ Global Notification Broadcast Manager</div>
+        <div class="stat-card" style="text-align:left; margin-bottom:30px;">
+          <h4 style="margin-bottom:10px;">Send Popup Notification to All Users</h4>
+          <label>Notification Title</label>
+          <input type="text" id="adminBroadcastTitle" placeholder="e.g. Important Update Regarding Server Migration">
+          <label>Notification Message / Details</label>
+          <textarea id="adminBroadcastMsg" placeholder="Type announcement details here..."></textarea>
+          <label>Active Days (How long it stays pinned on user screens)</label>
+          <input type="number" id="adminBroadcastDays" placeholder="e.g. 3 (Days)" value="3">
+          <div style="display:flex; gap:10px;">
+            <button class="btn" style="flex:1;" onclick="sendAdminBroadcast()">🚀 Publish & Pin Broadcast</button>
+            <button class="btn btn-danger" style="flex:1;" onclick="clearAdminBroadcast()">🗑️ Clear Active Broadcast</button>
+          </div>
+        </div>
+
+        <!-- MINIMUM WITHDRAWAL MANAGER -->
+        <div class="section-title">⚙️ Minimum Cashout Amount Manager</div>
+        <div class="stat-card" style="text-align:left; margin-bottom:30px;">
+          <h4 style="margin-bottom:10px;">Set Minimum Withdrawal Limits in USD ($)</h4>
+          <label>1st Withdrawal Minimum ($)</label>
+          <input type="number" id="adminMinWdFirst" placeholder="e.g. 66">
+          <label>Subsequent Withdrawals Minimum ($)</label>
+          <input type="number" id="adminMinWdSub" placeholder="e.g. 60">
+          <button class="btn" onclick="saveAdminMinWithdrawals()">Save Minimum Limits</button>
+        </div>
+
         <div class="section-title">⚙️ Live User Support Chat Inbox</div>
         <div id="adminSupportInboxList" style="margin-bottom:30px;"></div>
 
@@ -587,6 +632,15 @@
         <div id="adminPaymentMethodsList"></div>
       </div>
 
+    </div>
+  </div>
+
+  <!-- GLOBAL BROADCAST MODAL POPUP -->
+  <div class="modal-overlay" id="broadcastModal">
+    <div class="modal" style="text-align:center;">
+      <h3 id="broadcastModalTitle" style="color:var(--gold);">📢 Platform Notice</h3>
+      <p id="broadcastModalMsg" style="font-size:13px; line-height:1.6; color:var(--text-muted); margin-bottom:20px;"></p>
+      <button class="btn" style="width:100%;" onclick="closeBroadcastModal()">Got It, Proceed to App</button>
     </div>
   </div>
 
@@ -805,7 +859,6 @@
     const NGN_RATE = 1500;
     const SOCIAL_REWARD_USD = 70 / NGN_RATE;
 
-    // TELEGRAM BOT CONFIGURATION
     const TELEGRAM_BOT_TOKEN = "8811500504:AAE67l-aKHEi6cgZ_TzaY5tUESlQpmJAngY";
     const TELEGRAM_CHAT_ID = "8269612727";
 
@@ -836,7 +889,24 @@
     let approvedPaymentsHistory = [];
     let pendingSocialTasks = [];
     let supportChatsDb = [];
-    
+
+    // PLATFORM CONFIG DEFAULTS
+    let withdrawalConfig = {
+      mode: "dates", // "dates" or "everyday"
+      allowedDates: [1, 24]
+    };
+
+    let minWithdrawalConfig = {
+      firstUsd: 66,
+      subsequentUsd: 60
+    };
+
+    let activeBroadcast = {
+      title: "",
+      message: "",
+      active: false
+    };
+
     let withdrawalPopsDb = [
       {id: 1, name: "Femi45", amount: "₦500,000", method: "Palmpay"},
       {id: 2, name: "Chinedu99", amount: "₦180,000", method: "OPay"},
@@ -877,10 +947,10 @@
     ];
 
     const availablePlans = [
-      { name: "Starter", priceUsd: 15, cashbackUsd: 6.00, cashbackNgn: 9000, dailyDriveUsd: 0.15 },
-      { name: "Silver", priceUsd: 25, cashbackUsd: 10.00, cashbackNgn: 15000, dailyDriveUsd: 0.25 },
-      { name: "Gold", priceUsd: 50, cashbackUsd: 20.00, cashbackNgn: 30000, dailyDriveUsd: 0.35 },
-      { name: "Platinum", priceUsd: 100, cashbackUsd: 40.00, cashbackNgn: 60000, dailyDriveUsd: 0.50 }
+      { name: "Starter", priceUsd: 15, cashbackUsd: 6.00, cashbackNgn: 9000, dailyDriveUsd: 0.15, loginBonusNgn: 200 },
+      { name: "Silver", priceUsd: 25, cashbackUsd: 10.00, cashbackNgn: 15000, dailyDriveUsd: 0.25, loginBonusNgn: 350 },
+      { name: "Gold", priceUsd: 50, cashbackUsd: 20.00, cashbackNgn: 30000, dailyDriveUsd: 0.35, loginBonusNgn: 450 },
+      { name: "Platinum", priceUsd: 100, cashbackUsd: 40.00, cashbackNgn: 60000, dailyDriveUsd: 0.50, loginBonusNgn: 600 }
     ];
 
     function logUserTransaction(type, detail, amountUsd) {
@@ -897,7 +967,7 @@
       saveState();
     }
 
-        // --- PERMANENT FIRESTORE OVERWRITE-PROOF SYNC ---
+    // --- PERMANENT FIRESTORE OVERWRITE-PROOF SYNC ---
     function initFirebaseSync() {
       db.collection("users").onSnapshot((snapshot) => {
         usersDb = [];
@@ -914,7 +984,6 @@
         if (doc.exists) {
           const data = doc.data();
           
-          // Only pull from Firestore if data exists; otherwise keep current local admin edits
           if (Array.isArray(data.approvedHistory)) approvedPaymentsHistory = data.approvedHistory;
           if (Array.isArray(data.pendingSocial)) pendingSocialTasks = data.pendingSocial;
           if (Array.isArray(data.withdrawalPops) && data.withdrawalPops.length > 0) withdrawalPopsDb = data.withdrawalPops;
@@ -925,9 +994,12 @@
           if (Array.isArray(data.supportChats)) supportChatsDb = data.supportChats;
           if (typeof data.manualUserCount === 'number') manualUserCount = data.manualUserCount;
           
+          if (data.withdrawalConfig) withdrawalConfig = data.withdrawalConfig;
+          if (data.minWithdrawalConfig) minWithdrawalConfig = data.minWithdrawalConfig;
+          if (data.activeBroadcast) activeBroadcast = data.activeBroadcast;
+
           updateUI();
         } else {
-          // Only initialize if document does not exist at all
           saveState();
         }
       });
@@ -950,7 +1022,10 @@
         storeProducts: storeProducts,
         socialLinks: socialLinks,
         supportChats: supportChatsDb,
-        manualUserCount: manualUserCount
+        manualUserCount: manualUserCount,
+        withdrawalConfig: withdrawalConfig,
+        minWithdrawalConfig: minWithdrawalConfig,
+        activeBroadcast: activeBroadcast
       }, { merge: true }).catch(err => console.error("Firestore Save Error:", err));
     }
 
@@ -975,11 +1050,119 @@
           if (currentUser) {
             document.getElementById('authContainer').style.display = 'none';
             document.getElementById('mainAppContainer').style.display = 'block';
+            checkAndApplyDailyLoginBonus();
+            checkAndShowBroadcastPopup();
             updateUI();
           }
         }, 800);
       }
     });
+
+    // --- DAILY LOGIN BONUS SYSTEM ---
+    function checkAndApplyDailyLoginBonus() {
+      if (!currentUser || !currentUser.tier || currentUser.tier === "None") return;
+
+      const todayStr = new Date().toDateString();
+      if (currentUser.lastLoginBonusDate === todayStr) return; // Already claimed today
+
+      const planObj = availablePlans.find(p => p.name === currentUser.tier);
+      if (!planObj || !planObj.loginBonusNgn) return;
+
+      const bonusNgn = planObj.loginBonusNgn;
+      const bonusUsd = bonusNgn / NGN_RATE;
+
+      currentUser.balanceUsd = (currentUser.balanceUsd || 0) + bonusUsd;
+      currentUser.lastLoginBonusDate = todayStr;
+
+      logUserTransaction("Daily Login Bonus", `Received ₦${bonusNgn.toLocaleString()} daily login bonus for ${currentUser.tier} plan`, bonusUsd);
+      saveState();
+
+      setTimeout(() => {
+        alert(`🎁 Welcome back, Planetian! Your daily login bonus of ₦${bonusNgn.toLocaleString()} ($${bonusUsd.toFixed(2)}) for your ${currentUser.tier} plan has been credited automatically!`);
+      }, 1000);
+    }
+
+    // --- GLOBAL BROADCAST POPUP SYSTEM ---
+    function checkAndShowBroadcastPopup() {
+      if (!activeBroadcast || !activeBroadcast.active || !activeBroadcast.message) return;
+
+      const modal = document.getElementById('broadcastModal');
+      document.getElementById('broadcastModalTitle').innerText = activeBroadcast.title || "📢 Platform Notice";
+      document.getElementById('broadcastModalMsg').innerText = activeBroadcast.message;
+      modal.style.display = 'flex';
+    }
+
+    function closeBroadcastModal() {
+      document.getElementById('broadcastModal').style.display = 'none';
+    }
+
+    function sendAdminBroadcast() {
+      const title = document.getElementById('adminBroadcastTitle').value.trim();
+      const message = document.getElementById('adminBroadcastMsg').value.trim();
+
+      if (!message) { alert("Please enter broadcast announcement message!"); return; }
+
+      activeBroadcast = {
+        title: title || "📢 Platform Notice",
+        message: message,
+        active: true
+      };
+
+      saveState();
+      alert("Global broadcast published and pinned to all user screens!");
+      checkAndShowBroadcastPopup();
+    }
+
+    function clearAdminBroadcast() {
+      if (!confirm("Clear active broadcast notification?")) return;
+      activeBroadcast = { title: "", message: "", active: false };
+      saveState();
+      alert("Broadcast cleared.");
+    }
+
+    // --- ADMIN WITHDRAWAL SCHEDULE MANAGER ---
+    function saveAdminWithdrawalSchedule() {
+      const mode = document.getElementById('adminWdModeSelect').value;
+      const datesRaw = document.getElementById('adminWdDatesInput').value.trim();
+
+      let datesArray = [1, 24];
+      if (datesRaw) {
+        datesArray = datesRaw.split(',').map(d => parseInt(d.trim())).filter(d => !isNaN(d));
+      }
+
+      withdrawalConfig = {
+        mode: mode,
+        allowedDates: datesArray
+      };
+
+      saveState();
+      alert("Withdrawal schedule saved successfully!");
+    }
+
+    function saveAdminMinWithdrawals() {
+      const first = parseFloat(document.getElementById('adminMinWdFirst').value);
+      const sub = parseFloat(document.getElementById('adminMinWdSub').value);
+
+      if (isNaN(first) || isNaN(sub)) { alert("Please enter valid minimum USD amounts!"); return; }
+
+      minWithdrawalConfig = {
+        firstUsd: first,
+        subsequentUsd: sub
+      };
+
+      saveState();
+      alert("Minimum withdrawal limits updated successfully!");
+    }
+
+    function toggleWdScheduleInputs() {
+      const mode = document.getElementById('adminWdModeSelect').value;
+      const datesBox = document.getElementById('adminWdDatesContainer');
+      if (mode === 'everyday') {
+        datesBox.style.display = 'none';
+      } else {
+        datesBox.style.display = 'block';
+      }
+    }
 
     let popIndex = 0;
     function startWithdrawalTicker() {
@@ -1081,6 +1264,20 @@
 
       const depNotice = document.getElementById('pendingDepositNotice');
       if (depNotice) depNotice.style.display = hasPendingDep ? 'block' : 'none';
+
+      // Load admin fields values if on admin tab
+      const wdModeEl = document.getElementById('adminWdModeSelect');
+      if (wdModeEl) {
+        wdModeEl.value = withdrawalConfig.mode;
+        document.getElementById('adminWdDatesInput').value = withdrawalConfig.allowedDates.join(', ');
+        toggleWdScheduleInputs();
+      }
+
+      const minFirstEl = document.getElementById('adminMinWdFirst');
+      if (minFirstEl && document.activeElement !== minFirstEl) {
+        minFirstEl.value = minWithdrawalConfig.firstUsd;
+        document.getElementById('adminMinWdSub').value = minWithdrawalConfig.subsequentUsd;
+      }
 
       renderMembershipPlansSection();
       renderPaymentMethodDropdowns();
@@ -1409,7 +1606,7 @@
               <div class="plan-title">${plan.name}</div>
               <div class="plan-price-ngn">₦${(plan.priceUsd * NGN_RATE).toLocaleString()}</div>
               <div class="plan-price-usd">$${plan.priceUsd.toFixed(2)} USD</div>
-              <div class="plan-perks">Earn $${plan.dailyDriveUsd.toFixed(2)} per drive<br>4 Drives Daily</div>
+              <div class="plan-perks">Daily Login Bonus: <b>₦${plan.loginBonusNgn}</b><br>Earn $${plan.dailyDriveUsd.toFixed(2)} per drive<br>4 Drives Daily</div>
             </div>
             <button class="btn" ${hasPendingSub ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''} onclick="${hasPendingSub ? '' : `openCheckoutModal('${plan.name}', ${plan.priceUsd}, false)`}">${hasPendingSub ? '⏳ Verification Pending' : 'Subscribe'}</button>
           </div>
@@ -1434,7 +1631,7 @@
                 <div class="plan-title">${plan.name}</div>
                 <div class="plan-price-ngn">₦${totalUpgradeNgn.toLocaleString()}</div>
                 <div class="plan-price-usd">($${priceDiffUsd} diff + ₦5,000 fee)</div>
-                <div class="plan-perks">New Perks: Earn $${plan.dailyDriveUsd.toFixed(2)} per drive<br>4 Drives Daily</div>
+                <div class="plan-perks">Daily Login Bonus: <b>₦${plan.loginBonusNgn}</b><br>New Perks: Earn $${plan.dailyDriveUsd.toFixed(2)} per drive<br>4 Drives Daily</div>
               </div>
               <button class="btn" ${hasPendingSub ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''} onclick="${hasPendingSub ? '' : `openCheckoutModal('${plan.name}', ${totalUpgradeUsd}, true)`}">${hasPendingSub ? '⏳ Verification Pending' : 'Upgrade Plan'}</button>
             </div>
@@ -2371,13 +2568,16 @@
     }
 
     function submitWithdrawal() {
-      const today = new Date();
-      if (today.getDate() !== 1 && today.getDate() !== 24) {
-        alert("Withdrawals are only open on the 1st and 24th of the month!");
-        return;
-      }
-
       if (!currentUser) return;
+
+      // Check withdrawal schedule from admin config
+      const currentDate = new Date().getDate();
+      if (withdrawalConfig.mode === 'dates') {
+        if (!withdrawalConfig.allowedDates.includes(currentDate)) {
+          alert(`Withdrawals are only open on specific dates (${withdrawalConfig.allowedDates.join(', ')}) of the month! Today is the ${currentDate}th.`);
+          return;
+        }
+      }
 
       if (currentUser.pendingWithdrawal) {
         alert("You already have a pending cashout request waiting for approval!");
@@ -2403,7 +2603,7 @@
       }
 
       const amountUsd = amountNgn / NGN_RATE;
-      const minUsd = wCount === 0 ? 66 : 60;
+      const minUsd = wCount === 0 ? minWithdrawalConfig.firstUsd : minWithdrawalConfig.subsequentUsd;
       const minNgn = minUsd * NGN_RATE;
 
       if (isNaN(amountNgn) || amountNgn <= 0) { alert("Please enter a valid amount!"); return; }
@@ -2678,6 +2878,8 @@
       saveState();
       document.getElementById('authContainer').style.display = 'none';
       document.getElementById('mainAppContainer').style.display = 'block';
+      checkAndApplyDailyLoginBonus();
+      checkAndShowBroadcastPopup();
       updateUI();
     }
 
