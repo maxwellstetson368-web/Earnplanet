@@ -897,7 +897,7 @@
       saveState();
     }
 
-    // --- FIRESTORE REAL-TIME SYNC WITH OVERWRITE GUARD ---
+        // --- PERMANENT FIRESTORE OVERWRITE-PROOF SYNC ---
     function initFirebaseSync() {
       db.collection("users").onSnapshot((snapshot) => {
         usersDb = [];
@@ -913,17 +913,21 @@
       db.collection("platform_data").doc("state").onSnapshot((doc) => {
         if (doc.exists) {
           const data = doc.data();
-          if (data.approvedHistory) approvedPaymentsHistory = data.approvedHistory;
-          if (data.pendingSocial) pendingSocialTasks = data.pendingSocial;
-          if (data.withdrawalPops && data.withdrawalPops.length > 0) withdrawalPopsDb = data.withdrawalPops;
-          if (data.faqs && data.faqs.length > 0) faqsDb = data.faqs;
-          if (data.paymentMethods && data.paymentMethods.length > 0) paymentMethods = data.paymentMethods;
-          if (data.storeProducts && data.storeProducts.length > 0) storeProducts = data.storeProducts;
-          if (data.socialLinks && data.socialLinks.length > 0) socialLinks = data.socialLinks;
-          if (data.supportChats) supportChatsDb = data.supportChats;
+          
+          // Only pull from Firestore if data exists; otherwise keep current local admin edits
+          if (Array.isArray(data.approvedHistory)) approvedPaymentsHistory = data.approvedHistory;
+          if (Array.isArray(data.pendingSocial)) pendingSocialTasks = data.pendingSocial;
+          if (Array.isArray(data.withdrawalPops) && data.withdrawalPops.length > 0) withdrawalPopsDb = data.withdrawalPops;
+          if (Array.isArray(data.faqs) && data.faqs.length > 0) faqsDb = data.faqs;
+          if (Array.isArray(data.paymentMethods) && data.paymentMethods.length > 0) paymentMethods = data.paymentMethods;
+          if (Array.isArray(data.storeProducts) && data.storeProducts.length > 0) storeProducts = data.storeProducts;
+          if (Array.isArray(data.socialLinks) && data.socialLinks.length > 0) socialLinks = data.socialLinks;
+          if (Array.isArray(data.supportChats)) supportChatsDb = data.supportChats;
           if (typeof data.manualUserCount === 'number') manualUserCount = data.manualUserCount;
+          
           updateUI();
         } else {
+          // Only initialize if document does not exist at all
           saveState();
         }
       });
