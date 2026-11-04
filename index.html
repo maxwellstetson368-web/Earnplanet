@@ -911,7 +911,7 @@
       active: false
     };
 
-    // 400 Default Generated Withdrawal Tickers (fully expandable & manageable via Admin)
+        // 400 Default Generated Withdrawal Tickers (fully expandable & manageable via Admin)
     let withdrawalPopsDb = [
       {id: 1, name: "Ade_99", amount: "₦250,000", method: "OPay"},
       {id: 2, name: "Chinedu_X", amount: "₦180,000", method: "PalmPay"},
@@ -922,8 +922,12 @@
       {id: 7, name: "Aisha_M", amount: "₦210,000", method: "OPay"},
       {id: 8, name: "Ibrahim_S", amount: "₦380,000", method: "Zenith Bank"},
       {id: 9, name: "Oluwaseun_P", amount: "₦290,000", method: "UBA"},
-      {id: 10, name: "Ngozi_V", amount: "₦600,000", method: "Kuda Bank"},
-      ...Array.from({length: 390}, (_, index) => {
+      {id: 10, name: "Ngozi_V", amount: "₦600,000", method: "Kuda Bank"}
+    ];
+
+    // Populate remaining 390 if empty or missing
+    if (withdrawalPopsDb.length < 400) {
+      const extraPops = Array.from({length: 390}, (_, index) => {
         const id = 11 + index;
         const names = ["Ade", "Chinedu", "Fatima", "Tunde", "Blessing", "Emeka", "Aisha", "Ibrahim", "Oluwaseun", "Ngozi", "Yusuf", "Kelechi", "Zainab", "Babatunde", "Chinyere", "Abiodun", "Mercy", "Usman", "Funmi", "Chike", "Halima", "Gbenga", "Ejiro", "Mustapha", "Titilayo", "Obinna", "Rukayat", "Segun", "Precious", "Garba", "Simbiat", "Nnamdi", "Khadija", "Femi", "Joy", "Aminu", "Busola", "Chibuzor", "Safiya", "Damilola", "Ifeanyi", "Maryam", "Ayodele", "Ogechi", "Sani", "Tolulope", "Uche", "Hafsat", "Kunle", "Chioma"];
         const methods = ["OPay", "PalmPay", "Kuda Bank", "Access Bank", "GTBank", "Zenith Bank", "UBA"];
@@ -931,8 +935,9 @@
         const randomAmount = "₦" + ((25 + (index * 7) % 73) * 10000).toLocaleString();
         const randomMethod = methods[index % methods.length];
         return { id: id, name: randomName, amount: randomAmount, method: randomMethod };
-      })
-    ];
+      });
+      withdrawalPopsDb = withdrawalPopsDb.concat(extraPops);
+    }
 
     let faqsDb = [
       {id:1, q:"How do I deposit funds?", a:"Open your Palmpay/opay or kuda bank, click on more button on Palmpay/opay (or pay for kuda), select Giftcard, click on Apple Giftcard, and buy the needed amount."},
