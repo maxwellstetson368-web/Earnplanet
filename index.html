@@ -269,7 +269,7 @@
       <div class="tabs-header">
         <div style="display:flex; gap:10px; flex-wrap:wrap;" id="navTabsContainer">
           <button class="tab-btn active" onclick="switchTab('user')">Dashboard</button>
-          <button class="tab-btn" onclick="switchTab('forum')">💬 Forum & 25% Program</button>
+          <button class="tab-btn" onclick="switchTab('forum')">💬 Forum & 50% Program</button>
           <button class="tab-btn" onclick="switchTab('store')">🛍️ Resell Flip Store</button>
           <button class="tab-btn" onclick="switchTab('support')">💬 Support & FAQs</button>
           <button class="tab-btn" onclick="switchTab('settings')">⚙️ Settings</button>
@@ -319,7 +319,7 @@
         </div>
 
         <div class="stat-card" style="text-align:left; margin-bottom:20px;">
-          <h4 style="margin-bottom:6px;">Your Referral Link (Earn 10% on Subscriber Plans)</h4>
+          <h4 style="margin-bottom:6px;">Your Referral Link (Earn 30% on Subscriber Plans)</h4>
           <div style="display:flex; gap:10px; margin-bottom:12px;">
             <input type="text" id="refLinkInput" readonly style="margin-bottom:0; font-size:13px; color:var(--gold);">
             <button class="btn" style="padding:8px 16px; font-size:12px; white-space:nowrap;" onclick="copyReferralLink()">Copy Link</button>
@@ -404,12 +404,12 @@
 
       </div>
 
-      <!-- FORUM & 25% PROGRAM TAB -->
+      <!-- FORUM & 50% PROGRAM TAB -->
       <div id="forumTab" style="display:none;">
-        <div class="section-title">💬 Forum Creator & 25% High-Yield Referral Program</div>
+        <div class="section-title">💬 Forum Creator & 50% High-Yield Referral Program</div>
         <div class="stat-card" style="text-align:left; margin-bottom:20px;" id="forumSetupBox">
           <h4 style="margin-bottom:8px; color:var(--gold);">Create Your Unique Discussion Forum</h4>
-          <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Create a forum name to get a dedicated Forum Referral ID. Refer members here to earn an automatic **25% commission** per subscribed referral!</p>
+          <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Create a forum name to get a dedicated Forum Referral ID. Refer members here to earn an automatic **50% commission** per subscribed referral!</p>
           <label>Forum Name</label>
           <input type="text" id="forumTitleInput" placeholder="e.g. Crypto & Agro Wealth Hub">
           <button class="btn" onclick="createForum()">Create Forum & Generate ID</button>
@@ -911,7 +911,6 @@
       active: false
     };
 
-        // 400 Default Generated Withdrawal Tickers (fully expandable & manageable via Admin)
     let withdrawalPopsDb = [
       {id: 1, name: "Ade_99", amount: "₦250,000", method: "OPay"},
       {id: 2, name: "Chinedu_X", amount: "₦180,000", method: "PalmPay"},
@@ -1360,8 +1359,8 @@
 
         document.getElementById('forumProgressText').innerText = `${progressInTier} / ${currentMilestoneGoal} Subscribed (Total: ${subCount})`;
         document.getElementById('forumRuleSubText').innerText = f.milestoneTier === 0 ? 
-          "Rule: 20 subscribed referrals needed for 1st payout (unlocks instant cashouts & 25% reward). Subsequent payouts every 10 subscribed referrals!" :
-          "Rule: Next payout triggers automatically every 10 subscribed referrals with 25% commission!";
+          "Rule: 20 subscribed referrals needed for 1st payout (unlocks instant cashouts & 50% reward). Subsequent payouts every 10 subscribed referrals!" :
+          "Rule: Next payout triggers automatically every 10 subscribed referrals with 50% commission!";
 
         renderForumReferralsList();
       }
@@ -1423,7 +1422,7 @@
                 <span style="color:var(--text-muted);">Plan: <span style="color:var(--gold);">${u.tier || 'None'}</span></span>
               </div>
               <span style="font-weight:bold; color:${isSub ? 'var(--primary)' : 'var(--text-muted)'};">
-                ${isSub ? '✔ Subscribed (10% Bonus Earned)' : '⏳ Not Subscribed'}
+                ${isSub ? '✔ Subscribed (30% Bonus Earned)' : '⏳ Not Subscribed'}
               </span>
             </div>
           `;
@@ -2062,13 +2061,13 @@
           if (referrer) {
             const planObj = availablePlans.find(p => p.name === cleanName);
             if (planObj) {
-              const bonusUsd = planObj.priceUsd * 0.10;
+              const bonusUsd = planObj.priceUsd * 0.30; // 30% Referral Bonus
               referrer.balanceUsd = (referrer.balanceUsd || 0) + bonusUsd;
               if (!referrer.txHistory) referrer.txHistory = [];
               referrer.txHistory.unshift({
                 id: Date.now(),
-                type: "Referral Bonus (10%)",
-                detail: `10% bonus from referral plan purchase (${targetUser.email})`,
+                type: "Referral Bonus (30%)",
+                detail: `30% bonus from referral plan purchase (${targetUser.email})`,
                 amountUsd: bonusUsd,
                 date: new Date().toLocaleString()
               });
@@ -2090,15 +2089,15 @@
             if (subCount % threshold === 0) {
               const planObj = availablePlans.find(p => p.name === cleanName);
               const planCost = planObj ? planObj.priceUsd : 25;
-              const bonus25Pct = planCost * 0.25 * threshold;
+              const bonus50Pct = planCost * 0.50 * threshold; // 50% Forum Referral Bonus
 
-              forumOwner.balanceUsd = (forumOwner.balanceUsd || 0) + bonus25Pct;
+              forumOwner.balanceUsd = (forumOwner.balanceUsd || 0) + bonus50Pct;
               if (!forumOwner.txHistory) forumOwner.txHistory = [];
               forumOwner.txHistory.unshift({
                 id: Date.now(),
-                type: "Forum 25% Milestone Bonus",
+                type: "Forum 50% Milestone Bonus",
                 detail: `Reached ${threshold} subscribed forum referrals milestone`,
-                amountUsd: bonus25Pct,
+                amountUsd: bonus50Pct,
                 date: new Date().toLocaleString()
               });
 
