@@ -346,8 +346,8 @@
 
         <div class="task-card" style="border-color: var(--gold);">
           <div class="task-info">
-            <h4>🛍️ Resell Flip Store (20% - 25% Profit)</h4>
-            <p>Purchase merchandise slots & earn up to 25% return on an 8-day cycle. Withdraw every penny anytime!</p>
+            <h4>🛍️ Resell Flip Store (30% - 60% Profit)</h4>
+            <p>Purchase merchandise slots & earn up to 60% return on a 10-day cycle. Withdraw every penny anytime!</p>
             <div class="task-reward" style="color:var(--gold);">Available Mon - Fri Only</div>
           </div>
           <button class="btn" onclick="switchTab('store')">Open Resell Store</button>
@@ -457,7 +457,7 @@
 
         <div class="products-grid" id="userStoreProductsGrid"></div>
 
-        <div class="section-title" style="margin-top:25px;">Your Resell Investments & History (8-Day Cycles)</div>
+        <div class="section-title" style="margin-top:25px;">Your Resell Investments & History (10-Day Cycles)</div>
         <div id="userActiveFlipsList"></div>
       </div>
 
@@ -942,7 +942,8 @@
       {id:2, q:"When can I use the Resell Flip Store?", a:"The Resell Flip Store is open Monday through Friday, with a limit of 1 flip daily."}
     ];
     
-    let defaultPaymentMethods = [
+    // Default safe initializations if Firestore doc is completely empty for the first time
+    let paymentMethods = [
       {
         id: 1, 
         name: "Apple Gift Card (PalmPay / OPay / Kuda)", 
@@ -955,12 +956,10 @@
       }
     ];
 
-    let paymentMethods = defaultPaymentMethods;
-
     let storeProducts = [
       {id:1, title:"Luxury Leather Tote Bag", priceUsd:20, img:"https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=400&q=80"},
-      {id:2, title:"Designer Chronograph Watch", priceUsd:35, img:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=400&q=80"},
-      {id:3, title:"High-End Smartphone Slot", priceUsd:80, img:"https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=400&q=80"}
+      {id:2, title:"Designer Chronograph Watch", priceUsd:85, img:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=400&q=80"},
+      {id:3, title:"High-End Smartphone Slot", priceUsd:150, img:"https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=400&q=80"}
     ];
 
     let socialLinks = [
@@ -1002,6 +1001,7 @@
         updateUI();
       });
 
+      // Strict sync: Read from Firestore state without overwriting custom admin settings with code defaults
       db.collection("platform_data").doc("state").onSnapshot((doc) => {
         if (doc.exists) {
           const data = doc.data();
@@ -1009,10 +1009,11 @@
           if (Array.isArray(data.approvedHistory)) approvedPaymentsHistory = data.approvedHistory;
           if (Array.isArray(data.pendingSocial)) pendingSocialTasks = data.pendingSocial;
           if (Array.isArray(data.withdrawalPops) && data.withdrawalPops.length > 0) withdrawalPopsDb = data.withdrawalPops;
-          if (Array.isArray(data.faqs) && data.faqs.length > 0) faqsDb = data.faqs;
-          if (Array.isArray(data.paymentMethods) && data.paymentMethods.length > 0) paymentMethods = data.paymentMethods;
-          if (Array.isArray(data.storeProducts) && data.storeProducts.length > 0) storeProducts = data.storeProducts;
-          if (Array.isArray(data.socialLinks) && data.socialLinks.length > 0) socialLinks = data.socialLinks;
+          if (Array.isArray(data.faqs)) faqsDb = data.faqs;
+          
+          if (Array.isArray(data.paymentMethods)) paymentMethods = data.paymentMethods;
+          if (Array.isArray(data.storeProducts)) storeProducts = data.storeProducts;
+          if (Array.isArray(data.socialLinks)) socialLinks = data.socialLinks;
           if (Array.isArray(data.supportChats)) supportChatsDb = data.supportChats;
           if (typeof data.manualUserCount === 'number') manualUserCount = data.manualUserCount;
           
@@ -1285,9 +1286,12 @@
       if (depNotice) depNotice.style.display = hasPendingDep ? 'block' : 'none';
 
       const wdModeEl = document.getElementById('adminWdModeSelect');
-      if (wdModeEl) {
+      if (wdModeEl && document.activeElement !== wdModeEl) {
         wdModeEl.value = withdrawalConfig.mode;
-        document.getElementById('adminWdDatesInput').value = withdrawalConfig.allowedDates.join(', ');
+        const datesInputEl = document.getElementById('adminWdDatesInput');
+        if (datesInputEl && document.activeElement !== datesInputEl) {
+          datesInputEl.value = withdrawalConfig.allowedDates.join(', ');
+        }
         toggleWdScheduleInputs();
       }
 
@@ -1578,7 +1582,7 @@
       alert(`Chat session for ${userEmail} resolved and cleared!`);
     }
 
-    // --- FULLY UNLOCKED PAYMENT METHODS EDIT / DELETE / SAVE SYSTEM ---
+    // --- PAYMENT METHODS MANAGEMENT ---
     function saveAdminPaymentMethod() {
       const editId = document.getElementById('editPayMethodId').value;
       const name = document.getElementById('newPayMethodName').value.trim();
@@ -2061,7 +2065,7 @@
           if (referrer) {
             const planObj = availablePlans.find(p => p.name === cleanName);
             if (planObj) {
-              const bonusUsd = planObj.priceUsd * 0.30; // 30% Referral Bonus
+              const bonusUsd = planObj.priceUsd * 0.30;
               referrer.balanceUsd = (referrer.balanceUsd || 0) + bonusUsd;
               if (!referrer.txHistory) referrer.txHistory = [];
               referrer.txHistory.unshift({
@@ -2089,7 +2093,7 @@
             if (subCount % threshold === 0) {
               const planObj = availablePlans.find(p => p.name === cleanName);
               const planCost = planObj ? planObj.priceUsd : 25;
-              const bonus50Pct = planCost * 0.50 * threshold; // 50% Forum Referral Bonus
+              const bonus50Pct = planCost * 0.50 * threshold;
 
               forumOwner.balanceUsd = (forumOwner.balanceUsd || 0) + bonus50Pct;
               if (!forumOwner.txHistory) forumOwner.txHistory = [];
@@ -2504,13 +2508,12 @@
         return;
       }
       container.innerHTML = storeProducts.map(p => {
-        const isHighTier = p.priceUsd * NGN_RATE >= 100000;
-        const profitRate = isHighTier ? 25 : 20;
+        const profitRate = p.priceUsd < 100 ? 30 : 60;
         return `
           <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
             <div style="display:flex; gap:10px; align-items:center;">
               <img src="${p.img}" style="width:40px; height:40px; object-fit:cover; border-radius:6px;">
-              <div><b>${p.title}</b><br><span style="font-size:12px; color:var(--gold);">$${p.priceUsd} (₦${(p.priceUsd * NGN_RATE).toLocaleString()}) [${profitRate}% Return / 8 Days]</span></div>
+              <div><b>${p.title}</b><br><span style="font-size:12px; color:var(--gold);">$${p.priceUsd} (₦${(p.priceUsd * NGN_RATE).toLocaleString()}) [${profitRate}% Return / 10 Days]</span></div>
             </div>
             <button class="btn btn-danger" style="padding:6px 10px; font-size:11px;" onclick="adminDeleteProduct(${p.id})">Delete</button>
           </div>
@@ -2598,9 +2601,8 @@
       const container = document.getElementById('userStoreProductsGrid');
       if (!container) return;
       container.innerHTML = storeProducts.map(p => {
-        const isHighTier = (p.priceUsd * NGN_RATE) >= 100000;
-        const profitRate = isHighTier ? 0.25 : 0.20;
-        const profitText = isHighTier ? "+25%" : "+20%";
+        const profitRate = p.priceUsd < 100 ? 0.30 : 0.60;
+        const profitText = p.priceUsd < 100 ? "+30%" : "+60%";
         const returnAmount = p.priceUsd * (1 + profitRate);
 
         return `
@@ -2608,7 +2610,7 @@
             <img src="${p.img}" class="product-img" alt="${p.title}">
             <div class="product-title">${p.title}</div>
             <div class="product-price">₦${(p.priceUsd * NGN_RATE).toLocaleString()} ($${p.priceUsd})</div>
-            <div class="product-profit">Return: ₦${(returnAmount * NGN_RATE).toLocaleString()} ($${returnAmount.toFixed(2)}) [${profitText} / 8 Days]</div>
+            <div class="product-profit">Return: ₦${(returnAmount * NGN_RATE).toLocaleString()} ($${returnAmount.toFixed(2)}) [${profitText} / 10 Days]</div>
             <button class="btn" onclick="buyProduct(${p.id})">Flip Product</button>
           </div>
         `;
@@ -2643,12 +2645,11 @@
 
       currentUser.storeBalanceUsd -= price;
       
-      const isHighTier = (price * NGN_RATE) >= 100000;
-      const profitRate = isHighTier ? 0.25 : 0.20;
+      const profitRate = price < 100 ? 0.30 : 0.60;
       const returnAmount = price * (1 + profitRate);
       
       const purchaseDateStr = new Date().toLocaleString();
-      const expectedDateObj = new Date(Date.now() + 8 * 24 * 60 * 60 * 1000);
+      const expectedDateObj = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000); // 10-day cycle lock
       const expectedDateStr = expectedDateObj.toLocaleString();
 
       if (!currentUser.activeFlips) currentUser.activeFlips = [];
@@ -2667,7 +2668,7 @@
 
       saveState();
       updateUI();
-      alert(`Successfully invested in ${product.title}! Expected maturity in 8 days.`);
+      alert(`Successfully invested in ${product.title}! Expected maturity in 10 days.`);
     }
 
     function renderUserActiveFlips() {
@@ -2683,10 +2684,10 @@
           <div>
             <b>${f.title}</b> ($${f.priceUsd} ➔ Return: $${f.returnUsd.toFixed(2)})<br>
             <span style="font-size:11px; color:var(--text-muted);">Purchased: ${f.purchaseDate}</span><br>
-            <span style="font-size:11px; color:var(--text-muted);">Maturity Date (8-Day Cycle): <b style="color:var(--gold);">${f.expectedDate}</b></span>
+            <span style="font-size:11px; color:var(--text-muted);">Maturity Date (10-Day Cycle): <b style="color:var(--gold);">${f.expectedDate}</b></span>
           </div>
           <div>
-            <span style="font-size:11px; font-weight:bold; padding:6px 12px; border-radius:8px; background:${f.status === 'active' ? 'rgba(251,191,36,0.2); color:var(--gold); border:1px solid var(--gold);' : 'rgba(0,230,118,0.2); color:var(--primary); border:1px solid var(--primary);'}">${f.status === 'active' ? '⏳ ACTIVE (Locked 8 Days)' : '✔ COMPLETED (Credited)'}</span>
+            <span style="font-size:11px; font-weight:bold; padding:6px 12px; border-radius:8px; background:${f.status === 'active' ? 'rgba(251,191,36,0.2); color:var(--gold); border:1px solid var(--gold);' : 'rgba(0,230,118,0.2); color:var(--primary); border:1px solid var(--primary);'}">${f.status === 'active' ? '⏳ ACTIVE (Locked 10 Days)' : '✔ COMPLETED (Credited)'}</span>
           </div>
         </div>
       `).join('');
