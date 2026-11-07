@@ -889,6 +889,7 @@
     let showAllAdminApproved = false;
     let showAllAdminSupportChats = false;
 
+    // ✅ FIXED: Initialized as empty so code file never overwrites Firestore with defaults
     let manualUserCount = 1280;
     let pendingPaymentProofs = [];
     let approvedPaymentsHistory = [];
@@ -937,6 +938,7 @@
       withdrawalPopsDb = withdrawalPopsDb.concat(extraPops);
     }
 
+    // ✅ FIXED: Loaded dynamically from Firestore state
     let faqsDb = [];
     let paymentMethods = [];
     let storeProducts = [];
@@ -960,10 +962,10 @@
         amountUsd: amountUsd,
         date: new Date().toLocaleString()
       });
-      saveUserStateOnly();
+      saveState();
     }
 
-    // --- FIXED FIRESTORE SYNC & SAVE LOGIC ---
+    // --- FIRESTORE SYNC ---
     function initFirebaseSync() {
       db.collection("users").onSnapshot((snapshot) => {
         usersDb = [];
@@ -971,6 +973,7 @@
           usersDb.push(doc.data());
         });
         
+        // --- 10-MINUTE SAFETY NET FOR SOCIAL TASKS (AUTO-APPROVE) ---
         let stateChanged = false;
         const now = Date.now();
         const TEN_MINUTES = 10 * 60 * 1000;
@@ -979,6 +982,7 @@
           const remainingTasks = [];
           pendingSocialTasks.forEach(task => {
             if (task.timestamp && (now - task.timestamp >= TEN_MINUTES)) {
+              // Auto-approve and credit user
               const targetUser = usersDb.find(u => u.email === task.userEmail);
               if (targetUser) {
                 targetUser.balanceUsd = (targetUser.balanceUsd || 0) + SOCIAL_REWARD_USD;
@@ -1004,7 +1008,7 @@
           currentUser = usersDb.find(u => u.email === activeSessionEmail) || null;
         }
         updateUI();
-        if (stateChanged) saveUserStateOnly();
+        if (stateChanged) saveState();
       });
 
       db.collection("platform_data").doc("state").onSnapshot((doc) => {
@@ -1016,7 +1020,6 @@
           if (Array.isArray(data.withdrawalPops) && data.withdrawalPops.length > 0) withdrawalPopsDb = data.withdrawalPops;
           if (Array.isArray(data.faqs)) faqsDb = data.faqs;
           
-          // Only pull from cloud if data exists, avoiding automatic resets to empty arrays
           if (Array.isArray(data.paymentMethods)) paymentMethods = data.paymentMethods;
           if (Array.isArray(data.storeProducts)) storeProducts = data.storeProducts;
           if (Array.isArray(data.socialLinks)) socialLinks = data.socialLinks;
@@ -1028,21 +1031,19 @@
           if (data.activeBroadcast) activeBroadcast = data.activeBroadcast;
 
           updateUI();
+        } else {
+          saveState();
         }
       });
     }
 
-    function saveUserStateOnly() {
+    function saveState() {
       if (currentUser) {
         localStorage.setItem('earnplanet_session', currentUser.email);
         db.collection("users").doc(currentUser.email).set(currentUser, { merge: true }).catch(err => console.error(err));
       } else {
         localStorage.removeItem('earnplanet_session');
       }
-    }
-
-    function saveState() {
-      saveUserStateOnly();
 
       db.collection("platform_data").doc("state").set({
         approvedHistory: approvedPaymentsHistory,
@@ -1105,7 +1106,7 @@
       currentUser.lastLoginBonusDate = todayStr;
 
       logUserTransaction("Daily Login Bonus", `Received ₦${bonusNgn.toLocaleString()} daily login bonus for ${currentUser.tier} plan`, bonusUsd);
-      saveUserStateOnly();
+      saveState();
 
       setTimeout(() => {
         alert(`🎁 Welcome back, Planetian! Your daily login bonus of ₦${bonusNgn.toLocaleString()} ($${bonusUsd.toFixed(2)}) for your ${currentUser.tier} plan has been credited automatically!`);
@@ -1226,7 +1227,7 @@
           }
         });
         if (matured) {
-          saveUserStateOnly();
+          saveState();
           alert("🎉 Resell investment matured! Your return has been automatically added to your Main Balance.");
         }
       }
@@ -1277,7 +1278,7 @@
       if (currentUser.lastDriveDate !== todayStr) {
         currentUser.lastDriveDate = todayStr;
         currentUser.drivesCountToday = 0;
-        saveUserStateOnly();
+        saveState();
       }
       document.getElementById('drivesDisplay').innerText = `${currentUser.drivesCountToday || 0} / 4 Sessions`;
 
@@ -1344,7 +1345,7 @@
         milestoneTier: 0
       };
 
-      saveUserStateOnly();
+      saveState();
       updateUI();
       alert("Forum created successfully! Your unique forum referral link is now active.");
     }
@@ -1976,7 +1977,7 @@
 
         logUserTransaction("Plan Purchase", `Submitted proof for ${activeCheckoutPlan.name} plan`, -activeCheckoutPlan.priceUsd);
 
-        saveUserStateOnly();
+        saveState();
         closeCheckoutModal();
 
         sendAdminTelegramAlert(
@@ -2016,7 +2017,7 @@
           proofImg: e.target.result,
           type: "deposit"
         };
-        saveUserStateOnly();
+        saveState();
         closeDepositModal();
 
         sendAdminTelegramAlert(
@@ -2594,7 +2595,7 @@
       }
 
       await db.collection("users").doc(email).set(user, { merge: true });
-      saveUserStateOnly();
+      saveState();
       updateUI();
       alert(`Successfully updated user records for ${email}!`);
     }
@@ -2602,7 +2603,7 @@
     async function adminDeleteUser(email) {
       if (!confirm(`Are you sure you want to delete user ${email}?`)) return;
       await db.collection("users").doc(email).delete();
-      saveUserStateOnly();
+      saveState();
       updateUI();
       alert("User deleted successfully.");
     }
@@ -2682,7 +2683,7 @@
       currentUser.lastFlipDate = todayStr;
       logUserTransaction("Flip Investment", `Purchased slot for ${product.title}`, -price);
 
-      saveUserStateOnly();
+      saveState();
       updateUI();
       alert(`Successfully invested in ${product.title}! Expected maturity in 10 days.`);
     }
@@ -2802,7 +2803,7 @@
 
       logUserTransaction("Cashout Request", `Requested cashout to ${destinationInfo}`, -amountUsd);
 
-      saveUserStateOnly();
+      saveState();
       updateUI();
       closeWithdrawModal();
 
@@ -2825,7 +2826,7 @@
       currentUser.storeBalanceUsd = (currentUser.storeBalanceUsd || 0) + amt;
 
       logUserTransaction("Store Transfer", `Transferred funds to Resell Flip Store`, -amt);
-      saveUserStateOnly();
+      saveState();
       updateUI();
       closeAddFromMainModal();
       alert(`Successfully transferred $${amt} to store!`);
@@ -2840,7 +2841,7 @@
       currentUser.balanceUsd = (currentUser.balanceUsd || 0) + amt;
 
       logUserTransaction("Store Cashout", `Withdrew earnings from Resell Flip Store to Main`, amt);
-      saveUserStateOnly();
+      saveState();
       updateUI();
       closeTransferModal();
       alert(`Transferred $${amt.toFixed(2)} to main dashboard!`);
@@ -2856,7 +2857,7 @@
       if (currentUser.lastDriveDate !== todayStr) {
         currentUser.lastDriveDate = todayStr;
         currentUser.drivesCountToday = 0;
-        saveUserStateOnly();
+        saveState();
       }
 
       if ((currentUser.drivesCountToday || 0) >= 4) {
@@ -2923,7 +2924,7 @@
 
           logUserTransaction("Expressway Drive", `Completed Lagos expressway drive session`, rewardUsd);
 
-          saveUserStateOnly();
+          saveState();
           updateUI();
           alert(`🎉 Driving run completed successfully! Earned $${rewardUsd.toFixed(2)}.`);
           closeDrivingModal();
@@ -2938,7 +2939,7 @@
 
       await db.collection("users").doc(currentUser.email).delete();
       currentUser.email = newEmail;
-      saveUserStateOnly();
+      saveState();
       document.getElementById('settingsNewEmail').value = '';
       updateUI();
       alert("Email updated successfully!");
@@ -2952,7 +2953,7 @@
       if (oldPass !== currentUser.password) { alert("Current password incorrect!"); return; }
 
       currentUser.password = newPass;
-      saveUserStateOnly();
+      saveState();
       document.getElementById('settingsOldPass').value = '';
       document.getElementById('settingsNewPass').value = '';
       alert("Password updated successfully!");
@@ -2967,7 +2968,7 @@
       if (!user) { alert("Account not found!"); return; }
 
       user.password = newPass;
-      saveUserStateOnly();
+      saveState();
       alert("Password reset successful!");
       switchAuthView('login');
     }
@@ -3030,7 +3031,7 @@
       if (!user) { alert("Invalid credentials!"); return; }
 
       currentUser = user;
-      saveUserStateOnly();
+      saveState();
       document.getElementById('authContainer').style.display = 'none';
       document.getElementById('mainAppContainer').style.display = 'block';
       checkAndApplyDailyLoginBonus();
@@ -3040,7 +3041,7 @@
 
     function handleLogout() {
       currentUser = null;
-      saveUserStateOnly();
+      saveState();
       document.getElementById('mainAppContainer').style.display = 'none';
       document.getElementById('authContainer').style.display = 'block';
     }
