@@ -942,7 +942,7 @@
       {id:2, q:"When can I use the Resell Flip Store?", a:"The Resell Flip Store is open Monday through Friday, with a limit of 1 flip daily."}
     ];
     
-    // Default safe initializations if Firestore doc is completely empty for the first time
+    // Original Default Payment Methods Restored
     let paymentMethods = [
       {
         id: 1, 
@@ -1001,7 +1001,6 @@
         updateUI();
       });
 
-      // Strict sync: Read from Firestore state without overwriting custom admin settings with code defaults
       db.collection("platform_data").doc("state").onSnapshot((doc) => {
         if (doc.exists) {
           const data = doc.data();
@@ -2649,7 +2648,7 @@
       const returnAmount = price * (1 + profitRate);
       
       const purchaseDateStr = new Date().toLocaleString();
-      const expectedDateObj = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000); // 10-day cycle lock
+      const expectedDateObj = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000);
       const expectedDateStr = expectedDateObj.toLocaleString();
 
       if (!currentUser.activeFlips) currentUser.activeFlips = [];
