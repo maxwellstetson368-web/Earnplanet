@@ -294,7 +294,7 @@
         <!-- PULSING GRAPH LIVE USER TICKER -->
         <div class="pulse-graph-box">
           <h4 style="font-size:12px; color:var(--text-muted); text-transform:uppercase;">Live Active Platform Community</h4>
-          <p id="activeUsersDisplay" style="font-size:26px; font-weight:900; color:var(--primary); margin:4px 0;">1,280</p>
+          <p id="activeUsersDisplay" style="font-size:26px; font-weight:900; color:var(--primary); margin:4px 0;">0</p>
           <div style="font-size:11px; color:var(--gold); font-weight:bold;">🟢 Live Registrations Active Now</div>
           <div class="pulse-waves">
             <div class="wave-bar"></div>
@@ -889,7 +889,7 @@
     let showAllAdminApproved = false;
     let showAllAdminSupportChats = false;
 
-    let manualUserCount = 1280;
+    let manualUserCount = 0;
     let pendingPaymentProofs = [];
     let approvedPaymentsHistory = [];
     let pendingSocialTasks = [];
@@ -911,38 +911,11 @@
       active: false
     };
 
-    let withdrawalPopsDb = [
-      {id: 1, name: "Ade_99", amount: "₦250,000", method: "OPay"},
-      {id: 2, name: "Chinedu_X", amount: "₦180,000", method: "PalmPay"},
-      {id: 3, name: "Fatima_B", amount: "₦450,000", method: "Kuda Bank"},
-      {id: 4, name: "Tunde_O", amount: "₦320,000", method: "Access Bank"},
-      {id: 5, name: "Blessing_K", amount: "₦150,000", method: "GTBank"},
-      {id: 6, name: "Emeka_Z", amount: "₦500,000", method: "Palmpay"},
-      {id: 7, name: "Aisha_M", amount: "₦210,000", method: "OPay"},
-      {id: 8, name: "Ibrahim_S", amount: "₦380,000", method: "Zenith Bank"},
-      {id: 9, name: "Oluwaseun_P", amount: "₦290,000", method: "UBA"},
-      {id: 10, name: "Ngozi_V", amount: "₦600,000", method: "Kuda Bank"}
-    ];
+    let withdrawalPopsDb = [];
 
-    if (withdrawalPopsDb.length < 400) {
-      const extraPops = Array.from({length: 390}, (_, index) => {
-        const id = 11 + index;
-        const names = ["Ade", "Chinedu", "Fatima", "Tunde", "Blessing", "Emeka", "Aisha", "Ibrahim", "Oluwaseun", "Ngozi", "Yusuf", "Kelechi", "Zainab", "Babatunde", "Chinyere", "Abiodun", "Mercy", "Usman", "Funmi", "Chike", "Halima", "Gbenga", "Ejiro", "Mustapha", "Titilayo", "Obinna", "Rukayat", "Segun", "Precious", "Garba", "Simbiat", "Nnamdi", "Khadija", "Femi", "Joy", "Aminu", "Busola", "Chibuzor", "Safiya", "Damilola", "Ifeanyi", "Maryam", "Ayodele", "Ogechi", "Sani", "Tolulope", "Uche", "Hafsat", "Kunle", "Chioma"];
-        const methods = ["OPay", "PalmPay", "Kuda Bank", "Access Bank", "GTBank", "Zenith Bank", "UBA"];
-        const randomName = names[index % names.length] + "_" + (10 + (index % 89));
-        const randomAmount = "₦" + ((25 + (index * 7) % 73) * 10000).toLocaleString();
-        const randomMethod = methods[index % methods.length];
-        return { id: id, name: randomName, amount: randomAmount, method: randomMethod };
-      });
-      withdrawalPopsDb = withdrawalPopsDb.concat(extraPops);
-    }
-
-    let faqsDb = [
-      {id:1, q:"How do I deposit funds?", a:"Open your Palmpay/opay or kuda bank, click on more button on Palmpay/opay (or pay for kuda), select Giftcard, click on Apple Giftcard, and buy the needed amount."},
-      {id:2, q:"When can I use the Resell Flip Store?", a:"The Resell Flip Store is open Monday through Friday, with a limit of 1 flip daily."}
-    ];
+    let faqsDb = [];
     
-    // Original Default Payment Methods Restored
+    // Default Payment Methods with your correct USDT address pre-configured
     let paymentMethods = [
       {
         id: 1, 
@@ -952,20 +925,13 @@
       {
         id: 2, 
         name: "USDT Crypto (Binance / Bybit)", 
-        details: "Transfer TRC20 USDT to official platform wallet address: <br><code>TEP90124EarnPlanetOfficialUsdtAddr</code>"
+        details: "Transfer TRC20 USDT to official platform wallet address: <br><code>TWk8z5a6HYrrwsqbCNdcBuC2kmhkJZvx2t</code>"
       }
     ];
 
-    let storeProducts = [
-      {id:1, title:"Luxury Leather Tote Bag", priceUsd:20, img:"https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=400&q=80"},
-      {id:2, title:"Designer Chronograph Watch", priceUsd:85, img:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=400&q=80"},
-      {id:3, title:"High-End Smartphone Slot", priceUsd:150, img:"https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=400&q=80"}
-    ];
+    let storeProducts = [];
 
-    let socialLinks = [
-      {id:1, platform:"Telegram Channel", url:"https://t.me/earnplanetofficial"},
-      {id:2, platform:"Facebook Page", url:"https://facebook.com/earnplanet"}
-    ];
+    let socialLinks = [];
 
     const availablePlans = [
       { name: "Starter", priceUsd: 15, cashbackUsd: 6.00, cashbackNgn: 9000, dailyDriveUsd: 0.15, loginBonusNgn: 200 },
@@ -1007,14 +973,23 @@
           
           if (Array.isArray(data.approvedHistory)) approvedPaymentsHistory = data.approvedHistory;
           if (Array.isArray(data.pendingSocial)) pendingSocialTasks = data.pendingSocial;
-          if (Array.isArray(data.withdrawalPops) && data.withdrawalPops.length > 0) withdrawalPopsDb = data.withdrawalPops;
+          if (Array.isArray(data.withdrawalPops)) withdrawalPopsDb = data.withdrawalPops;
           if (Array.isArray(data.faqs)) faqsDb = data.faqs;
           
-          if (Array.isArray(data.paymentMethods)) paymentMethods = data.paymentMethods;
-          if (Array.isArray(data.storeProducts)) storeProducts = data.storeProducts;
+          if (Array.isArray(data.paymentMethods) && data.paymentMethods.length > 0) {
+            paymentMethods = data.paymentMethods;
+          }
+          
+          if (Array.isArray(data.storeProducts)) {
+            storeProducts = data.storeProducts;
+          }
+
           if (Array.isArray(data.socialLinks)) socialLinks = data.socialLinks;
           if (Array.isArray(data.supportChats)) supportChatsDb = data.supportChats;
-          if (typeof data.manualUserCount === 'number') manualUserCount = data.manualUserCount;
+          
+          if (typeof data.manualUserCount === 'number') {
+            manualUserCount = data.manualUserCount;
+          }
           
           if (data.withdrawalConfig) withdrawalConfig = data.withdrawalConfig;
           if (data.minWithdrawalConfig) minWithdrawalConfig = data.minWithdrawalConfig;
@@ -2406,7 +2381,7 @@
 
     function adminSaveSiteUserCount() {
       const val = parseInt(document.getElementById('adminSiteUserCountInput').value);
-      if (isNaN(val) || val <= 0) { alert("Please enter a valid user count number!"); return; }
+      if (isNaN(val) || val < 0) { alert("Please enter a valid user count number!"); return; }
       manualUserCount = val;
       saveState();
       updateUI();
@@ -2520,6 +2495,30 @@
       }).join('');
     }
 
+    function renderUserStoreProducts() {
+      const container = document.getElementById('userStoreProductsGrid');
+      if (!container) return;
+      if (storeProducts.length === 0) {
+        container.innerHTML = `<div class="stat-card" style="grid-column: 1/-1;"><p style="color:var(--text-muted);">No products available in store right now. Check back soon!</p></div>`;
+        return;
+      }
+      container.innerHTML = storeProducts.map(p => {
+        const profitRate = p.priceUsd < 100 ? 0.30 : 0.60;
+        const profitText = p.priceUsd < 100 ? "+30%" : "+60%";
+        const returnAmount = p.priceUsd * (1 + profitRate);
+
+        return `
+          <div class="product-card">
+            <img src="${p.img}" class="product-img" alt="${p.title}">
+            <div class="product-title">${p.title}</div>
+            <div class="product-price">₦${(p.priceUsd * NGN_RATE).toLocaleString()} ($${p.priceUsd})</div>
+            <div class="product-profit">Return: ₦${(returnAmount * NGN_RATE).toLocaleString()} ($${returnAmount.toFixed(2)}) [${profitText} / 10 Days]</div>
+            <button class="btn" onclick="buyProduct(${p.id})">Flip Product</button>
+          </div>
+        `;
+      }).join('');
+    }
+
     function renderAdminUsersList() {
       const container = document.getElementById('adminUsersListContainer');
       if (!container) return;
@@ -2594,26 +2593,6 @@
       saveState();
       updateUI();
       alert("User deleted successfully.");
-    }
-
-    function renderUserStoreProducts() {
-      const container = document.getElementById('userStoreProductsGrid');
-      if (!container) return;
-      container.innerHTML = storeProducts.map(p => {
-        const profitRate = p.priceUsd < 100 ? 0.30 : 0.60;
-        const profitText = p.priceUsd < 100 ? "+30%" : "+60%";
-        const returnAmount = p.priceUsd * (1 + profitRate);
-
-        return `
-          <div class="product-card">
-            <img src="${p.img}" class="product-img" alt="${p.title}">
-            <div class="product-title">${p.title}</div>
-            <div class="product-price">₦${(p.priceUsd * NGN_RATE).toLocaleString()} ($${p.priceUsd})</div>
-            <div class="product-profit">Return: ₦${(returnAmount * NGN_RATE).toLocaleString()} ($${returnAmount.toFixed(2)}) [${profitText} / 10 Days]</div>
-            <button class="btn" onclick="buyProduct(${p.id})">Flip Product</button>
-          </div>
-        `;
-      }).join('');
     }
 
     function buyProduct(productId) {
@@ -2695,6 +2674,10 @@
     function renderUserSocialLinks() {
       const container = document.getElementById('userSocialLinksGrid');
       if (!container) return;
+      if (socialLinks.length === 0) {
+        container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No social links added yet.</p>`;
+        return;
+      }
       container.innerHTML = socialLinks.map(s => `
         <a href="${s.url}" target="_blank" class="btn btn-secondary" style="justify-content:center; text-align:center; padding:12px; font-size:13px; color:var(--gold);">
           📢 Join ${s.platform}
