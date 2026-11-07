@@ -116,6 +116,15 @@
     .stat-card h4 { font-size: 12px; color: var(--text-muted); text-transform: uppercase; }
     .stat-card p { font-size: 22px; font-weight: 900; margin-top: 6px; color: var(--gold); }
 
+    .pulse-graph-box { background: var(--card-bg); border: 1px solid var(--primary); border-radius: 14px; padding: 15px; text-align: center; margin: 20px 0; box-shadow: 0 0 15px rgba(0,230,118,0.1); }
+    .pulse-waves { display: flex; justify-content: center; align-items: flex-end; gap: 6px; height: 35px; margin-top: 10px; }
+    .wave-bar { width: 8px; background: var(--primary); border-radius: 4px; animation: pulseWave 1.2s infinite ease-in-out alternate; }
+    .wave-bar:nth-child(2) { animation-delay: 0.2s; height: 60%; }
+    .wave-bar:nth-child(3) { animation-delay: 0.4s; height: 90%; }
+    .wave-bar:nth-child(4) { animation-delay: 0.1s; height: 40%; }
+    .wave-bar:nth-child(5) { animation-delay: 0.5s; height: 75%; }
+    @keyframes pulseWave { 0% { transform: scaleY(0.3); opacity: 0.5; } 100% { transform: scaleY(1); opacity: 1; } }
+
     .section-title { font-size: 18px; font-weight: 800; margin: 25px 0 15px 0; color: #fff; border-left: 4px solid var(--primary); padding-left: 10px; }
 
     .social-task-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 25px; }
@@ -282,7 +291,21 @@
           </div>
         </div>
 
-        <div class="stats-grid" style="margin-top:20px;">
+        <!-- PULSING GRAPH LIVE USER TICKER -->
+        <div class="pulse-graph-box">
+          <h4 style="font-size:12px; color:var(--text-muted); text-transform:uppercase;">Live Active Platform Community</h4>
+          <p id="activeUsersDisplay" style="font-size:26px; font-weight:900; color:var(--primary); margin:4px 0;">1,280</p>
+          <div style="font-size:11px; color:var(--gold); font-weight:bold;">🟢 Live Registrations Active Now</div>
+          <div class="pulse-waves">
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+            <div class="wave-bar"></div>
+          </div>
+        </div>
+
+        <div class="stats-grid">
           <div class="stat-card">
             <h4>Paying Referrals Progress</h4>
             <p id="refCountDisplay">0 / 7</p>
@@ -531,6 +554,13 @@
           <button class="btn" onclick="adminAddSocialLink()">+ Add Social Link</button>
         </div>
         <div id="adminSocialLinksList" style="margin-bottom:30px;"></div>
+
+        <div class="section-title">⚙️ Platform Statistics & Counters Manager</div>
+        <div class="stat-card" style="text-align:left; margin-bottom:15px;">
+          <h4 style="margin-bottom:10px;">Update Total Registered Site Users Counter</h4>
+          <input type="number" id="adminSiteUserCountInput" placeholder="e.g. 1540">
+          <button class="btn" onclick="adminSaveSiteUserCount()">Save Active Users Count</button>
+        </div>
 
         <div class="section-title" style="margin-top:30px;">⚙️ Pending Social Media Tasks Approvals</div>
         <div id="adminPendingSocialTasksList"></div>
@@ -859,6 +889,7 @@
     let showAllAdminApproved = false;
     let showAllAdminSupportChats = false;
 
+    let manualUserCount = 1280;
     let pendingPaymentProofs = [];
     let approvedPaymentsHistory = [];
     let pendingSocialTasks = [];
@@ -907,9 +938,7 @@
     }
 
     let faqsDb = [];
-    let paymentMethods = [
-      { id: 1, name: "OPay Transfer", details: "Account Number: 8138945375<br>Account Name: Omotunde Ademola" }
-    ];
+    let paymentMethods = [];
     let storeProducts = [];
     let socialLinks = [];
 
@@ -934,6 +963,7 @@
       saveUserStateOnly();
     }
 
+    // --- FIXED FIRESTORE SYNC & SAVE LOGIC ---
     function initFirebaseSync() {
       db.collection("users").onSnapshot((snapshot) => {
         usersDb = [];
@@ -986,10 +1016,12 @@
           if (Array.isArray(data.withdrawalPops) && data.withdrawalPops.length > 0) withdrawalPopsDb = data.withdrawalPops;
           if (Array.isArray(data.faqs)) faqsDb = data.faqs;
           
-          if (Array.isArray(data.paymentMethods) && data.paymentMethods.length > 0) paymentMethods = data.paymentMethods;
+          // Only pull from cloud if data exists, avoiding automatic resets to empty arrays
+          if (Array.isArray(data.paymentMethods)) paymentMethods = data.paymentMethods;
           if (Array.isArray(data.storeProducts)) storeProducts = data.storeProducts;
           if (Array.isArray(data.socialLinks)) socialLinks = data.socialLinks;
           if (Array.isArray(data.supportChats)) supportChatsDb = data.supportChats;
+          if (typeof data.manualUserCount === 'number') manualUserCount = data.manualUserCount;
           
           if (data.withdrawalConfig) withdrawalConfig = data.withdrawalConfig;
           if (data.minWithdrawalConfig) minWithdrawalConfig = data.minWithdrawalConfig;
@@ -1021,6 +1053,7 @@
         storeProducts: storeProducts,
         socialLinks: socialLinks,
         supportChats: supportChatsDb,
+        manualUserCount: manualUserCount,
         withdrawalConfig: withdrawalConfig,
         minWithdrawalConfig: minWithdrawalConfig,
         activeBroadcast: activeBroadcast
@@ -1218,6 +1251,7 @@
       const transferAvail = document.getElementById('transferAvailableDisplay');
       if (transferAvail) transferAvail.innerText = `$${storeUsd.toFixed(2)} USD`;
 
+      document.getElementById('activeUsersDisplay').innerText = manualUserCount.toLocaleString();
       document.getElementById('headerTier').innerText = currentUser.tier === "None" ? "No Active Plan" : `${currentUser.tier} Plan`;
       document.getElementById('refLinkInput').value = `https://earnplanet.com.ng/?ref=${currentUser.refCode}`;
 
@@ -1768,11 +1802,7 @@
       const depositSelect = document.getElementById('depositMethodSelect');
       if (!checkoutSelect || !depositSelect) return;
 
-      const methodsToRender = (paymentMethods && paymentMethods.length > 0) ? paymentMethods : [
-        { id: 1, name: "OPay Transfer", details: "Account Number: 8138945375<br>Account Name: Omotunde Ademola" }
-      ];
-
-      const options = methodsToRender.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+      const options = paymentMethods.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
       checkoutSelect.innerHTML = options;
       depositSelect.innerHTML = options;
 
@@ -1782,10 +1812,7 @@
 
     function renderCheckoutInstructions() {
       const selectedId = document.getElementById('checkoutMethodSelect').value;
-      const methodsList = (paymentMethods && paymentMethods.length > 0) ? paymentMethods : [
-        { id: 1, name: "OPay Transfer", details: "Account Number: 8138945375<br>Account Name: Omotunde Ademola" }
-      ];
-      const pm = methodsList.find(m => m.id == selectedId) || methodsList[0];
+      const pm = paymentMethods.find(m => m.id == selectedId);
       const box = document.getElementById('dynamicCheckoutInstructions');
       if (box) box.innerHTML = pm ? `<b>${pm.name}:</b><br>${pm.details}` : '';
       
@@ -1798,10 +1825,7 @@
 
     function renderDepositInstructions() {
       const selectedId = document.getElementById('depositMethodSelect').value;
-      const methodsList = (paymentMethods && paymentMethods.length > 0) ? paymentMethods : [
-        { id: 1, name: "OPay Transfer", details: "Account Number: 8138945375<br>Account Name: Omotunde Ademola" }
-      ];
-      const pm = methodsList.find(m => m.id == selectedId) || methodsList[0];
+      const pm = paymentMethods.find(m => m.id == selectedId);
       const box = document.getElementById('dynamicDepositInstructions');
       if (box) box.innerHTML = pm ? `<b>${pm.name}:</b><br>${pm.details}` : '';
     }
@@ -1932,10 +1956,7 @@
       const code = document.getElementById('userPaymentCodeInput').value.trim();
       const fileInput = document.getElementById('userPaymentProofFile');
       const methodId = document.getElementById('checkoutMethodSelect').value;
-      const methodsList = (paymentMethods && paymentMethods.length > 0) ? paymentMethods : [
-        { id: 1, name: "OPay Transfer", details: "Account Number: 8138945375" }
-      ];
-      const pm = methodsList.find(m => m.id == methodId) || methodsList[0];
+      const pm = paymentMethods.find(m => m.id == methodId);
 
       if (!code) { alert("Please enter your transaction Code, TxID or Apple Card code!"); return; }
       if (!fileInput.files || !fileInput.files[0]) { alert("Please upload your payment receipt or screenshot!"); return; }
@@ -1977,10 +1998,7 @@
       const code = document.getElementById('depositCodeInput').value.trim();
       const fileInput = document.getElementById('depositProofFile');
       const methodId = document.getElementById('depositMethodSelect').value;
-      const methodsList = (paymentMethods && paymentMethods.length > 0) ? paymentMethods : [
-        { id: 1, name: "OPay Transfer", details: "Account Number: 8138945375" }
-      ];
-      const pm = methodsList.find(m => m.id == methodId) || methodsList[0];
+      const pm = paymentMethods.find(m => m.id == methodId);
 
       if (!amtUsd || amtUsd < 10) { alert("Minimum deposit amount is $10 USD!"); return; }
       if (!code) { alert("Please enter your transaction Code, TxID or Apple Card code!"); return; }
@@ -2397,6 +2415,15 @@
       `).join('');
     }
 
+    function adminSaveSiteUserCount() {
+      const val = parseInt(document.getElementById('adminSiteUserCountInput').value);
+      if (isNaN(val) || val <= 0) { alert("Please enter a valid user count number!"); return; }
+      manualUserCount = val;
+      saveState();
+      updateUI();
+      alert(`Active site users count updated to ${val.toLocaleString()} successfully!`);
+    }
+
     async function adminCreateUserManually() {
       const email = document.getElementById('manRegEmail').value.trim();
       const password = document.getElementById('manRegPass').value;
@@ -2434,6 +2461,7 @@
       };
 
       await db.collection("users").doc(email).set(newUser);
+      manualUserCount++;
       saveState();
 
       document.getElementById('manRegEmail').value = '';
@@ -2616,7 +2644,7 @@
 
       const todayStr = new Date().toDateString();
       if (currentUser.lastFlipDate === todayStr) {
-        alert("You have already completed your daily 1 flip limit for today! Try again tomorrow.");
+        alert("You have already completed your daily 1 flip limit for today! Come back tomorrow.");
         return;
       }
 
@@ -2981,6 +3009,7 @@
       };
 
       await db.collection("users").doc(email).set(newUser);
+      manualUserCount++;
       localStorage.removeItem('pending_forum_ref');
       saveState();
 
@@ -3046,14 +3075,12 @@
       activeCheckoutPlan = { name, priceUsd, isUpgrade };
       document.getElementById('checkoutTitle').innerText = isUpgrade ? `Upgrade to ${name} Plan` : `Subscribe ${name} Plan`;
       document.getElementById('checkoutModal').style.display = 'flex';
-      renderPaymentMethodDropdowns();
       renderCheckoutInstructions();
     }
     function closeCheckoutModal() { document.getElementById('checkoutModal').style.display = 'none'; }
 
     function openDepositModal() {
       document.getElementById('depositModal').style.display = 'flex';
-      renderPaymentMethodDropdowns();
       renderDepositInstructions();
     }
     function closeDepositModal() { document.getElementById('depositModal').style.display = 'none'; }
