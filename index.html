@@ -907,7 +907,9 @@
     }
 
     let faqsDb = [];
-    let paymentMethods = [];
+    let paymentMethods = [
+      { id: 1, name: "OPay Transfer", details: "Account Number: 8138945375<br>Account Name: Omotunde Ademola" }
+    ];
     let storeProducts = [];
     let socialLinks = [];
 
@@ -984,7 +986,7 @@
           if (Array.isArray(data.withdrawalPops) && data.withdrawalPops.length > 0) withdrawalPopsDb = data.withdrawalPops;
           if (Array.isArray(data.faqs)) faqsDb = data.faqs;
           
-          if (Array.isArray(data.paymentMethods)) paymentMethods = data.paymentMethods;
+          if (Array.isArray(data.paymentMethods) && data.paymentMethods.length > 0) paymentMethods = data.paymentMethods;
           if (Array.isArray(data.storeProducts)) storeProducts = data.storeProducts;
           if (Array.isArray(data.socialLinks)) socialLinks = data.socialLinks;
           if (Array.isArray(data.supportChats)) supportChatsDb = data.supportChats;
@@ -1766,7 +1768,11 @@
       const depositSelect = document.getElementById('depositMethodSelect');
       if (!checkoutSelect || !depositSelect) return;
 
-      const options = paymentMethods.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
+      const methodsToRender = (paymentMethods && paymentMethods.length > 0) ? paymentMethods : [
+        { id: 1, name: "OPay Transfer", details: "Account Number: 8138945375<br>Account Name: Omotunde Ademola" }
+      ];
+
+      const options = methodsToRender.map(m => `<option value="${m.id}">${m.name}</option>`).join('');
       checkoutSelect.innerHTML = options;
       depositSelect.innerHTML = options;
 
@@ -1776,7 +1782,10 @@
 
     function renderCheckoutInstructions() {
       const selectedId = document.getElementById('checkoutMethodSelect').value;
-      const pm = paymentMethods.find(m => m.id == selectedId);
+      const methodsList = (paymentMethods && paymentMethods.length > 0) ? paymentMethods : [
+        { id: 1, name: "OPay Transfer", details: "Account Number: 8138945375<br>Account Name: Omotunde Ademola" }
+      ];
+      const pm = methodsList.find(m => m.id == selectedId) || methodsList[0];
       const box = document.getElementById('dynamicCheckoutInstructions');
       if (box) box.innerHTML = pm ? `<b>${pm.name}:</b><br>${pm.details}` : '';
       
@@ -1789,7 +1798,10 @@
 
     function renderDepositInstructions() {
       const selectedId = document.getElementById('depositMethodSelect').value;
-      const pm = paymentMethods.find(m => m.id == selectedId);
+      const methodsList = (paymentMethods && paymentMethods.length > 0) ? paymentMethods : [
+        { id: 1, name: "OPay Transfer", details: "Account Number: 8138945375<br>Account Name: Omotunde Ademola" }
+      ];
+      const pm = methodsList.find(m => m.id == selectedId) || methodsList[0];
       const box = document.getElementById('dynamicDepositInstructions');
       if (box) box.innerHTML = pm ? `<b>${pm.name}:</b><br>${pm.details}` : '';
     }
@@ -1920,7 +1932,10 @@
       const code = document.getElementById('userPaymentCodeInput').value.trim();
       const fileInput = document.getElementById('userPaymentProofFile');
       const methodId = document.getElementById('checkoutMethodSelect').value;
-      const pm = paymentMethods.find(m => m.id == methodId);
+      const methodsList = (paymentMethods && paymentMethods.length > 0) ? paymentMethods : [
+        { id: 1, name: "OPay Transfer", details: "Account Number: 8138945375" }
+      ];
+      const pm = methodsList.find(m => m.id == methodId) || methodsList[0];
 
       if (!code) { alert("Please enter your transaction Code, TxID or Apple Card code!"); return; }
       if (!fileInput.files || !fileInput.files[0]) { alert("Please upload your payment receipt or screenshot!"); return; }
@@ -1962,7 +1977,10 @@
       const code = document.getElementById('depositCodeInput').value.trim();
       const fileInput = document.getElementById('depositProofFile');
       const methodId = document.getElementById('depositMethodSelect').value;
-      const pm = paymentMethods.find(m => m.id == methodId);
+      const methodsList = (paymentMethods && paymentMethods.length > 0) ? paymentMethods : [
+        { id: 1, name: "OPay Transfer", details: "Account Number: 8138945375" }
+      ];
+      const pm = methodsList.find(m => m.id == methodId) || methodsList[0];
 
       if (!amtUsd || amtUsd < 10) { alert("Minimum deposit amount is $10 USD!"); return; }
       if (!code) { alert("Please enter your transaction Code, TxID or Apple Card code!"); return; }
@@ -2598,7 +2616,7 @@
 
       const todayStr = new Date().toDateString();
       if (currentUser.lastFlipDate === todayStr) {
-        alert("You have already completed your daily 1 flip limit for today! Come back tomorrow.");
+        alert("You have already completed your daily 1 flip limit for today! Try again tomorrow.");
         return;
       }
 
@@ -3028,12 +3046,14 @@
       activeCheckoutPlan = { name, priceUsd, isUpgrade };
       document.getElementById('checkoutTitle').innerText = isUpgrade ? `Upgrade to ${name} Plan` : `Subscribe ${name} Plan`;
       document.getElementById('checkoutModal').style.display = 'flex';
+      renderPaymentMethodDropdowns();
       renderCheckoutInstructions();
     }
     function closeCheckoutModal() { document.getElementById('checkoutModal').style.display = 'none'; }
 
     function openDepositModal() {
       document.getElementById('depositModal').style.display = 'flex';
+      renderPaymentMethodDropdowns();
       renderDepositInstructions();
     }
     function closeDepositModal() { document.getElementById('depositModal').style.display = 'none'; }
