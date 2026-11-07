@@ -355,7 +355,7 @@
 
         <!-- SOCIAL MEDIA TASKS SECTION -->
         <div class="section-title">📲 Earn ₦70 Daily Per Social Media Post</div>
-        <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Promote EarnPlanet on your social accounts. Submit your link or screenshot daily to earn ₦70 (auto-credits after 10 mins if admin is offline)!</p>
+        <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Promote EarnPlanet on your social accounts. Submit your link or screenshot daily to earn ₦70 upon admin approval!</p>
         
         <div class="social-task-grid">
           <div class="social-task-card">
@@ -714,7 +714,7 @@
   <div class="modal-overlay" id="socialTaskModal">
     <div class="modal">
       <h3 id="socialTaskModalTitle">Submit Social Task</h3>
-      <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Earn ₦70 ($0.0467) directly to your Main Balance upon admin approval (auto-approves in 10 mins if offline)!</p>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Earn ₦70 ($0.0467) directly to your Main Balance upon admin approval!</p>
       
       <div id="socialTaskLinkBox">
         <label>Enter Post Link / Video URL</label>
@@ -889,7 +889,6 @@
     let showAllAdminApproved = false;
     let showAllAdminSupportChats = false;
 
-    // ✅ FIXED: Initialized as empty so code file never overwrites Firestore with defaults
     let manualUserCount = 1280;
     let pendingPaymentProofs = [];
     let approvedPaymentsHistory = [];
@@ -938,11 +937,35 @@
       withdrawalPopsDb = withdrawalPopsDb.concat(extraPops);
     }
 
-    // ✅ FIXED: Loaded dynamically from Firestore state
-    let faqsDb = [];
-    let paymentMethods = [];
-    let storeProducts = [];
-    let socialLinks = [];
+    let faqsDb = [
+      {id:1, q:"How do I deposit funds?", a:"Open your Palmpay/opay or kuda bank, click on more button on Palmpay/opay (or pay for kuda), select Giftcard, click on Apple Giftcard, and buy the needed amount."},
+      {id:2, q:"When can I use the Resell Flip Store?", a:"The Resell Flip Store is open Monday through Friday, with a limit of 1 flip daily."}
+    ];
+    
+    // Default safe initializations if Firestore doc is completely empty for the first time
+    let paymentMethods = [
+      {
+        id: 1, 
+        name: "Apple Gift Card (PalmPay / OPay / Kuda)", 
+        details: "1. Open your Palmpay/opay or kuda bank<br>2. Click on more button on Palmpay/opay but for kuda click on pay<br>3. Select Giftcard<br>4. Click on Apple Giftcard<br>5. Buy the needed amount"
+      },
+      {
+        id: 2, 
+        name: "USDT Crypto (Binance / Bybit)", 
+        details: "Transfer TRC20 USDT to official platform wallet address: <br><code>TEP90124EarnPlanetOfficialUsdtAddr</code>"
+      }
+    ];
+
+    let storeProducts = [
+      {id:1, title:"Luxury Leather Tote Bag", priceUsd:20, img:"https://images.unsplash.com/photo-1584917865442-de89df76afd3?auto=format&fit=crop&w=400&q=80"},
+      {id:2, title:"Designer Chronograph Watch", priceUsd:85, img:"https://images.unsplash.com/photo-1523275335684-37898b6baf30?auto=format&fit=crop&w=400&q=80"},
+      {id:3, title:"High-End Smartphone Slot", priceUsd:150, img:"https://images.unsplash.com/photo-1511707171634-5f897ff02aa9?auto=format&fit=crop&w=400&q=80"}
+    ];
+
+    let socialLinks = [
+      {id:1, platform:"Telegram Channel", url:"https://t.me/earnplanetofficial"},
+      {id:2, platform:"Facebook Page", url:"https://facebook.com/earnplanet"}
+    ];
 
     const availablePlans = [
       { name: "Starter", priceUsd: 15, cashbackUsd: 6.00, cashbackNgn: 9000, dailyDriveUsd: 0.15, loginBonusNgn: 200 },
@@ -972,45 +995,13 @@
         snapshot.forEach((doc) => {
           usersDb.push(doc.data());
         });
-        
-        // --- 10-MINUTE SAFETY NET FOR SOCIAL TASKS (AUTO-APPROVE) ---
-        let stateChanged = false;
-        const now = Date.now();
-        const TEN_MINUTES = 10 * 60 * 1000;
-
-        if (pendingSocialTasks && pendingSocialTasks.length > 0) {
-          const remainingTasks = [];
-          pendingSocialTasks.forEach(task => {
-            if (task.timestamp && (now - task.timestamp >= TEN_MINUTES)) {
-              // Auto-approve and credit user
-              const targetUser = usersDb.find(u => u.email === task.userEmail);
-              if (targetUser) {
-                targetUser.balanceUsd = (targetUser.balanceUsd || 0) + SOCIAL_REWARD_USD;
-                if (!targetUser.txHistory) targetUser.txHistory = [];
-                targetUser.txHistory.unshift({
-                  id: Date.now(),
-                  type: "Social Task Auto-Reward",
-                  detail: `Auto-approved ${task.platform} task after 10 mins offline`,
-                  amountUsd: SOCIAL_REWARD_USD,
-                  date: new Date().toLocaleString()
-                });
-                db.collection("users").doc(targetUser.email).set(targetUser, { merge: true });
-                stateChanged = true;
-              }
-            } else {
-              remainingTasks.push(task);
-            }
-          });
-          pendingSocialTasks = remainingTasks;
-        }
-
         if (activeSessionEmail) {
           currentUser = usersDb.find(u => u.email === activeSessionEmail) || null;
         }
         updateUI();
-        if (stateChanged) saveState();
       });
 
+      // Strict sync: Read from Firestore state without overwriting custom admin settings with code defaults
       db.collection("platform_data").doc("state").onSnapshot((doc) => {
         if (doc.exists) {
           const data = doc.data();
@@ -1901,7 +1892,6 @@
             platform: activeSocialPlatform,
             proofUrl: e.target.result,
             isImage: true,
-            timestamp: Date.now(),
             date: todayStr
           });
           localStorage.setItem(userTasksKey, 'true');
@@ -1913,10 +1903,10 @@
             `👤 <b>User:</b> ${currentUser.email}\n` +
             `📌 <b>Platform:</b> ${activeSocialPlatform}\n` +
             `🎁 <b>Reward:</b> ₦70\n\n` +
-            `Review and approve in Admin Panel (Auto-credits in 10 mins if offline).`
+            `Review and approve in Admin Panel.`
           );
 
-          alert("WhatsApp Status screenshot submitted successfully! Pending approval (auto-credits in 10 mins if admin is offline).");
+          alert("WhatsApp Status screenshot submitted successfully! Pending admin approval.");
           updateUI();
         };
         reader.readAsDataURL(fileInput.files[0]);
@@ -1930,7 +1920,6 @@
           platform: activeSocialPlatform,
           proofUrl: link,
           isImage: false,
-          timestamp: Date.now(),
           date: todayStr
         });
 
@@ -1945,10 +1934,10 @@
           `📌 <b>Platform:</b> ${activeSocialPlatform}\n` +
           `🔗 <b>Link:</b> ${link}\n` +
           `🎁 <b>Reward:</b> ₦70\n\n` +
-          `Review and approve in Admin Panel (Auto-credits in 10 mins if offline).`
+          `Review and approve in Admin Panel.`
         );
 
-        alert(`${activeSocialPlatform} post link submitted successfully! Pending approval (auto-credits in 10 mins if admin is offline).`);
+        alert(`${activeSocialPlatform} post link submitted successfully! Pending admin approval.`);
         updateUI();
       }
     }
@@ -2611,12 +2600,6 @@
     function renderUserStoreProducts() {
       const container = document.getElementById('userStoreProductsGrid');
       if (!container) return;
-      
-      if (storeProducts.length === 0) {
-        container.innerHTML = `<p style="font-size:12px; color:var(--text-muted); grid-column: 1/-1; text-align:center;">No resell products available yet. Add products in the Admin Panel.</p>`;
-        return;
-      }
-
       container.innerHTML = storeProducts.map(p => {
         const profitRate = p.priceUsd < 100 ? 0.30 : 0.60;
         const profitText = p.priceUsd < 100 ? "+30%" : "+60%";
@@ -2713,10 +2696,6 @@
     function renderUserSocialLinks() {
       const container = document.getElementById('userSocialLinksGrid');
       if (!container) return;
-      if (socialLinks.length === 0) {
-        container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No social links added yet.</p>`;
-        return;
-      }
       container.innerHTML = socialLinks.map(s => `
         <a href="${s.url}" target="_blank" class="btn btn-secondary" style="justify-content:center; text-align:center; padding:12px; font-size:13px; color:var(--gold);">
           📢 Join ${s.platform}
