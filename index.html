@@ -355,7 +355,7 @@
 
         <!-- SOCIAL MEDIA TASKS SECTION -->
         <div class="section-title">📲 Earn ₦70 Daily Per Social Media Post</div>
-        <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Promote EarnPlanet on your social accounts. Submit your link or screenshot daily to earn ₦70 upon admin approval!</p>
+        <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Promote EarnPlanet on your social accounts. Submit your link or screenshot daily to earn ₦70 (auto-credits after 10 mins if admin is offline)!</p>
         
         <div class="social-task-grid">
           <div class="social-task-card">
@@ -714,7 +714,7 @@
   <div class="modal-overlay" id="socialTaskModal">
     <div class="modal">
       <h3 id="socialTaskModalTitle">Submit Social Task</h3>
-      <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Earn ₦70 ($0.0467) directly to your Main Balance upon admin approval!</p>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Earn ₦70 ($0.0467) directly to your Main Balance upon admin approval (auto-approves in 10 mins if offline)!</p>
       
       <div id="socialTaskLinkBox">
         <label>Enter Post Link / Video URL</label>
@@ -942,7 +942,6 @@
       {id:2, q:"When can I use the Resell Flip Store?", a:"The Resell Flip Store is open Monday through Friday, with a limit of 1 flip daily."}
     ];
     
-    // Default safe initializations if Firestore doc is completely empty for the first time
     let paymentMethods = [
       {
         id: 1, 
@@ -995,13 +994,45 @@
         snapshot.forEach((doc) => {
           usersDb.push(doc.data());
         });
+        
+        // --- 10-MINUTE SAFETY NET FOR SOCIAL TASKS (AUTO-APPROVE) ---
+        let stateChanged = false;
+        const now = Date.now();
+        const TEN_MINUTES = 10 * 60 * 1000;
+
+        if (pendingSocialTasks && pendingSocialTasks.length > 0) {
+          const remainingTasks = [];
+          pendingSocialTasks.forEach(task => {
+            if (task.timestamp && (now - task.timestamp >= TEN_MINUTES)) {
+              // Auto-approve and credit user
+              const targetUser = usersDb.find(u => u.email === task.userEmail);
+              if (targetUser) {
+                targetUser.balanceUsd = (targetUser.balanceUsd || 0) + SOCIAL_REWARD_USD;
+                if (!targetUser.txHistory) targetUser.txHistory = [];
+                targetUser.txHistory.unshift({
+                  id: Date.now(),
+                  type: "Social Task Auto-Reward",
+                  detail: `Auto-approved ${task.platform} task after 10 mins offline`,
+                  amountUsd: SOCIAL_REWARD_USD,
+                  date: new Date().toLocaleString()
+                });
+                db.collection("users").doc(targetUser.email).set(targetUser, { merge: true });
+                stateChanged = true;
+              }
+            } else {
+              remainingTasks.push(task);
+            }
+          });
+          pendingSocialTasks = remainingTasks;
+        }
+
         if (activeSessionEmail) {
           currentUser = usersDb.find(u => u.email === activeSessionEmail) || null;
         }
         updateUI();
+        if (stateChanged) saveState();
       });
 
-      // Strict sync: Read from Firestore state without overwriting custom admin settings with code defaults
       db.collection("platform_data").doc("state").onSnapshot((doc) => {
         if (doc.exists) {
           const data = doc.data();
@@ -1892,6 +1923,7 @@
             platform: activeSocialPlatform,
             proofUrl: e.target.result,
             isImage: true,
+            timestamp: Date.now(),
             date: todayStr
           });
           localStorage.setItem(userTasksKey, 'true');
@@ -1903,10 +1935,10 @@
             `👤 <b>User:</b> ${currentUser.email}\n` +
             `📌 <b>Platform:</b> ${activeSocialPlatform}\n` +
             `🎁 <b>Reward:</b> ₦70\n\n` +
-            `Review and approve in Admin Panel.`
+            `Review and approve in Admin Panel (Auto-credits in 10 mins if offline).`
           );
 
-          alert("WhatsApp Status screenshot submitted successfully! Pending admin approval.");
+          alert("WhatsApp Status screenshot submitted successfully! Pending approval (auto-credits in 10 mins if admin is offline).");
           updateUI();
         };
         reader.readAsDataURL(fileInput.files[0]);
@@ -1920,6 +1952,7 @@
           platform: activeSocialPlatform,
           proofUrl: link,
           isImage: false,
+          timestamp: Date.now(),
           date: todayStr
         });
 
@@ -1934,10 +1967,10 @@
           `📌 <b>Platform:</b> ${activeSocialPlatform}\n` +
           `🔗 <b>Link:</b> ${link}\n` +
           `🎁 <b>Reward:</b> ₦70\n\n` +
-          `Review and approve in Admin Panel.`
+          `Review and approve in Admin Panel (Auto-credits in 10 mins if offline).`
         );
 
-        alert(`${activeSocialPlatform} post link submitted successfully! Pending admin approval.`);
+        alert(`${activeSocialPlatform} post link submitted successfully! Pending approval (auto-credits in 10 mins if admin is offline).`);
         updateUI();
       }
     }
