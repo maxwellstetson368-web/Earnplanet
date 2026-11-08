@@ -122,7 +122,6 @@
     .leaderboard-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: #04100a; border: 1px solid var(--card-border); border-radius: 10px; margin-bottom: 8px; font-size: 13px; }
     .leaderboard-rank { font-weight: 900; width: 30px; color: var(--gold); }
 
-    /* Pulsing Active Indicator Dot & Spinner */
     .active-indicator {
       display: inline-flex;
       align-items: center;
@@ -232,7 +231,7 @@
       <div id="registerView" style="display:none;">
         <h3>Create New Account</h3>
         <label>Full Name</label>
-        <input type="text" id="regFullName" placeholder="e.g. Felix john">
+        <input type="text" id="regFullName" placeholder="e.g. Femi Ademola">
         <label>Email Address</label>
         <input type="email" id="regEmail" placeholder="user@gmail.com">
         <label>Password</label>
@@ -427,15 +426,22 @@
       <div id="communityTab" style="display:none;">
         <div class="section-title">💬 Planetians Public Community Channel</div>
         <div class="stat-card" style="text-align:left; margin-bottom:15px; border-color:var(--primary);">
-          <h4 style="color:var(--primary); margin-bottom:4px;">🌍 Welcome to the Global Planetian Channel</h4>
-          <p style="font-size:12px; color:var(--text-muted);">Chat with other Planetians, ask questions, and share strategies. Default Active Members: <b style="color:var(--gold);" id="channelMemberCount">1,500</b> online</p>
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div>
+              <h4 style="color:var(--primary); margin-bottom:4px;">🌍 Global Planetian Channel</h4>
+              <p style="font-size:12px; color:var(--text-muted);">Active Online Members: <b style="color:var(--gold);" id="channelMemberCount">1,500</b></p>
+            </div>
+            <div id="channelJoinActionContainer">
+              <button class="btn" id="joinChannelBtn" onclick="joinCommunityChannel()">+ Join Channel to Chat</button>
+            </div>
+          </div>
         </div>
 
-        <div class="chat-container" style="height: 420px;">
+        <div class="chat-container" style="height: 400px;">
           <div class="chat-messages" id="communityMessagesList">
-            <div class="msg msg-other"><b>Admin System:</b> Welcome to the public Planetians channel! Feel free to drop your questions or ask fellow members for help here.</div>
+            <div class="msg msg-other"><b>Admin System:</b> Welcome to the public Planetians channel! Click 'Join Channel to Chat' above to participate and ask questions.</div>
           </div>
-          <div class="chat-input-row">
+          <div class="chat-input-row" id="communityInputRow" style="display:none;">
             <input type="text" id="communityChatInput" placeholder="Message public channel..." style="margin-bottom:0;" onkeypress="if(event.key==='Enter') sendCommunityMessage()">
             <button class="btn" onclick="sendCommunityMessage()">Send</button>
           </div>
@@ -949,7 +955,6 @@
       active: false
     };
 
-    // Automated Withdrawal Pop-up Tickers
     let withdrawalPopsDb = [
       { id: 1, name: "Femi_O", amount: "₦150,000", method: "OPay" },
       { id: 2, name: "Blessing99", amount: "₦320,000", method: "PalmPay" },
@@ -958,18 +963,19 @@
       { id: 5, name: "Aisha_Bello", amount: "₦240,000", method: "Access Bank" }
     ];
 
-    // TOP WITHDRAWN LEADERBOARD WITH ACTIVE DAYS & SPECIFIC HOURLY INCREMENTS
-    let topEarnersLeaderboard = [
-      { name: "Oluwaseun Ade", amountNgn: 14850000, hourlyInc: 500 * 1500, daysActive: 62, status: "Flipping Earnplanet Shares" },
-      { name: "Chinedu Okafor", amountNgn: 13200000, hourlyInc: 470 * 1500, daysActive: 58, status: "Doing tasks with Platinum" },
-      { name: "Fatima Bello", amountNgn: 11950000, hourlyInc: 454 * 1500, daysActive: 54, status: "Flipping Earnplanet products" },
-      { name: "Ibrahim Sanni", amountNgn: 10800000, hourlyInc: 350 * 1500, daysActive: 49, status: "Doing tasks on Gold" },
-      { name: "Blessing Okoro", amountNgn: 9950000, hourlyInc: 400 * 1500, daysActive: 45, status: "Doing tasks on Silver" },
-      { name: "Adebayo Tunde", amountNgn: 9500000, hourlyInc: 420 * 1500, daysActive: 41, status: "Flipping Earnplanet Shares" },
-      { name: "Nkechi Amadi", amountNgn: 9200000, hourlyInc: 256 * 1500, daysActive: 37, status: "Doing tasks with Platinum" },
-      { name: "Samuel Etim", amountNgn: 9050000, hourlyInc: 430 * 1500, daysActive: 33, status: "Flipping Earnplanet products" },
-      { name: "Zainab Musa", amountNgn: 8900000, hourlyInc: 170 * 1500, daysActive: 29, status: "Doing tasks on Gold" },
-      { name: "Kelechi Nwachukwu", amountNgn: 8750000, hourlyInc: 150 * 1500, daysActive: 25, status: "Doing tasks" }
+    // BASE START TIME FOR TIMESTAMP-BASED HOURLY DELTA CALCULATION
+    const BASE_START_TIMESTAMP = 1718000000000; // Fixed baseline
+    let baseTopEarners = [
+      { name: "Oluwaseun Ade", baseNgn: 14850000, hourlyInc: 500 * 1500, daysActive: 62, status: "Flipping Earnplanet Shares" },
+      { name: "Chinedu Okafor", baseNgn: 13200000, hourlyInc: 470 * 1500, daysActive: 58, status: "Doing tasks with Platinum" },
+      { name: "Fatima Bello", baseNgn: 11950000, hourlyInc: 454 * 1500, daysActive: 54, status: "Flipping Earnplanet products" },
+      { name: "Ibrahim Sanni", baseNgn: 10800000, hourlyInc: 350 * 1500, daysActive: 49, status: "Doing tasks on Gold" },
+      { name: "Blessing Okoro", baseNgn: 9950000, hourlyInc: 400 * 1500, daysActive: 45, status: "Doing tasks on Silver" },
+      { name: "Adebayo Tunde", baseNgn: 9500000, hourlyInc: 420 * 1500, daysActive: 41, status: "Flipping Earnplanet Shares" },
+      { name: "Nkechi Amadi", baseNgn: 9200000, hourlyInc: 256 * 1500, daysActive: 37, status: "Doing tasks with Platinum" },
+      { name: "Samuel Etim", baseNgn: 9050000, hourlyInc: 430 * 1500, daysActive: 33, status: "Flipping Earnplanet products" },
+      { name: "Zainab Musa", baseNgn: 8900000, hourlyInc: 170 * 1500, daysActive: 29, status: "Doing tasks on Gold" },
+      { name: "Kelechi Nwachukwu", baseNgn: 8750000, hourlyInc: 150 * 1500, daysActive: 25, status: "Doing tasks" }
     ];
 
     let faqsDb = [];
@@ -987,8 +993,8 @@
       }
     ];
 
-    // STORE PRODUCTS & SHARES INCLUDING REQUESTED $900, $1000, $1500, $2000, $3000
-    let storeProducts = [
+    // DEFINITIVE PRODUCTS & SHARES INCLUDING EXACT $900, $1,000, $1,500, $2,000, $2,500, $3,000
+    const DEFINITIVE_STORE_PRODUCTS = [
       { id: 1, title: "Starter Merchandise Slot", priceUsd: 10, img: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80" },
       { id: 2, title: "Bronze Inventory Pack", priceUsd: 20, img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80" },
       { id: 3, title: "Silver Commerce Slot", priceUsd: 50, img: "https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=400&q=80" },
@@ -1000,8 +1006,12 @@
       { id: 9, title: "EarnPlanet Silver Share", priceUsd: 1000, img: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=400&q=80" },
       { id: 10, title: "EarnPlanet Executive Share", priceUsd: 1500, img: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=400&q=80" },
       { id: 11, title: "EarnPlanet Prime Share", priceUsd: 2000, img: "https://images.unsplash.com/photo-1621416894569-0f39ed31d247?w=400&q=80" },
-      { id: 12, title: "EarnPlanet Sovereign Share", priceUsd: 3000, img: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400&q=80" }
+      { id: 12, title: "EarnPlanet Elite Share", priceUsd: 2500, img: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=400&q=80" },
+      { id: 13, title: "EarnPlanet Sovereign Share", priceUsd: 3000, img: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400&q=80" }
     ];
+
+    let storeProducts = DEFINITIVE_STORE_PRODUCTS;
+    let storeVersion = 5; // Forces product refresh
 
     let socialLinks = [];
 
@@ -1026,7 +1036,7 @@
       saveState();
     }
 
-    // --- AUTOMATED LEADERBOARD & FIRESTORE SYNC ---
+    // --- FIREBASE SYNC & TIMESTAMP-BASED DELTA LEADERBOARD ---
     function initFirebaseSync() {
       db.collection("users").onSnapshot((snapshot) => {
         usersDb = [];
@@ -1046,16 +1056,21 @@
           if (Array.isArray(data.approvedHistory)) approvedPaymentsHistory = data.approvedHistory;
           if (Array.isArray(data.pendingSocial)) pendingSocialTasks = data.pendingSocial;
           if (Array.isArray(data.withdrawalPops) && data.withdrawalPops.length > 0) withdrawalPopsDb = data.withdrawalPops;
-          if (Array.isArray(data.leaderboard) && data.leaderboard.length > 0) topEarnersLeaderboard = data.leaderboard;
           if (Array.isArray(data.faqs)) faqsDb = data.faqs;
           if (Array.isArray(data.communityChannel)) communityChannelDb = data.communityChannel;
           
           if (Array.isArray(data.paymentMethods) && data.paymentMethods.length > 0) {
             paymentMethods = data.paymentMethods;
           }
-          if (Array.isArray(data.storeProducts) && data.storeProducts.length > 0) {
+
+          // Force update store products if version mismatch
+          if (!data.storeVersion || data.storeVersion < storeVersion || !Array.isArray(data.storeProducts) || data.storeProducts.length < DEFINITIVE_STORE_PRODUCTS.length) {
+            storeProducts = DEFINITIVE_STORE_PRODUCTS;
+            saveState();
+          } else if (Array.isArray(data.storeProducts)) {
             storeProducts = data.storeProducts;
           }
+
           if (Array.isArray(data.socialLinks)) socialLinks = data.socialLinks;
           if (Array.isArray(data.supportChats)) supportChatsDb = data.supportChats;
           
@@ -1073,27 +1088,25 @@
       });
     }
 
-    // Hourly exact increment for top withdrawers and daily active days increment
-    setInterval(() => {
-      topEarnersLeaderboard.forEach(item => {
-        item.amountNgn += item.hourlyInc;
-      });
-      saveState();
-    }, 60 * 60 * 1000);
+    // Timestamp delta calculator for foolproof hourly increments
+    function getCalculatedLeaderboard() {
+      const hoursPassed = Math.floor((Date.now() - BASE_START_TIMESTAMP) / (1000 * 60 * 60));
+      const daysPassed = Math.floor(hoursPassed / 24);
 
-    // Daily active days ticker increment
-    setInterval(() => {
-      topEarnersLeaderboard.forEach(item => {
-        item.daysActive += 1;
+      return baseTopEarners.map(item => {
+        const currentNgn = item.baseNgn + (hoursPassed * item.hourlyInc);
+        const currentDaysActive = item.daysActive + daysPassed;
+        return {
+          ...item,
+          amountNgn: currentNgn,
+          daysActive: currentDaysActive
+        };
       });
-      saveState();
-    }, 24 * 60 * 60 * 1000);
+    }
 
     setInterval(() => {
-      manualUserCount += 1;
-      channelMemberCount += Math.floor(Math.random() * 3);
-      saveState();
-    }, 15 * 60 * 1000);
+      updateUI();
+    }, 60 * 1000); // Check every minute
 
     function saveState() {
       if (currentUser) {
@@ -1107,11 +1120,11 @@
         approvedHistory: approvedPaymentsHistory,
         pendingSocial: pendingSocialTasks,
         withdrawalPops: withdrawalPopsDb,
-        leaderboard: topEarnersLeaderboard,
         faqs: faqsDb,
         communityChannel: communityChannelDb,
         paymentMethods: paymentMethods,
         storeProducts: storeProducts,
+        storeVersion: storeVersion,
         socialLinks: socialLinks,
         supportChats: supportChatsDb,
         manualUserCount: manualUserCount,
@@ -1372,6 +1385,16 @@
 
       document.getElementById('channelMemberCount').innerText = channelMemberCount.toLocaleString();
 
+      const joinBtn = document.getElementById('joinChannelBtn');
+      const inputRow = document.getElementById('communityInputRow');
+      if (currentUser.joinedCommunityChannel) {
+        if (joinBtn) joinBtn.style.display = 'none';
+        if (inputRow) inputRow.style.display = 'flex';
+      } else {
+        if (joinBtn) joinBtn.style.display = 'inline-flex';
+        if (inputRow) inputRow.style.display = 'none';
+      }
+
       renderLeaderboardUI();
       renderMembershipPlansSection();
       renderPaymentMethodDropdowns();
@@ -1396,14 +1419,15 @@
       renderAdminSocialLinksManager();
     }
 
-    // --- LEADERBOARD RENDERER WITH ACTIVE DAYS & LOADING INDICATOR ---
+    // --- LEADERBOARD RENDERER WITH DELTA INCREMENT ---
     function renderLeaderboardUI() {
       const container = document.getElementById('leaderboardContainer');
       if (!container) return;
 
-      topEarnersLeaderboard.sort((a, b) => b.amountNgn - a.amountNgn);
+      const calculatedLeaderboard = getCalculatedLeaderboard();
+      calculatedLeaderboard.sort((a, b) => b.amountNgn - a.amountNgn);
 
-      container.innerHTML = topEarnersLeaderboard.slice(0, 10).map((item, index) => {
+      container.innerHTML = calculatedLeaderboard.slice(0, 10).map((item, index) => {
         const usdEquiv = (item.amountNgn / NGN_RATE).toLocaleString(undefined, {maximumFractionDigits: 0});
         const rankColor = index === 0 ? 'color:var(--gold); font-size:15px;' : (index === 1 ? 'color:#e2e8f0;' : (index === 2 ? 'color:#b45309;' : 'color:var(--text-muted);'));
         
@@ -1425,18 +1449,32 @@
             </div>
             <div style="text-align:right;">
               <span style="font-weight:900; color:var(--primary);">₦${item.amountNgn.toLocaleString()}</span><br>
-              <span style="font-size:10px; color:var(--gold);">($${usdEquiv})</span>
+              <span style="font-size:10px; color:var(--gold);"><i class="pulse-dot" style="display:inline-block;"></i> ($${usdEquiv})</span>
             </div>
           </div>
         `;
       }).join('');
     }
 
-    // --- COMMUNITY PUBLIC CHANNEL SYSTEM ---
+    // --- COMMUNITY PUBLIC CHANNEL SYSTEM WITH JOIN WALL ---
+    function joinCommunityChannel() {
+      if (!currentUser) return;
+      currentUser.joinedCommunityChannel = true;
+      channelMemberCount += 1;
+      saveState();
+      updateUI();
+      alert("🎉 You have successfully joined the Planetians Public Channel! You can now participate in conversations and ask questions.");
+    }
+
     function sendCommunityMessage() {
       const input = document.getElementById('communityChatInput');
       const text = input.value.trim();
       if (!text || !currentUser) return;
+
+      if (!currentUser.joinedCommunityChannel) {
+        alert("Please click 'Join Channel to Chat' first before messaging!");
+        return;
+      }
 
       communityChannelDb.push({
         id: Date.now(),
@@ -2587,6 +2625,7 @@
         lastFlipDate: "",
         withdrawalCount: 0,
         activeFlips: [],
+        joinedCommunityChannel: true,
         txHistory: [
           { id: Date.now(), type: "Admin Grant", detail: "Initial Account Creation", amountUsd: initialBalUsd, date: new Date().toLocaleString() }
         ]
@@ -2662,7 +2701,6 @@
       `).join('');
     }
 
-    // USER STORE WITH FLEXIBLE LOCK DURATION SELECTOR (10, 17, 25 DAYS)
     function renderUserStoreProducts() {
       const container = document.getElementById('userStoreProductsGrid');
       if (!container) return;
@@ -2801,7 +2839,7 @@
       currentUser.storeBalanceUsd -= price;
       
       const profitAmount = price * returnPct;
-      const totalPayoutUsd = price + profitAmount; // Capital + Return
+      const totalPayoutUsd = price + profitAmount;
       
       const purchaseDateStr = new Date().toLocaleString();
       const expectedDateObj = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
@@ -3148,6 +3186,7 @@
         lastFlipDate: "",
         withdrawalCount: 0,
         activeFlips: [],
+        joinedCommunityChannel: false,
         txHistory: [
           { id: Date.now(), type: "Welcome Bonus", detail: "$10 (₦15,000) Sign Up Welcome Bonus", amountUsd: welcomeBonusUsd, date: new Date().toLocaleString() }
         ]
