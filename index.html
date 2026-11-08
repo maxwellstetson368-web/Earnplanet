@@ -116,16 +116,11 @@
     .stat-card h4 { font-size: 12px; color: var(--text-muted); text-transform: uppercase; }
     .stat-card p { font-size: 22px; font-weight: 900; margin-top: 6px; color: var(--gold); }
 
-    .pulse-graph-box { background: var(--card-bg); border: 1px solid var(--primary); border-radius: 14px; padding: 15px; text-align: center; margin: 20px 0; box-shadow: 0 0 15px rgba(0,230,118,0.1); }
-    .pulse-waves { display: flex; justify-content: center; align-items: flex-end; gap: 6px; height: 35px; margin-top: 10px; }
-    .wave-bar { width: 8px; background: var(--primary); border-radius: 4px; animation: pulseWave 1.2s infinite ease-in-out alternate; }
-    .wave-bar:nth-child(2) { animation-delay: 0.2s; height: 60%; }
-    .wave-bar:nth-child(3) { animation-delay: 0.4s; height: 90%; }
-    .wave-bar:nth-child(4) { animation-delay: 0.1s; height: 40%; }
-    .wave-bar:nth-child(5) { animation-delay: 0.5s; height: 75%; }
-    @keyframes pulseWave { 0% { transform: scaleY(0.3); opacity: 0.5; } 100% { transform: scaleY(1); opacity: 1; } }
-
     .section-title { font-size: 18px; font-weight: 800; margin: 25px 0 15px 0; color: #fff; border-left: 4px solid var(--primary); padding-left: 10px; }
+
+    .leaderboard-box { background: var(--card-bg); border: 1px solid var(--gold); border-radius: 14px; padding: 18px; margin: 20px 0; box-shadow: 0 0 15px rgba(251,191,36,0.1); }
+    .leaderboard-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: #04100a; border: 1px solid var(--card-border); border-radius: 10px; margin-bottom: 8px; font-size: 13px; }
+    .leaderboard-rank { font-weight: 900; width: 30px; color: var(--gold); }
 
     .social-task-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 25px; }
     .social-task-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 16px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; }
@@ -147,12 +142,11 @@
     .plan-perks { font-size: 12px; color: var(--text-muted); line-height: 1.6; margin-bottom: 15px; }
     .plan-bonus { background: rgba(0, 230, 118, 0.15); color: var(--primary); font-size: 11px; font-weight: bold; padding: 4px 8px; border-radius: 10px; margin-bottom: 10px; display: inline-block; }
 
-    .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px; }
+    .products-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 15px; margin-bottom: 25px; }
     .product-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 15px; display: flex; flex-direction: column; justify-content: space-between; text-align: center; }
     .product-img { width: 100%; height: 140px; object-fit: cover; border-radius: 10px; margin-bottom: 10px; background: #04100a; }
     .product-title { font-size: 15px; font-weight: 800; color: #fff; margin-bottom: 4px; }
     .product-price { font-size: 16px; font-weight: 900; color: var(--primary); }
-    .product-profit { font-size: 12px; color: var(--gold); margin: 4px 0 12px 0; font-weight: 700; }
 
     .task-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; }
     .task-info h4 { font-size: 15px; font-weight: 800; color: #fff; }
@@ -291,18 +285,13 @@
           </div>
         </div>
 
-        <!-- PULSING GRAPH LIVE USER TICKER -->
-        <div class="pulse-graph-box">
-          <h4 style="font-size:12px; color:var(--text-muted); text-transform:uppercase;">Live Active Platform Community</h4>
-          <p id="activeUsersDisplay" style="font-size:26px; font-weight:900; color:var(--primary); margin:4px 0;">3,000</p>
-          <div style="font-size:11px; color:var(--gold); font-weight:bold;">🟢 Live Registrations Active Now</div>
-          <div class="pulse-waves">
-            <div class="wave-bar"></div>
-            <div class="wave-bar"></div>
-            <div class="wave-bar"></div>
-            <div class="wave-bar"></div>
-            <div class="wave-bar"></div>
-          </div>
+        <!-- TOP USERS THAT WITHDRAWN MONEY LEADERBOARD -->
+        <div class="leaderboard-box">
+          <h4 style="font-size:14px; color:var(--gold); text-transform:uppercase; margin-bottom:4px; display:flex; align-items:center; gap:6px;">
+            🏆 Top Users That Withdrawn Money
+          </h4>
+          <p style="font-size:11px; color:var(--text-muted); margin-bottom:12px;">Live real-time leaderboards updating hourly as top earners climb ranks!</p>
+          <div id="leaderboardContainer"></div>
         </div>
 
         <div class="stats-grid">
@@ -346,8 +335,8 @@
 
         <div class="task-card" style="border-color: var(--gold);">
           <div class="task-info">
-            <h4>🛍️ Resell Flip Store (30% - 60% Profit)</h4>
-            <p>Purchase merchandise slots & earn up to 60% return on a 10-day cycle. Withdraw every penny anytime!</p>
+            <h4>🛍️ Resell Flip Store & Shares (Choose 10, 17, or 25 Days)</h4>
+            <p>Select your preferred lock period: 10 Days (20%), 17 Days (40%), or 25 Days (60%). Capital + returns credited together!</p>
             <div class="task-reward" style="color:var(--gold);">Available Mon - Fri Only</div>
           </div>
           <button class="btn" onclick="switchTab('store')">Open Resell Store</button>
@@ -436,7 +425,7 @@
 
       <!-- RESELL FLIP STORE TAB -->
       <div id="storeTab" style="display:none;">
-        <div class="section-title">🛍️ Merchandise Flip Store</div>
+        <div class="section-title">🛍️ Merchandise Flip Store & EarnPlanet Shares</div>
         
         <div class="wallet-card" style="border-color:var(--gold); margin-bottom:20px;">
           <div class="wallet-info">
@@ -457,7 +446,7 @@
 
         <div class="products-grid" id="userStoreProductsGrid"></div>
 
-        <div class="section-title" style="margin-top:25px;">Your Resell Investments & History (10-Day Cycles)</div>
+        <div class="section-title" style="margin-top:25px;">Your Active Investments & Returns History</div>
         <div id="userActiveFlipsList"></div>
       </div>
 
@@ -555,13 +544,6 @@
         </div>
         <div id="adminSocialLinksList" style="margin-bottom:30px;"></div>
 
-        <div class="section-title">⚙️ Platform Statistics & Counters Manager</div>
-        <div class="stat-card" style="text-align:left; margin-bottom:15px;">
-          <h4 style="margin-bottom:10px;">Update Total Registered Site Users Counter</h4>
-          <input type="number" id="adminSiteUserCountInput" placeholder="e.g. 3000">
-          <button class="btn" onclick="adminSaveSiteUserCount()">Save Active Users Count</button>
-        </div>
-
         <div class="section-title" style="margin-top:30px;">⚙️ Pending Social Media Tasks Approvals</div>
         <div id="adminPendingSocialTasksList"></div>
 
@@ -596,9 +578,9 @@
 
         <div class="section-title" style="margin-top:30px;">⚙️ Resell Flip Store Products Manager</div>
         <div class="stat-card" style="text-align:left; margin-bottom:15px;">
-          <h4 style="margin-bottom:10px;">Add New Resell Product</h4>
-          <input type="text" id="newProdTitle" placeholder="Product Title (e.g. Luxury Handbag)">
-          <input type="number" id="newProdPrice" placeholder="Price in USD (e.g. 20)">
+          <h4 style="margin-bottom:10px;">Add New Resell Product / Share</h4>
+          <input type="text" id="newProdTitle" placeholder="Product Title (e.g. Luxury Handbag or Premium Share)">
+          <input type="number" id="newProdPrice" placeholder="Price in USD (e.g. 1000)">
           <label style="font-size:12px; color:var(--text-muted); display:block; margin-bottom:4px;">Upload Product Image</label>
           <input type="file" id="newProdImgFile" accept="image/*">
           <button class="btn" onclick="adminAddProduct()">+ Add Product</button>
@@ -889,7 +871,7 @@
     let showAllAdminApproved = false;
     let showAllAdminSupportChats = false;
 
-    let manualUserCount = 3000; // Starts at 3,000 users automatically
+    let manualUserCount = 3000;
     let pendingPaymentProofs = [];
     let approvedPaymentsHistory = [];
     let pendingSocialTasks = [];
@@ -911,7 +893,7 @@
       active: false
     };
 
-    // Pre-loaded with over 1,000+ realistic withdrawal tickers for 24/7 automated rotation
+    // Automated Withdrawal Pop-up Tickers
     let withdrawalPopsDb = [
       { id: 1, name: "Femi_O", amount: "₦150,000", method: "OPay" },
       { id: 2, name: "Blessing99", amount: "₦320,000", method: "PalmPay" },
@@ -922,17 +904,21 @@
       { id: 7, name: "Grace_James", amount: "₦120,000", method: "OPay" },
       { id: 8, name: "Samuel_O", amount: "₦600,000", method: "Binance USDT" },
       { id: 9, name: "Zainab_H", amount: "₦95,000", method: "PalmPay" },
-      { id: 10, name: "David_Mark", amount: "₦280,000", method: "UBA" },
-      { id: 11, name: "Kelechi_P", amount: "₦350,000", method: "Zenith Bank" },
-      { id: 12, name: "Fatima_Ali", amount: "₦110,000", method: "Kuda Bank" },
-      { id: 13, name: "Oluwaseun_T", amount: "₦750,000", method: "USDT TRC20" },
-      { id: 14, name: "Ibrahim_S", amount: "₦200,000", method: "First Bank" },
-      { id: 15, name: "Chioma_L", amount: "₦180,000", method: "OPay" },
-      { id: 16, name: "Yusuf_M", amount: "₦310,000", method: "PalmPay" },
-      { id: 17, name: "Nkechi_D", amount: "₦540,000", method: "GTBank" },
-      { id: 18, name: "Abiodun_W", amount: "₦135,000", method: "Access Bank" },
-      { id: 19, name: "Mercy_E", amount: "₦420,000", method: "USDT TRC20" },
-      { id: 20, name: "Victor_A", amount: "₦290,000", method: "Kuda Bank" }
+      { id: 10, name: "David_Mark", amount: "₦280,000", method: "UBA" }
+    ];
+
+    // AUTOMATED LEADERBOARD ("Top Users That Withdrawn Money") starting at ₦9M+
+    let topEarnersLeaderboard = [
+      { name: "Oluwaseun Ade", amountNgn: 14850000, status: "Flipping Earnplanet Shares" },
+      { name: "Chinedu Okafor", amountNgn: 13200000, status: "Doing tasks with Platinum" },
+      { name: "Fatima Bello", amountNgn: 11950000, status: "Flipping Earnplanet products" },
+      { name: "Ibrahim Sanni", amountNgn: 10800000, status: "Doing tasks on Gold" },
+      { name: "Blessing Okoro", amountNgn: 9950000, status: "Doing tasks on Silver" },
+      { name: "Adebayo Tunde", amountNgn: 9500000, status: "Flipping Earnplanet Shares" },
+      { name: "Nkechi Amadi", amountNgn: 9200000, status: "Doing tasks with Platinum" },
+      { name: "Samuel Etim", amountNgn: 9050000, status: "Flipping Earnplanet products" },
+      { name: "Zainab Musa", amountNgn: 8900000, status: "Doing tasks on Gold" },
+      { name: "Kelechi Nwachukwu", amountNgn: 8750000, status: "Doing tasks" }
     ];
 
     let faqsDb = [];
@@ -950,26 +936,20 @@
       }
     ];
 
-    // Pre-loaded store products with all your requested prices pre-configured automatically
+    // Pre-loaded store products and EarnPlanet shares including requested $800, $1000, $1200, $1500, $2000, $3000
     let storeProducts = [
       { id: 1, title: "Starter Merchandise Slot", priceUsd: 10, img: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80" },
-      { id: 2, title: "Standard Digital Asset", priceUsd: 15, img: "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&q=80" },
-      { id: 3, title: "Bronze Inventory Pack", priceUsd: 20, img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80" },
-      { id: 4, title: "Express Logistics Unit", priceUsd: 30, img: "https://images.unsplash.com/photo-1526170375885-4d8ecf77b99f?w=400&q=80" },
-      { id: 5, title: "Silver Commerce Slot", priceUsd: 35, img: "https://images.unsplash.com/photo-1572635196237-14b3f281503f?w=400&q=80" },
-      { id: 6, title: "Retail Hub Package", priceUsd: 40, img: "https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=400&q=80" },
-      { id: 7, title: "Gold Tier Asset Pack", priceUsd: 50, img: "https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=400&q=80" },
-      { id: 8, title: "Premium Resell Bundle", priceUsd: 60, img: "https://images.unsplash.com/photo-1583394838336-acd977736f90?w=400&q=80" },
-      { id: 9, title: "Elite Trading Slot", priceUsd: 70, img: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400&q=80" },
-      { id: 10, title: "Platinum Merchandise Box", priceUsd: 90, img: "https://images.unsplash.com/photo-1575537302964-96cd47c06b1b?w=400&q=80" },
-      { id: 11, title: "Master Franchise Slot", priceUsd: 120, img: "https://images.unsplash.com/photo-1511556532299-8f662fc26c06?w=400&q=80" },
-      { id: 12, title: "Wholesale Inventory Crate", priceUsd: 130, img: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&q=80" },
-      { id: 13, title: "Executive Retail Pack", priceUsd: 150, img: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400&q=80" },
-      { id: 14, title: "Corporate Supply Unit", priceUsd: 170, img: "https://images.unsplash.com/photo-1454165804606-c3d57bc86b40?w=400&q=80" },
-      { id: 15, title: "Global Shipping Share", priceUsd: 180, img: "https://images.unsplash.com/photo-1586528116311-ad8dd3c8310d?w=400&q=80" },
-      { id: 16, title: "Super Cargo Bundle", priceUsd: 200, img: "https://images.unsplash.com/photo-1578575437130-527eed3abbec?w=400&q=80" },
-      { id: 17, title: "Mega Enterprise Slot", priceUsd: 250, img: "https://images.unsplash.com/photo-1579373903781-fd5c0c30c4cd?w=400&q=80" },
-      { id: 18, title: "Ultimate Wealth Syndicate", priceUsd: 500, img: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=400&q=80" }
+      { id: 2, title: "Bronze Inventory Pack", priceUsd: 20, img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80" },
+      { id: 3, title: "Silver Commerce Slot", priceUsd: 50, img: "https://images.unsplash.com/photo-1560769629-975ec94e6a86?w=400&q=80" },
+      { id: 4, title: "Gold Tier Asset Pack", priceUsd: 100, img: "https://images.unsplash.com/photo-1491553895911-0055eca6402d?w=400&q=80" },
+      { id: 5, title: "Platinum Merchandise Box", priceUsd: 200, img: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400&q=80" },
+      { id: 6, title: "Ultimate Wealth Syndicate", priceUsd: 500, img: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=400&q=80" },
+      { id: 7, title: "EarnPlanet Bronze Share", priceUsd: 800, img: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&q=80" },
+      { id: 8, title: "EarnPlanet Silver Share", priceUsd: 1000, img: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=400&q=80" },
+      { id: 9, title: "EarnPlanet Gold Share", priceUsd: 1200, img: "https://images.unsplash.com/photo-1642543492481-44e81e3914a7?w=400&q=80" },
+      { id: 10, title: "EarnPlanet Executive Share", priceUsd: 1500, img: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=400&q=80" },
+      { id: 11, title: "EarnPlanet Prime Share", priceUsd: 2000, img: "https://images.unsplash.com/photo-1621416894569-0f39ed31d247?w=400&q=80" },
+      { id: 12, title: "EarnPlanet Sovereign Share", priceUsd: 3000, img: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400&q=80" }
     ];
 
     let socialLinks = [];
@@ -995,7 +975,7 @@
       saveState();
     }
 
-    // --- AUTOMATED USER COUNT & FIRESTORE SYNC ---
+    // --- AUTOMATED LEADERBOARD SHUFFLER & FIRESTORE SYNC ---
     function initFirebaseSync() {
       db.collection("users").onSnapshot((snapshot) => {
         usersDb = [];
@@ -1015,13 +995,13 @@
           if (Array.isArray(data.approvedHistory)) approvedPaymentsHistory = data.approvedHistory;
           if (Array.isArray(data.pendingSocial)) pendingSocialTasks = data.pendingSocial;
           if (Array.isArray(data.withdrawalPops) && data.withdrawalPops.length > 0) withdrawalPopsDb = data.withdrawalPops;
+          if (Array.isArray(data.leaderboard) && data.leaderboard.length > 0) topEarnersLeaderboard = data.leaderboard;
           if (Array.isArray(data.faqs)) faqsDb = data.faqs;
           
           if (Array.isArray(data.paymentMethods) && data.paymentMethods.length > 0) {
             paymentMethods = data.paymentMethods;
           }
           
-          // Keeps pre-loaded products active
           if (Array.isArray(data.storeProducts) && data.storeProducts.length > 0) {
             storeProducts = data.storeProducts;
           }
@@ -1044,7 +1024,20 @@
       });
     }
 
-    // Automated timer: adds +1 user every 15 minutes automatically
+    // Automated hourly leaderboard reshuffle & growth
+    setInterval(() => {
+      topEarnersLeaderboard.forEach(item => {
+        item.amountNgn += Math.floor(Math.random() * 75000) + 15000;
+      });
+      if (topEarnersLeaderboard.length > 2) {
+        let idx = Math.floor(Math.random() * (topEarnersLeaderboard.length - 2)) + 1;
+        let temp = topEarnersLeaderboard[idx];
+        topEarnersLeaderboard[idx] = topEarnersLeaderboard[idx + 1];
+        topEarnersLeaderboard[idx + 1] = temp;
+      }
+      saveState();
+    }, 60 * 60 * 1000);
+
     setInterval(() => {
       manualUserCount += 1;
       saveState();
@@ -1062,6 +1055,7 @@
         approvedHistory: approvedPaymentsHistory,
         pendingSocial: pendingSocialTasks,
         withdrawalPops: withdrawalPopsDb,
+        leaderboard: topEarnersLeaderboard,
         faqs: faqsDb,
         paymentMethods: paymentMethods,
         storeProducts: storeProducts,
@@ -1235,13 +1229,13 @@
           if (f.status === 'active' && new Date() >= new Date(f.expectedDate)) {
             f.status = 'completed';
             currentUser.balanceUsd = (currentUser.balanceUsd || 0) + f.returnUsd;
-            logUserTransaction("Flip Return", `Matured flip return for ${f.title}`, f.returnUsd);
+            logUserTransaction("Flip Return & Capital", `Matured payout (Capital + Returns) for ${f.title}`, f.returnUsd);
             matured = true;
           }
         });
         if (matured) {
           saveState();
-          alert("🎉 Resell investment matured! Your return has been automatically added to your Main Balance.");
+          alert("🎉 Investment matured! Your capital and returns have been automatically added to your Main Balance.");
         }
       }
 
@@ -1265,7 +1259,6 @@
       const transferAvail = document.getElementById('transferAvailableDisplay');
       if (transferAvail) transferAvail.innerText = `$${storeUsd.toFixed(2)} USD`;
 
-      document.getElementById('activeUsersDisplay').innerText = manualUserCount.toLocaleString();
       document.getElementById('headerTier').innerText = currentUser.tier === "None" ? "No Active Plan" : `${currentUser.tier} Plan`;
       document.getElementById('refLinkInput').value = `https://earnplanet.com.ng/?ref=${currentUser.refCode}`;
 
@@ -1323,6 +1316,7 @@
         document.getElementById('adminMinWdSub').value = minWithdrawalConfig.subsequentUsd;
       }
 
+      renderLeaderboardUI();
       renderMembershipPlansSection();
       renderPaymentMethodDropdowns();
       renderPendingApprovals();
@@ -1343,6 +1337,34 @@
       renderUserChatMessages();
       renderAdminSupportInbox();
       renderAdminSocialLinksManager();
+    }
+
+    // --- LEADERBOARD RENDERER ---
+    function renderLeaderboardUI() {
+      const container = document.getElementById('leaderboardContainer');
+      if (!container) return;
+
+      topEarnersLeaderboard.sort((a, b) => b.amountNgn - a.amountNgn);
+
+      container.innerHTML = topEarnersLeaderboard.slice(0, 10).map((item, index) => {
+        const usdEquiv = (item.amountNgn / NGN_RATE).toLocaleString(undefined, {maximumFractionDigits: 0});
+        const rankColor = index === 0 ? 'color:var(--gold); font-size:15px;' : (index === 1 ? 'color:#e2e8f0;' : (index === 2 ? 'color:#b45309;' : 'color:var(--text-muted);'));
+        return `
+          <div class="leaderboard-item">
+            <div style="display:flex; align-items:center; gap:10px;">
+              <span class="leaderboard-rank" style="${rankColor}">#${index + 1}</span>
+              <div>
+                <b>${item.name}</b><br>
+                <span style="font-size:10px; color:var(--text-muted);">💼 ${item.status}</span>
+              </div>
+            </div>
+            <div style="text-align:right;">
+              <span style="font-weight:900; color:var(--primary);">₦${item.amountNgn.toLocaleString()}</span><br>
+              <span style="font-size:10px; color:var(--gold);">($${usdEquiv})</span>
+            </div>
+          </div>
+        `;
+      }).join('');
     }
 
     // --- FORUM CREATION & REFERRAL SYSTEM ---
@@ -2427,15 +2449,6 @@
       `).join('');
     }
 
-    function adminSaveSiteUserCount() {
-      const val = parseInt(document.getElementById('adminSiteUserCountInput').value);
-      if (isNaN(val) || val < 0) { alert("Please enter a valid user count number!"); return; }
-      manualUserCount = val;
-      saveState();
-      updateUI();
-      alert(`Active site users count updated to ${val.toLocaleString()} successfully!`);
-    }
-
     async function adminCreateUserManually() {
       const email = document.getElementById('manRegEmail').value.trim();
       const password = document.getElementById('manRegPass').value;
@@ -2473,7 +2486,7 @@
       };
 
       await db.collection("users").doc(email).set(newUser);
-      manualUserCount++; // Automatically increments user count on new user signup
+      manualUserCount++;
       saveState();
 
       document.getElementById('manRegEmail').value = '';
@@ -2509,7 +2522,7 @@
         document.getElementById('newProdPrice').value = '';
         fileInput.value = '';
         updateUI();
-        alert("Resell product added successfully!");
+        alert("Resell product / share added successfully!");
       };
       reader.readAsDataURL(fileInput.files[0]);
     }
@@ -2529,20 +2542,18 @@
         container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No products in store.</p>`;
         return;
       }
-      container.innerHTML = storeProducts.map(p => {
-        const profitRate = p.priceUsd < 100 ? 30 : 60;
-        return `
-          <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
-            <div style="display:flex; gap:10px; align-items:center;">
-              <img src="${p.img}" style="width:40px; height:40px; object-fit:cover; border-radius:6px;">
-              <div><b>${p.title}</b><br><span style="font-size:12px; color:var(--gold);">$${p.priceUsd} (₦${(p.priceUsd * NGN_RATE).toLocaleString()}) [${profitRate}% Return / 10 Days]</span></div>
-            </div>
-            <button class="btn btn-danger" style="padding:6px 10px; font-size:11px;" onclick="adminDeleteProduct(${p.id})">Delete</button>
+      container.innerHTML = storeProducts.map(p => `
+        <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+          <div style="display:flex; gap:10px; align-items:center;">
+            <img src="${p.img}" style="width:40px; height:40px; object-fit:cover; border-radius:6px;">
+            <div><b>${p.title}</b><br><span style="font-size:12px; color:var(--gold);">$${p.priceUsd} (₦${(p.priceUsd * NGN_RATE).toLocaleString()})</span></div>
           </div>
-        `;
-      }).join('');
+          <button class="btn btn-danger" style="padding:6px 10px; font-size:11px;" onclick="adminDeleteProduct(${p.id})">Delete</button>
+        </div>
+      `).join('');
     }
 
+    // USER STORE WITH FLEXIBLE LOCK DURATION SELECTOR (10, 17, 25 DAYS)
     function renderUserStoreProducts() {
       const container = document.getElementById('userStoreProductsGrid');
       if (!container) return;
@@ -2550,21 +2561,22 @@
         container.innerHTML = `<div class="stat-card" style="grid-column: 1/-1;"><p style="color:var(--text-muted);">No products available in store right now. Check back soon!</p></div>`;
         return;
       }
-      container.innerHTML = storeProducts.map(p => {
-        const profitRate = p.priceUsd < 100 ? 0.30 : 0.60;
-        const profitText = p.priceUsd < 100 ? "+30%" : "+60%";
-        const returnAmount = p.priceUsd * (1 + profitRate);
+      container.innerHTML = storeProducts.map(p => `
+        <div class="product-card">
+          <img src="${p.img}" class="product-img" alt="${p.title}">
+          <div class="product-title">${p.title}</div>
+          <div class="product-price">₦${(p.priceUsd * NGN_RATE).toLocaleString()} ($${p.priceUsd})</div>
+          
+          <label style="font-size:11px; color:var(--text-muted); margin-top:8px; display:block; text-align:left;">Choose Lock Duration & Returns:</label>
+          <select id="lockDuration_${p.id}" style="width:100%; padding:8px; font-size:12px; margin-bottom:10px;">
+            <option value="10">10 Days Lock (20% Return + Capital)</option>
+            <option value="17">17 Days Lock (40% Return + Capital)</option>
+            <option value="25">25 Days Lock (60% Return + Capital)</option>
+          </select>
 
-        return `
-          <div class="product-card">
-            <img src="${p.img}" class="product-img" alt="${p.title}">
-            <div class="product-title">${p.title}</div>
-            <div class="product-price">₦${(p.priceUsd * NGN_RATE).toLocaleString()} ($${p.priceUsd})</div>
-            <div class="product-profit">Return: ₦${(returnAmount * NGN_RATE).toLocaleString()} ($${returnAmount.toFixed(2)}) [${profitText} / 10 Days]</div>
-            <button class="btn" onclick="buyProduct(${p.id})">Flip Product</button>
-          </div>
-        `;
-      }).join('');
+          <button class="btn" onclick="buyProduct(${p.id})">Flip Product / Share</button>
+        </div>
+      `).join('');
     }
 
     function renderAdminUsersList() {
@@ -2661,6 +2673,13 @@
       const product = storeProducts.find(p => p.id === productId);
       if (!product) return;
 
+      const lockSelect = document.getElementById(`lockDuration_${productId}`);
+      const days = parseInt(lockSelect ? lockSelect.value : "10");
+
+      let returnPct = 0.20;
+      if (days === 17) returnPct = 0.40;
+      if (days === 25) returnPct = 0.60;
+
       const price = product.priceUsd;
       const storeBal = currentUser.storeBalanceUsd || 0;
 
@@ -2671,11 +2690,11 @@
 
       currentUser.storeBalanceUsd -= price;
       
-      const profitRate = price < 100 ? 0.30 : 0.60;
-      const returnAmount = price * (1 + profitRate);
+      const profitAmount = price * returnPct;
+      const totalPayoutUsd = price + profitAmount; // Capital + Return
       
       const purchaseDateStr = new Date().toLocaleString();
-      const expectedDateObj = new Date(Date.now() + 10 * 24 * 60 * 60 * 1000);
+      const expectedDateObj = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
       const expectedDateStr = expectedDateObj.toLocaleString();
 
       if (!currentUser.activeFlips) currentUser.activeFlips = [];
@@ -2683,18 +2702,20 @@
         id: Date.now(),
         title: product.title,
         priceUsd: price,
-        returnUsd: returnAmount,
+        returnUsd: totalPayoutUsd,
+        daysLocked: days,
+        profitPct: (returnPct * 100),
         purchaseDate: purchaseDateStr,
         expectedDate: expectedDateStr,
         status: 'active'
       });
 
       currentUser.lastFlipDate = todayStr;
-      logUserTransaction("Flip Investment", `Purchased slot for ${product.title}`, -price);
+      logUserTransaction("Investment Locked", `Purchased slot for ${product.title} (${days} Days Lock)`, -price);
 
       saveState();
       updateUI();
-      alert(`Successfully invested in ${product.title}! Expected maturity in 10 days.`);
+      alert(`Successfully invested in ${product.title}! Capital ($${price}) + ${returnPct * 100}% returns ($${profitAmount.toFixed(2)}) locked for ${days} days.`);
     }
 
     function renderUserActiveFlips() {
@@ -2708,12 +2729,13 @@
       container.innerHTML = currentUser.activeFlips.map(f => `
         <div class="payment-account-card" style="margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
           <div>
-            <b>${f.title}</b> ($${f.priceUsd} ➔ Return: $${f.returnUsd.toFixed(2)})<br>
+            <b>${f.title}</b> (Capital: $${f.priceUsd} ➔ Payout: <span style="color:var(--primary);">$${f.returnUsd.toFixed(2)}</span>)<br>
+            <span style="font-size:11px; color:var(--gold);">Lock Duration: <b>${f.daysLocked || 10} Days (${f.profitPct || 20}% Return)</b></span><br>
             <span style="font-size:11px; color:var(--text-muted);">Purchased: ${f.purchaseDate}</span><br>
-            <span style="font-size:11px; color:var(--text-muted);">Maturity Date (10-Day Cycle): <b style="color:var(--gold);">${f.expectedDate}</b></span>
+            <span style="font-size:11px; color:var(--text-muted);">Maturity Date: <b style="color:var(--gold);">${f.expectedDate}</b></span>
           </div>
           <div>
-            <span style="font-size:11px; font-weight:bold; padding:6px 12px; border-radius:8px; background:${f.status === 'active' ? 'rgba(251,191,36,0.2); color:var(--gold); border:1px solid var(--gold);' : 'rgba(0,230,118,0.2); color:var(--primary); border:1px solid var(--primary);'}">${f.status === 'active' ? '⏳ ACTIVE (Locked 10 Days)' : '✔ COMPLETED (Credited)'}</span>
+            <span style="font-size:11px; font-weight:bold; padding:6px 12px; border-radius:8px; background:${f.status === 'active' ? 'rgba(251,191,36,0.2); color:var(--gold); border:1px solid var(--gold);' : 'rgba(0,230,118,0.2); color:var(--primary); border:1px solid var(--primary);'}">${f.status === 'active' ? `⏳ ACTIVE (${f.daysLocked || 10} Days)` : '✔ COMPLETED (Credited)'}</span>
           </div>
         </div>
       `).join('');
@@ -2992,7 +3014,7 @@
       if (!email || !password || pin.length !== 4) { alert("Fill all fields correctly!"); return; }
       if (usersDb.some(u => u.email === email)) { alert("Email already exists!"); return; }
 
-      const welcomeBonusUsd = 10000 / NGN_RATE;
+      const welcomeBonusUsd = 15000 / NGN_RATE;
       const uniqueRefCode = "EP-" + Math.floor(10000 + Math.random() * 90000);
 
       const newUser = { 
@@ -3014,12 +3036,12 @@
         withdrawalCount: 0,
         activeFlips: [],
         txHistory: [
-          { id: Date.now(), type: "Welcome Bonus", detail: "₦10,000 Sign Up Welcome Bonus", amountUsd: welcomeBonusUsd, date: new Date().toLocaleString() }
+          { id: Date.now(), type: "Welcome Bonus", detail: "$10 (₦15,000) Sign Up Welcome Bonus", amountUsd: welcomeBonusUsd, date: new Date().toLocaleString() }
         ]
       };
 
       await db.collection("users").doc(email).set(newUser);
-      manualUserCount++; // Automatically increments user counter on signup
+      manualUserCount++;
       localStorage.removeItem('pending_forum_ref');
       saveState();
 
@@ -3029,7 +3051,7 @@
         `🔗 <b>Referred By:</b> ${refCodeInput || 'None'}`
       );
 
-      alert("Account created successfully! ₦10,000 welcome bonus credited.");
+      alert("Account created successfully! $10 (₦15,000) welcome bonus credited.");
       switchAuthView('login');
     }
 
