@@ -122,6 +122,33 @@
     .leaderboard-item { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px; background: #04100a; border: 1px solid var(--card-border); border-radius: 10px; margin-bottom: 8px; font-size: 13px; }
     .leaderboard-rank { font-weight: 900; width: 30px; color: var(--gold); }
 
+    /* Pulsing Active Indicator Dot & Spinner */
+    .active-indicator {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 10px;
+      color: var(--primary);
+      background: rgba(0, 230, 118, 0.1);
+      padding: 2px 6px;
+      border-radius: 6px;
+      border: 1px solid rgba(0, 230, 118, 0.3);
+      margin-top: 2px;
+    }
+    .pulse-dot {
+      width: 6px;
+      height: 6px;
+      background-color: var(--primary);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--primary);
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0% { transform: scale(0.95); opacity: 0.8; }
+      50% { transform: scale(1.2); opacity: 1; box-shadow: 0 0 12px var(--primary); }
+      100% { transform: scale(0.95); opacity: 0.8; }
+    }
+
     .social-task-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 25px; }
     .social-task-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 16px; text-align: center; display: flex; flex-direction: column; justify-content: space-between; gap: 10px; }
 
@@ -153,10 +180,10 @@
     .task-info p { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
     .task-reward { color: var(--primary); font-weight: 800; font-size: 13px; margin-top: 5px; }
 
-    .chat-container { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; height: 350px; display: flex; flex-direction: column; margin-bottom: 20px; }
+    .chat-container { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; height: 380px; display: flex; flex-direction: column; margin-bottom: 20px; }
     .chat-messages { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; margin-bottom: 15px; }
-    .msg { padding: 10px 14px; border-radius: 12px; font-size: 13px; max-width: 80%; line-height: 1.4; }
-    .msg-bot { background: #16422b; color: #fff; align-self: flex-start; }
+    .msg { padding: 10px 14px; border-radius: 12px; font-size: 13px; max-width: 85%; line-height: 1.4; }
+    .msg-other { background: #16422b; color: #fff; align-self: flex-start; }
     .msg-user { background: var(--primary); color: #04100a; font-weight: 700; align-self: flex-end; }
     .chat-input-row { display: flex; gap: 10px; }
 
@@ -204,6 +231,8 @@
       <!-- REGISTER VIEW -->
       <div id="registerView" style="display:none;">
         <h3>Create New Account</h3>
+        <label>Full Name</label>
+        <input type="text" id="regFullName" placeholder="e.g. Femi Ademola">
         <label>Email Address</label>
         <input type="email" id="regEmail" placeholder="user@gmail.com">
         <label>Password</label>
@@ -263,6 +292,7 @@
       <div class="tabs-header">
         <div style="display:flex; gap:10px; flex-wrap:wrap;" id="navTabsContainer">
           <button class="tab-btn active" onclick="switchTab('user')">Dashboard</button>
+          <button class="tab-btn" onclick="switchTab('community')">💬 Planetians Channel</button>
           <button class="tab-btn" onclick="switchTab('forum')">💬 Forum & 50% Program</button>
           <button class="tab-btn" onclick="switchTab('store')">🛍️ Resell Flip Store</button>
           <button class="tab-btn" onclick="switchTab('support')">💬 Support & FAQs</button>
@@ -393,6 +423,25 @@
 
       </div>
 
+      <!-- PLANETIANS PUBLIC COMMUNITY CHANNEL TAB -->
+      <div id="communityTab" style="display:none;">
+        <div class="section-title">💬 Planetians Public Community Channel</div>
+        <div class="stat-card" style="text-align:left; margin-bottom:15px; border-color:var(--primary);">
+          <h4 style="color:var(--primary); margin-bottom:4px;">🌍 Welcome to the Global Planetian Channel</h4>
+          <p style="font-size:12px; color:var(--text-muted);">Chat with other Planetians, ask questions, and share strategies. Default Active Members: <b style="color:var(--gold);" id="channelMemberCount">1,500</b> online</p>
+        </div>
+
+        <div class="chat-container" style="height: 420px;">
+          <div class="chat-messages" id="communityMessagesList">
+            <div class="msg msg-other"><b>Admin System:</b> Welcome to the public Planetians channel! Feel free to drop your questions or ask fellow members for help here.</div>
+          </div>
+          <div class="chat-input-row">
+            <input type="text" id="communityChatInput" placeholder="Message public channel..." style="margin-bottom:0;" onkeypress="if(event.key==='Enter') sendCommunityMessage()">
+            <button class="btn" onclick="sendCommunityMessage()">Send</button>
+          </div>
+        </div>
+      </div>
+
       <!-- FORUM & 50% PROGRAM TAB -->
       <div id="forumTab" style="display:none;">
         <div class="section-title">💬 Forum Creator & 50% High-Yield Referral Program</div>
@@ -455,7 +504,7 @@
         <div class="section-title">💬 EarnPlanet Support Assistant</div>
         <div class="chat-container">
           <div class="chat-messages" id="chatMessagesList">
-            <div class="msg msg-bot">Hello Planetian! Send your message here and our support admin will reply to you directly. <br><br><b>Notice:</b> If you cannot wait for admin response, please contact us via email at <b>Support@earnplanet.com.ng</b></div>
+            <div class="msg msg-other">Hello Planetian! Send your message here and our support admin will reply to you directly. <br><br><b>Notice:</b> If you cannot wait for admin response, please contact us via email at <b>Support@earnplanet.com.ng</b></div>
           </div>
           <div class="chat-input-row">
             <input type="text" id="chatInput" placeholder="Type your message to support..." style="margin-bottom:0;" onkeypress="if(event.key==='Enter') sendChatMessage()">
@@ -569,6 +618,7 @@
         <div class="section-title" style="margin-top:30px;">⚙️ Manual User Creator (Admin)</div>
         <div class="stat-card" style="text-align:left; margin-bottom:15px;">
           <h4 style="margin-bottom:10px;">Create User Manually</h4>
+          <input type="text" id="manRegName" placeholder="Full Name">
           <input type="email" id="manRegEmail" placeholder="User Email (e.g. user@gmail.com)">
           <input type="text" id="manRegPass" placeholder="Password">
           <input type="text" id="manRegPin" maxlength="4" placeholder="4-Digit PIN">
@@ -872,10 +922,16 @@
     let showAllAdminSupportChats = false;
 
     let manualUserCount = 3000;
+    let channelMemberCount = 1500;
     let pendingPaymentProofs = [];
     let approvedPaymentsHistory = [];
     let pendingSocialTasks = [];
     let supportChatsDb = [];
+    let communityChannelDb = [
+      { id: 1, sender: "Blessing99", text: "Hello everyone! Has anyone successfully flipped the $1,000 share today?", time: "10:15 AM" },
+      { id: 2, sender: "Tunde_Wealth", text: "Yes Blessing! Just locked my 25-days return cycle. EarnPlanet is solid.", time: "10:18 AM" },
+      { id: 3, sender: "Chinonso_E", text: "Please how long does the withdrawal approval take?", time: "10:22 AM" }
+    ];
 
     let withdrawalConfig = {
       mode: "dates",
@@ -899,26 +955,21 @@
       { id: 2, name: "Blessing99", amount: "₦320,000", method: "PalmPay" },
       { id: 3, name: "Tunde_Wealth", amount: "₦500,000", method: "USDT TRC20" },
       { id: 4, name: "Chinonso_E", amount: "₦85,000", method: "Kuda Bank" },
-      { id: 5, name: "Aisha_Bello", amount: "₦240,000", method: "Access Bank" },
-      { id: 6, name: "Emmanuel_K", amount: "₦450,000", method: "GTBank" },
-      { id: 7, name: "Grace_James", amount: "₦120,000", method: "OPay" },
-      { id: 8, name: "Samuel_O", amount: "₦600,000", method: "Binance USDT" },
-      { id: 9, name: "Zainab_H", amount: "₦95,000", method: "PalmPay" },
-      { id: 10, name: "David_Mark", amount: "₦280,000", method: "UBA" }
+      { id: 5, name: "Aisha_Bello", amount: "₦240,000", method: "Access Bank" }
     ];
 
-    // AUTOMATED LEADERBOARD ("Top Users That Withdrawn Money") starting at ₦9M+
+    // TOP WITHDRAWN LEADERBOARD WITH ACTIVE DAYS & SPECIFIC HOURLY INCREMENTS
     let topEarnersLeaderboard = [
-      { name: "Oluwaseun Ade", amountNgn: 14850000, status: "Flipping Earnplanet Shares" },
-      { name: "Chinedu Okafor", amountNgn: 13200000, status: "Doing tasks with Platinum" },
-      { name: "Fatima Bello", amountNgn: 11950000, status: "Flipping Earnplanet products" },
-      { name: "Ibrahim Sanni", amountNgn: 10800000, status: "Doing tasks on Gold" },
-      { name: "Blessing Okoro", amountNgn: 9950000, status: "Doing tasks on Silver" },
-      { name: "Adebayo Tunde", amountNgn: 9500000, status: "Flipping Earnplanet Shares" },
-      { name: "Nkechi Amadi", amountNgn: 9200000, status: "Doing tasks with Platinum" },
-      { name: "Samuel Etim", amountNgn: 9050000, status: "Flipping Earnplanet products" },
-      { name: "Zainab Musa", amountNgn: 8900000, status: "Doing tasks on Gold" },
-      { name: "Kelechi Nwachukwu", amountNgn: 8750000, status: "Doing tasks" }
+      { name: "Oluwaseun Ade", amountNgn: 14850000, hourlyInc: 500 * 1500, daysActive: 62, status: "Flipping Earnplanet Shares" },
+      { name: "Chinedu Okafor", amountNgn: 13200000, hourlyInc: 470 * 1500, daysActive: 58, status: "Doing tasks with Platinum" },
+      { name: "Fatima Bello", amountNgn: 11950000, hourlyInc: 454 * 1500, daysActive: 54, status: "Flipping Earnplanet products" },
+      { name: "Ibrahim Sanni", amountNgn: 10800000, hourlyInc: 350 * 1500, daysActive: 49, status: "Doing tasks on Gold" },
+      { name: "Blessing Okoro", amountNgn: 9950000, hourlyInc: 400 * 1500, daysActive: 45, status: "Doing tasks on Silver" },
+      { name: "Adebayo Tunde", amountNgn: 9500000, hourlyInc: 420 * 1500, daysActive: 41, status: "Flipping Earnplanet Shares" },
+      { name: "Nkechi Amadi", amountNgn: 9200000, hourlyInc: 256 * 1500, daysActive: 37, status: "Doing tasks with Platinum" },
+      { name: "Samuel Etim", amountNgn: 9050000, hourlyInc: 430 * 1500, daysActive: 33, status: "Flipping Earnplanet products" },
+      { name: "Zainab Musa", amountNgn: 8900000, hourlyInc: 170 * 1500, daysActive: 29, status: "Doing tasks on Gold" },
+      { name: "Kelechi Nwachukwu", amountNgn: 8750000, hourlyInc: 150 * 1500, daysActive: 25, status: "Doing tasks" }
     ];
 
     let faqsDb = [];
@@ -936,7 +987,7 @@
       }
     ];
 
-    // Pre-loaded store products and EarnPlanet shares including requested $800, $1000, $1200, $1500, $2000, $3000
+    // STORE PRODUCTS & SHARES INCLUDING REQUESTED $900, $1000, $1500, $2000, $3000
     let storeProducts = [
       { id: 1, title: "Starter Merchandise Slot", priceUsd: 10, img: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80" },
       { id: 2, title: "Bronze Inventory Pack", priceUsd: 20, img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80" },
@@ -945,8 +996,8 @@
       { id: 5, title: "Platinum Merchandise Box", priceUsd: 200, img: "https://images.unsplash.com/photo-1546868871-7041f2a55e12?w=400&q=80" },
       { id: 6, title: "Ultimate Wealth Syndicate", priceUsd: 500, img: "https://images.unsplash.com/photo-1559526324-4b87b5e36e44?w=400&q=80" },
       { id: 7, title: "EarnPlanet Bronze Share", priceUsd: 800, img: "https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=400&q=80" },
-      { id: 8, title: "EarnPlanet Silver Share", priceUsd: 1000, img: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=400&q=80" },
-      { id: 9, title: "EarnPlanet Gold Share", priceUsd: 1200, img: "https://images.unsplash.com/photo-1642543492481-44e81e3914a7?w=400&q=80" },
+      { id: 8, title: "EarnPlanet Special Share", priceUsd: 900, img: "https://images.unsplash.com/photo-1579532537598-459ecdaf39cc?w=400&q=80" },
+      { id: 9, title: "EarnPlanet Silver Share", priceUsd: 1000, img: "https://images.unsplash.com/photo-1590283603385-17ffb3a7f29f?w=400&q=80" },
       { id: 10, title: "EarnPlanet Executive Share", priceUsd: 1500, img: "https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=400&q=80" },
       { id: 11, title: "EarnPlanet Prime Share", priceUsd: 2000, img: "https://images.unsplash.com/photo-1621416894569-0f39ed31d247?w=400&q=80" },
       { id: 12, title: "EarnPlanet Sovereign Share", priceUsd: 3000, img: "https://images.unsplash.com/photo-1507679799987-c73779587ccf?w=400&q=80" }
@@ -975,7 +1026,7 @@
       saveState();
     }
 
-    // --- AUTOMATED LEADERBOARD SHUFFLER & FIRESTORE SYNC ---
+    // --- AUTOMATED LEADERBOARD & FIRESTORE SYNC ---
     function initFirebaseSync() {
       db.collection("users").onSnapshot((snapshot) => {
         usersDb = [];
@@ -997,21 +1048,19 @@
           if (Array.isArray(data.withdrawalPops) && data.withdrawalPops.length > 0) withdrawalPopsDb = data.withdrawalPops;
           if (Array.isArray(data.leaderboard) && data.leaderboard.length > 0) topEarnersLeaderboard = data.leaderboard;
           if (Array.isArray(data.faqs)) faqsDb = data.faqs;
+          if (Array.isArray(data.communityChannel)) communityChannelDb = data.communityChannel;
           
           if (Array.isArray(data.paymentMethods) && data.paymentMethods.length > 0) {
             paymentMethods = data.paymentMethods;
           }
-          
           if (Array.isArray(data.storeProducts) && data.storeProducts.length > 0) {
             storeProducts = data.storeProducts;
           }
-
           if (Array.isArray(data.socialLinks)) socialLinks = data.socialLinks;
           if (Array.isArray(data.supportChats)) supportChatsDb = data.supportChats;
           
-          if (typeof data.manualUserCount === 'number' && data.manualUserCount >= 3000) {
-            manualUserCount = data.manualUserCount;
-          }
+          if (typeof data.manualUserCount === 'number') manualUserCount = data.manualUserCount;
+          if (typeof data.channelMemberCount === 'number') channelMemberCount = data.channelMemberCount;
           
           if (data.withdrawalConfig) withdrawalConfig = data.withdrawalConfig;
           if (data.minWithdrawalConfig) minWithdrawalConfig = data.minWithdrawalConfig;
@@ -1024,22 +1073,25 @@
       });
     }
 
-    // Automated hourly leaderboard reshuffle & growth
+    // Hourly exact increment for top withdrawers and daily active days increment
     setInterval(() => {
       topEarnersLeaderboard.forEach(item => {
-        item.amountNgn += Math.floor(Math.random() * 75000) + 15000;
+        item.amountNgn += item.hourlyInc;
       });
-      if (topEarnersLeaderboard.length > 2) {
-        let idx = Math.floor(Math.random() * (topEarnersLeaderboard.length - 2)) + 1;
-        let temp = topEarnersLeaderboard[idx];
-        topEarnersLeaderboard[idx] = topEarnersLeaderboard[idx + 1];
-        topEarnersLeaderboard[idx + 1] = temp;
-      }
       saveState();
     }, 60 * 60 * 1000);
 
+    // Daily active days ticker increment
+    setInterval(() => {
+      topEarnersLeaderboard.forEach(item => {
+        item.daysActive += 1;
+      });
+      saveState();
+    }, 24 * 60 * 60 * 1000);
+
     setInterval(() => {
       manualUserCount += 1;
+      channelMemberCount += Math.floor(Math.random() * 3);
       saveState();
     }, 15 * 60 * 1000);
 
@@ -1057,11 +1109,13 @@
         withdrawalPops: withdrawalPopsDb,
         leaderboard: topEarnersLeaderboard,
         faqs: faqsDb,
+        communityChannel: communityChannelDb,
         paymentMethods: paymentMethods,
         storeProducts: storeProducts,
         socialLinks: socialLinks,
         supportChats: supportChatsDb,
         manualUserCount: manualUserCount,
+        channelMemberCount: channelMemberCount,
         withdrawalConfig: withdrawalConfig,
         minWithdrawalConfig: minWithdrawalConfig,
         activeBroadcast: activeBroadcast
@@ -1116,7 +1170,7 @@
       saveState();
 
       setTimeout(() => {
-        alert(`🎁 Welcome back, Planetian! Your daily login bonus of ₦${bonusNgn.toLocaleString()} ($${bonusUsd.toFixed(2)}) for your ${currentUser.tier} plan has been credited automatically!`);
+        alert(`🎁 Welcome back, ${currentUser.fullName || 'Planetian'}! Your daily login bonus of ₦${bonusNgn.toLocaleString()} ($${bonusUsd.toFixed(2)}) has been credited automatically!`);
       }, 1000);
     }
 
@@ -1316,6 +1370,8 @@
         document.getElementById('adminMinWdSub').value = minWithdrawalConfig.subsequentUsd;
       }
 
+      document.getElementById('channelMemberCount').innerText = channelMemberCount.toLocaleString();
+
       renderLeaderboardUI();
       renderMembershipPlansSection();
       renderPaymentMethodDropdowns();
@@ -1335,11 +1391,12 @@
       renderMainTransactionHistory();
       renderForumUI();
       renderUserChatMessages();
+      renderCommunityChatMessages();
       renderAdminSupportInbox();
       renderAdminSocialLinksManager();
     }
 
-    // --- LEADERBOARD RENDERER ---
+    // --- LEADERBOARD RENDERER WITH ACTIVE DAYS & LOADING INDICATOR ---
     function renderLeaderboardUI() {
       const container = document.getElementById('leaderboardContainer');
       if (!container) return;
@@ -1349,13 +1406,21 @@
       container.innerHTML = topEarnersLeaderboard.slice(0, 10).map((item, index) => {
         const usdEquiv = (item.amountNgn / NGN_RATE).toLocaleString(undefined, {maximumFractionDigits: 0});
         const rankColor = index === 0 ? 'color:var(--gold); font-size:15px;' : (index === 1 ? 'color:#e2e8f0;' : (index === 2 ? 'color:#b45309;' : 'color:var(--text-muted);'));
+        
+        const months = Math.floor(item.daysActive / 30);
+        const days = item.daysActive % 30;
+        const activeDurationStr = months > 0 ? `${months} Month${months > 1 ? 's' : ''}, ${days} Day${days > 1 ? 's' : ''}` : `${days} Days`;
+
         return `
           <div class="leaderboard-item">
             <div style="display:flex; align-items:center; gap:10px;">
               <span class="leaderboard-rank" style="${rankColor}">#${index + 1}</span>
               <div>
                 <b>${item.name}</b><br>
-                <span style="font-size:10px; color:var(--text-muted);">💼 ${item.status}</span>
+                <span style="font-size:10px; color:var(--text-muted);">💼 ${item.status}</span><br>
+                <div class="active-indicator">
+                  <span class="pulse-dot"></span> Active: ${activeDurationStr}
+                </div>
               </div>
             </div>
             <div style="text-align:right;">
@@ -1365,6 +1430,43 @@
           </div>
         `;
       }).join('');
+    }
+
+    // --- COMMUNITY PUBLIC CHANNEL SYSTEM ---
+    function sendCommunityMessage() {
+      const input = document.getElementById('communityChatInput');
+      const text = input.value.trim();
+      if (!text || !currentUser) return;
+
+      communityChannelDb.push({
+        id: Date.now(),
+        sender: currentUser.fullName || currentUser.email.split('@')[0],
+        text: text,
+        time: new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})
+      });
+
+      saveState();
+      input.value = '';
+      updateUI();
+    }
+
+    function renderCommunityChatMessages() {
+      const list = document.getElementById('communityMessagesList');
+      if (!list || !currentUser) return;
+
+      const myName = currentUser.fullName || currentUser.email.split('@')[0];
+
+      list.innerHTML = communityChannelDb.map(m => {
+        const isMe = m.sender === myName;
+        return `
+          <div class="msg ${isMe ? 'msg-user' : 'msg-other'}">
+            <div style="font-size:10px; color:${isMe ? '#04100a' : 'var(--gold)'}; margin-bottom:2px; font-weight:bold;">${m.sender}</div>
+            <div>${m.text}</div>
+            <div style="font-size:9px; text-align:right; color:${isMe ? '#04100a' : 'var(--text-muted)'}; margin-top:2px;">${m.time}</div>
+          </div>
+        `;
+      }).join('');
+      list.scrollTop = list.scrollHeight;
     }
 
     // --- FORUM CREATION & REFERRAL SYSTEM ---
@@ -1440,7 +1542,7 @@
         return `
           <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center; font-size:13px; margin-bottom:8px;">
             <div>
-              👤 <b>${u.email}</b><br>
+              👤 <b>${u.fullName || u.email}</b><br>
               <span style="font-size:11px; color:var(--text-muted);">Tier: <b style="color:var(--gold);">${u.tier || 'None'}</b></span>
             </div>
             <div>
@@ -1466,7 +1568,7 @@
           return `
             <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center; font-size:12px; margin-bottom:8px;">
               <div>
-                <b>${u.email}</b><br>
+                <b>${u.fullName || u.email}</b><br>
                 <span style="color:var(--text-muted);">Plan: <span style="color:var(--gold);">${u.tier || 'None'}</span></span>
               </div>
               <span style="font-weight:bold; color:${isSub ? 'var(--primary)' : 'var(--text-muted)'};">
@@ -1501,6 +1603,7 @@
       supportChatsDb = supportChatsDb.filter(c => c.userEmail !== currentUser.email);
       supportChatsDb.unshift({
         userEmail: currentUser.email,
+        userName: currentUser.fullName || currentUser.email,
         lastMessage: text,
         date: new Date().toLocaleString(),
         messages: currentUser.chatMessages
@@ -1512,7 +1615,7 @@
 
       sendAdminTelegramAlert(
         `💬 <b>NEW SUPPORT MESSAGE!</b>\n\n` +
-        `👤 <b>User:</b> ${currentUser.email}\n` +
+        `👤 <b>User:</b> ${currentUser.fullName || currentUser.email}\n` +
         `✉️ <b>Message:</b> ${text}\n\n` +
         `Login to Admin Panel to reply.`
       );
@@ -1522,14 +1625,14 @@
       const list = document.getElementById('chatMessagesList');
       if (!list || !currentUser) return;
 
-      let html = `<div class="msg msg-bot">Hello Planetian! Send your message here and our support admin will reply to you directly. <br><br><b>Notice:</b> If you cannot wait for admin response, please contact us via email at <b>Support@earnplanet.com.ng</b></div>`;
+      let html = `<div class="msg msg-other">Hello Planetian! Send your message here and our support admin will reply to you directly. <br><br><b>Notice:</b> If you cannot wait for admin response, please contact us via email at <b>Support@earnplanet.com.ng</b></div>`;
 
       if (currentUser.chatMessages) {
         currentUser.chatMessages.forEach(m => {
           if (m.sender === 'user') {
             html += `<div class="msg msg-user">${m.text}</div>`;
           } else {
-            html += `<div class="msg msg-bot"><b>Admin Support:</b> ${m.text}</div>`;
+            html += `<div class="msg msg-other"><b>Admin Support:</b> ${m.text}</div>`;
           }
         });
       }
@@ -1550,7 +1653,7 @@
 
       let html = displayedChats.map(chat => `
         <div class="payment-account-card" style="margin-bottom:12px; font-size:13px;">
-          <div><b>User: <span style="color:var(--primary);">${chat.userEmail}</span></b></div>
+          <div><b>User: <span style="color:var(--primary);">${chat.userName || chat.userEmail}</span></b> (${chat.userEmail})</div>
           <div style="font-size:12px; color:var(--text-muted); margin:4px 0 10px 0;">Latest: "${chat.lastMessage}" (${chat.date})</div>
           
           <div style="display:flex; gap:8px; margin-bottom:10px;">
@@ -1944,7 +2047,7 @@
           
           sendAdminTelegramAlert(
             `📲 <b>NEW SOCIAL MEDIA TASK SUBMISSION!</b>\n\n` +
-            `👤 <b>User:</b> ${currentUser.email}\n` +
+            `👤 <b>User:</b> ${currentUser.fullName || currentUser.email}\n` +
             `📌 <b>Platform:</b> ${activeSocialPlatform}\n` +
             `🎁 <b>Reward:</b> ₦70\n\n` +
             `Review and approve in Admin Panel.`
@@ -1974,7 +2077,7 @@
         
         sendAdminTelegramAlert(
           `📲 <b>NEW SOCIAL MEDIA TASK SUBMISSION!</b>\n\n` +
-          `👤 <b>User:</b> ${currentUser.email}\n` +
+          `👤 <b>User:</b> ${currentUser.fullName || currentUser.email}\n` +
           `📌 <b>Platform:</b> ${activeSocialPlatform}\n` +
           `🔗 <b>Link:</b> ${link}\n` +
           `🎁 <b>Reward:</b> ₦70\n\n` +
@@ -2000,6 +2103,7 @@
         currentUser.pendingPayment = {
           id: Date.now(),
           userEmail: currentUser.email,
+          userName: currentUser.fullName || currentUser.email,
           planName: activeCheckoutPlan.isUpgrade ? `${activeCheckoutPlan.name} (Upgrade)` : activeCheckoutPlan.name,
           amountUsd: activeCheckoutPlan.priceUsd,
           methodName: pm ? pm.name : "Direct Transfer",
@@ -2015,7 +2119,7 @@
 
         sendAdminTelegramAlert(
           `🚨 <b>NEW PLAN ${activeCheckoutPlan.isUpgrade ? 'UPGRADE' : 'SUBSCRIPTION'} PAYMENT!</b>\n\n` +
-          `👤 <b>User:</b> ${currentUser.email}\n` +
+          `👤 <b>User:</b> ${currentUser.fullName || currentUser.email}\n` +
           `💳 <b>Plan:</b> ${activeCheckoutPlan.name} ($${activeCheckoutPlan.priceUsd} / ₦${(activeCheckoutPlan.priceUsd * NGN_RATE).toLocaleString()})\n` +
           `🏦 <b>Method:</b> ${pm ? pm.name : 'Transfer'}\n` +
           `🔑 <b>Code/TxID:</b> ${code}`
@@ -2043,6 +2147,7 @@
         currentUser.pendingPayment = {
           id: Date.now(),
           userEmail: currentUser.email,
+          userName: currentUser.fullName || currentUser.email,
           planName: "Store Deposit",
           amountUsd: amtUsd,
           methodName: pm ? pm.name : "Direct Transfer",
@@ -2055,7 +2160,7 @@
 
         sendAdminTelegramAlert(
           `💰 <b>NEW FLIP STORE DEPOSIT!</b>\n\n` +
-          `👤 <b>User:</b> ${currentUser.email}\n` +
+          `👤 <b>User:</b> ${currentUser.fullName || currentUser.email}\n` +
           `💵 <b>Amount:</b> $${amtUsd.toFixed(2)} (₦${(amtUsd * NGN_RATE).toLocaleString()})\n` +
           `🏦 <b>Method:</b> ${pm ? pm.name : 'Transfer'}\n` +
           `🔑 <b>Code/TxID:</b> ${code}`
@@ -2080,7 +2185,7 @@
           <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px;">
             <div>
               <b>${item.planName}</b> ($${item.amountUsd} / ₦${(item.amountUsd * NGN_RATE).toLocaleString()})<br>
-              <span style="font-size:12px;">User: <b>${item.userEmail}</b> | Method: ${item.methodName}</span><br>
+              <span style="font-size:12px;">User: <b>${item.userName || item.userEmail}</b> | Method: ${item.methodName}</span><br>
               <span style="font-size:12px; color:var(--gold);">TxID/Code: ${item.code}</span>
             </div>
             <div>
@@ -2115,7 +2220,7 @@
               referrer.txHistory.unshift({
                 id: Date.now(),
                 type: "Referral Bonus (30%)",
-                detail: `30% bonus from referral plan purchase (${targetUser.email})`,
+                detail: `30% bonus from referral plan purchase (${targetUser.fullName || targetUser.email})`,
                 amountUsd: bonusUsd,
                 date: new Date().toLocaleString()
               });
@@ -2207,7 +2312,7 @@
         <div class="payment-account-card" style="margin-bottom:12px;">
           <div>
             <b>💸 Cashout Request (Net Payout: <span style="color:var(--primary);">₦${item.netNgn.toLocaleString()}</span>)</b><br>
-            <span style="font-size:12px;">User: <b>${item.userEmail}</b></span><br>
+            <span style="font-size:12px;">User: <b>${item.userName || item.userEmail}</b></span><br>
             <span style="font-size:12px; color:var(--text-muted);">Gross Amount: ₦${item.amountNgn.toLocaleString()} ($${item.amountUsd.toFixed(2)})</span><br>
             <span style="font-size:12px; color:var(--gold);">📍 Destination: ${item.destination}</span><br>
             <span style="font-size:10px; color:var(--text-muted);">${item.date}</span>
@@ -2247,7 +2352,7 @@
       await db.collection("users").doc(targetUser.email).set(targetUser, { merge: true });
       saveState();
       updateUI();
-      alert(`Withdrawal for ${targetUser.email} marked as approved/paid!`);
+      alert(`Withdrawal for ${targetUser.fullName || targetUser.email} marked as approved/paid!`);
     }
 
     async function rejectWithdrawal(id) {
@@ -2265,7 +2370,7 @@
       await db.collection("users").doc(targetUser.email).set(targetUser, { merge: true });
       saveState();
       updateUI();
-      alert(`Cashout rejected and $${item.amountUsd.toFixed(2)} refunded to ${targetUser.email}!`);
+      alert(`Cashout rejected and $${item.amountUsd.toFixed(2)} refunded!`);
     }
 
     function renderAdminApprovedHistory() {
@@ -2450,6 +2555,7 @@
     }
 
     async function adminCreateUserManually() {
+      const fullName = document.getElementById('manRegName').value.trim() || "Planetian User";
       const email = document.getElementById('manRegEmail').value.trim();
       const password = document.getElementById('manRegPass').value;
       const pin = document.getElementById('manRegPin').value;
@@ -2466,6 +2572,7 @@
       }
 
       const newUser = {
+        fullName,
         email,
         password,
         pin,
@@ -2487,8 +2594,10 @@
 
       await db.collection("users").doc(email).set(newUser);
       manualUserCount++;
+      channelMemberCount++;
       saveState();
 
+      document.getElementById('manRegName').value = '';
       document.getElementById('manRegEmail').value = '';
       document.getElementById('manRegPass').value = '';
       document.getElementById('manRegPin').value = '';
@@ -2593,6 +2702,7 @@
         <div class="payment-account-card" style="margin-bottom:12px; font-size:13px;">
           <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:8px;">
             <div>
+              <b>Name:</b> <span style="color:var(--gold);">${u.fullName || 'N/A'}</span><br>
               <b>Email:</b> <span style="color:var(--primary);">${u.email}</span><br>
               <b>Tier:</b> <span style="color:var(--gold);">${u.tier || 'None'}</span> | <b>Refs:</b> ${usersDb.filter(ref => ref.referredBy === u.refCode && ref.tier && ref.tier !== "None").length} (${u.refCode})<br>
               <b>Password:</b> <span style="color:var(--text-muted);">${u.password}</span> | <b>PIN:</b> <span style="color:var(--text-muted);">${u.pin}</span>
@@ -2821,6 +2931,7 @@
       currentUser.pendingWithdrawal = {
         id: Date.now(),
         userEmail: currentUser.email,
+        userName: currentUser.fullName || currentUser.email,
         amountNgn: amountNgn,
         amountUsd: amountUsd,
         feeNgn: feeNgn,
@@ -2840,7 +2951,7 @@
 
       sendAdminTelegramAlert(
         `💸 <b>NEW CASHOUT REQUEST!</b>\n\n` +
-        `👤 <b>User:</b> ${currentUser.email}\n` +
+        `👤 <b>User:</b> ${currentUser.fullName || currentUser.email}\n` +
         `💵 <b>Amount:</b> ₦${amountNgn.toLocaleString()} ($${amountUsd.toFixed(2)})\n` +
         `📍 <b>Destination:</b> ${destinationInfo}`
       );
@@ -3005,19 +3116,21 @@
     }
 
     async function handleRegister() {
+      const fullName = document.getElementById('regFullName').value.trim();
       const email = document.getElementById('regEmail').value.trim();
       const password = document.getElementById('regPassword').value;
       const pin = document.getElementById('regPin').value;
       const refCodeInput = document.getElementById('regRefCode').value.trim();
       const forumRefParam = localStorage.getItem('pending_forum_ref') || "";
 
-      if (!email || !password || pin.length !== 4) { alert("Fill all fields correctly!"); return; }
+      if (!fullName || !email || !password || pin.length !== 4) { alert("Please fill all fields including your Full Name and 4-digit PIN!"); return; }
       if (usersDb.some(u => u.email === email)) { alert("Email already exists!"); return; }
 
       const welcomeBonusUsd = 15000 / NGN_RATE;
       const uniqueRefCode = "EP-" + Math.floor(10000 + Math.random() * 90000);
 
       const newUser = { 
+        fullName,
         email, 
         password, 
         pin, 
@@ -3042,16 +3155,18 @@
 
       await db.collection("users").doc(email).set(newUser);
       manualUserCount++;
+      channelMemberCount++;
       localStorage.removeItem('pending_forum_ref');
       saveState();
 
       sendAdminTelegramAlert(
         `👤 <b>NEW USER REGISTERED!</b>\n\n` +
+        `📛 <b>Name:</b> ${fullName}\n` +
         `📧 <b>Email:</b> ${email}\n` +
         `🔗 <b>Referred By:</b> ${refCodeInput || 'None'}`
       );
 
-      alert("Account created successfully! $10 (₦15,000) welcome bonus credited.");
+      alert(`Welcome to EarnPlanet, ${fullName}! Your account has been created and $10 (₦15,000) welcome bonus credited.`);
       switchAuthView('login');
     }
 
@@ -3096,6 +3211,7 @@
 
     function switchTab(t) {
       document.getElementById('userTab').style.display = t === 'user' ? 'block' : 'none';
+      document.getElementById('communityTab').style.display = t === 'community' ? 'block' : 'none';
       document.getElementById('forumTab').style.display = t === 'forum' ? 'block' : 'none';
       document.getElementById('storeTab').style.display = t === 'store' ? 'block' : 'none';
       document.getElementById('supportTab').style.display = t === 'support' ? 'block' : 'none';
