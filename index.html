@@ -327,8 +327,8 @@
         <div class="stats-grid">
           <div class="stat-card">
             <h4>Paying Referrals Progress</h4>
-            <p id="refCountDisplay">0 / 7</p>
-            <span style="font-size:11px; color:var(--text-muted);" id="refRequirementText">7 required for 1st Cashout</span>
+            <p id="refCountDisplay">0 / 10</p>
+            <span style="font-size:11px; color:var(--text-muted);" id="refRequirementText">10 required for 1st Cashout</span>
           </div>
           <div class="stat-card">
             <h4>Daily Tasks Session Limit</h4>
@@ -367,7 +367,7 @@
         <div class="task-card" style="border-color: var(--primary);">
           <div class="task-info">
             <h4>⚽ Penalty Shootout Football Match</h4>
-            <p>Score penalties on a real football field! Earn bonuses on goals, small penalty on misses.</p>
+            <p>Score penalties on a real football field! Challenging gameplay ($0.10 penalty on miss for all tiers).</p>
             <div class="task-reward" id="penaltyRewardText">Unlock via Plan (Starter: 2/day, Silver: 3/day, Gold: 4/day, Plat: 5/day)</div>
           </div>
           <button class="btn" onclick="openPenaltyGameModal()">Play Penalty</button>
@@ -617,7 +617,7 @@
         <div class="stat-card" style="text-align:left; margin-bottom:15px;">
           <h4 style="margin-bottom:10px;">Add Withdrawal Pop-up</h4>
           <input type="text" id="newWdPopName" placeholder="Username / Name (e.g. Femi45)">
-          <input type="text" id="newWdPopAmount" placeholder="Amount (e.g. ₦500,000)">
+          <input type="text" id="newWdPopAmount" placeholder="Amount (e.g. ₦1,000,000)">
           <input type="text" id="newWdPopMethod" placeholder="Payment Method (e.g. Palmpay)">
           <button class="btn" onclick="adminAddWithdrawalPop()">+ Add Withdrawal Pop-up</button>
         </div>
@@ -829,7 +829,7 @@
     <div class="modal" style="max-width: 440px; text-align: center;">
       <h3>⚽ Penalty Shootout Match</h3>
       <canvas id="penaltyCanvas" width="340" height="240"></canvas>
-      <div id="penaltyGameStatus" style="font-weight:bold; margin: 10px 0; color:var(--gold);">Choose where to kick!</div>
+      <div id="penaltyGameStatus" style="font-weight:bold; margin: 10px 0; color:var(--gold);">Choose where to kick! (Challenging)</div>
       <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 15px;">
         <button class="btn" style="background:var(--gold); color:#04100a;" onclick="shootPenalty('left')">⬅️ Left Corner</button>
         <button class="btn" onclick="shootPenalty('center')">⬆️ Center</button>
@@ -843,7 +843,7 @@
   <div class="modal-overlay" id="withdrawModal">
     <div class="modal">
       <h3>Request Cashout</h3>
-      <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;" id="withdrawRuleNotice">1st Cashout requires 7 Referrals | Subsequent withdrawals unlocked</p>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;" id="withdrawRuleNotice">1st Cashout requires 10 Referrals | Subsequent withdrawals unlocked</p>
       <div class="payment-account-card">
         <span style="font-size:11px; color:var(--text-muted);">Available Cashout Balance:</span><br>
         <b style="font-size:18px; color:var(--primary);" id="wdAvailableDisplayNgn">₦0.00</b>
@@ -981,27 +981,36 @@
       active: false
     };
 
-    let withdrawalPopsDb = [
-      { id: 1, name: "Femi_O", amount: "₦150,000", method: "OPay" },
-      { id: 2, name: "Blessing99", amount: "₦320,000", method: "PalmPay" },
-      { id: 3, name: "Tunde_Wealth", amount: "₦500,000", method: "USDT TRC20" },
-      { id: 4, name: "Chinonso_E", amount: "₦85,000", method: "Kuda Bank" },
-      { id: 5, name: "Aisha_Bello", amount: "₦240,000", method: "Access Bank" }
-    ];
+    // --- 1,000 AUTOMATED HIGH-VALUE WITHDRAWAL POP-UPS ---
+    const popNames = ["Femi_O", "Blessing99", "Tunde_Wealth", "Chinonso_E", "Aisha_Bello", "Emeka_Trader", "Zainab_M", "Oluwaseun_A", "Kabiru_N", "Chinedu_X", "Grace_P", "Ibrahim_S", "Nkechi_V", "Samuel_E", "Adebayo_T"];
+    const popAmounts = ["₦800,000", "₦1,000,000", "₦1,250,000", "₦1,500,000", "₦2,000,000", "₦500,000", "₦350,000", "₦2,500,000", "₦950,000", "₦1,800,000"];
+    const popMethods = ["OPay", "PalmPay", "USDT TRC20", "Kuda Bank", "Access Bank", "GTBank", "Zenith Bank", "UBA"];
 
-    // BASE START TIME FOR 3-HOURLY DELTA CALCULATION & 7+ MONTHS ACTIVE DURATIONS
+    let withdrawalPopsDb = Array.from({ length: 1000 }, (_, index) => {
+      const name = popNames[index % popNames.length] + (index > 15 ? (index + 1) : "");
+      const amount = popAmounts[index % popAmounts.length];
+      const method = popMethods[index % popMethods.length];
+      return {
+        id: index + 1,
+        name: name,
+        amount: amount,
+        method: method
+      };
+    });
+
+    // BASE START TIME FOR 3-HOURLY DELTA & CORRECTED ₦340M / ₦290M SCALE + 7M 2D / 6M 3D
     const BASE_START_TIMESTAMP = 1718000000000; 
     let baseTopEarners = [
-      { name: "Oluwaseun Ade", baseNgn: 54000000, hourlyInc: 200000, baseDays: 213, status: "Flipping Earnplanet Shares" }, // ~7 Months 3 Days
-      { name: "Chinedu Okafor", baseNgn: 43500000, hourlyInc: 175000, baseDays: 204, status: "Doing tasks with Platinum" },  // ~6 Months 24 Days
-      { name: "Fatima Bello", baseNgn: 38200000, hourlyInc: 150000, baseDays: 195, status: "Flipping Earnplanet products" },
-      { name: "Ibrahim Sanni", baseNgn: 34100000, hourlyInc: 130000, baseDays: 186, status: "Doing tasks on Gold" },
-      { name: "Blessing Okoro", baseNgn: 30500000, hourlyInc: 110000, baseDays: 177, status: "Doing tasks on Silver" },
-      { name: "Adebayo Tunde", baseNgn: 27800000, hourlyInc: 95000, baseDays: 168, status: "Flipping Earnplanet Shares" },
-      { name: "Nkechi Amadi", baseNgn: 24500000, hourlyInc: 85000, baseDays: 159, status: "Doing tasks with Platinum" },
-      { name: "Samuel Etim", baseNgn: 22100000, hourlyInc: 75000, baseDays: 150, status: "Flipping Earnplanet products" },
-      { name: "Zainab Musa", baseNgn: 19800000, hourlyInc: 65000, baseDays: 141, status: "Doing tasks on Gold" },
-      { name: "Kelechi Nwachukwu", baseNgn: 17500000, hourlyInc: 50000, baseDays: 132, status: "Doing tasks" }
+      { name: "Oluwaseun Ade", baseNgn: 340000000, hourlyInc: 500000, baseDays: 212, status: "Flipping Earnplanet Shares" }, // ~7 Months 2 Days
+      { name: "Chinedu Okafor", baseNgn: 290000000, hourlyInc: 450000, baseDays: 183, status: "Doing tasks with Platinum" },  // ~6 Months 3 Days
+      { name: "Fatima Bello", baseNgn: 245000000, hourlyInc: 400000, baseDays: 154, status: "Flipping Earnplanet products" },
+      { name: "Ibrahim Sanni", baseNgn: 210000000, hourlyInc: 350000, baseDays: 125, status: "Doing tasks on Gold" },
+      { name: "Blessing Okoro", baseNgn: 180000000, hourlyInc: 300000, baseDays: 96, status: "Doing tasks on Silver" },
+      { name: "Adebayo Tunde", baseNgn: 155000000, hourlyInc: 250000, baseDays: 77, status: "Flipping Earnplanet Shares" },
+      { name: "Nkechi Amadi", baseNgn: 130000000, hourlyInc: 200000, baseDays: 58, status: "Doing tasks with Platinum" },
+      { name: "Samuel Etim", baseNgn: 110000000, hourlyInc: 175000, baseDays: 39, status: "Flipping Earnplanet products" },
+      { name: "Zainab Musa", baseNgn: 92000000, hourlyInc: 150000, baseDays: 20, status: "Doing tasks on Gold" },
+      { name: "Kelechi Nwachukwu", baseNgn: 75000000, hourlyInc: 120000, baseDays: 10, status: "Doing tasks" }
     ];
 
     let faqsDb = [];
@@ -1036,16 +1045,16 @@
     ];
 
     let storeProducts = DEFINITIVE_STORE_PRODUCTS;
-    let storeVersion = 6;
+    let storeVersion = 7;
 
     let socialLinks = [];
 
-    // UPDATED PLAN PRICES: Starter = $20, Silver = $30
+    // UPDATED PLAN PRICES & UNIFORM $0.10 MISS PENALTY
     const availablePlans = [
       { name: "Starter", priceUsd: 20, cashbackUsd: 8.00, cashbackNgn: 12000, dailyDriveUsd: 0.15, loginBonusNgn: 200, dailyDrives: 4, penaltyLimit: 2, scoreReward: 0.30, missPenalty: 0.10 },
-      { name: "Silver", priceUsd: 30, cashbackUsd: 12.00, cashbackNgn: 18000, dailyDriveUsd: 0.25, loginBonusNgn: 350, dailyDrives: 6, penaltyLimit: 3, scoreReward: 0.40, missPenalty: 0.15 },
-      { name: "Gold", priceUsd: 50, cashbackUsd: 20.00, cashbackNgn: 30000, dailyDriveUsd: 0.35, loginBonusNgn: 450, dailyDrives: 8, penaltyLimit: 4, scoreReward: 0.50, missPenalty: 0.20 },
-      { name: "Platinum", priceUsd: 100, cashbackUsd: 40.00, cashbackNgn: 60000, dailyDriveUsd: 0.50, loginBonusNgn: 600, dailyDrives: 10, penaltyLimit: 5, scoreReward: 0.60, missPenalty: 0.25 }
+      { name: "Silver", priceUsd: 30, cashbackUsd: 12.00, cashbackNgn: 18000, dailyDriveUsd: 0.25, loginBonusNgn: 350, dailyDrives: 6, penaltyLimit: 3, scoreReward: 0.40, missPenalty: 0.10 },
+      { name: "Gold", priceUsd: 50, cashbackUsd: 20.00, cashbackNgn: 30000, dailyDriveUsd: 0.35, loginBonusNgn: 450, dailyDrives: 8, penaltyLimit: 4, scoreReward: 0.50, missPenalty: 0.10 },
+      { name: "Platinum", priceUsd: 100, cashbackUsd: 40.00, cashbackNgn: 60000, dailyDriveUsd: 0.50, loginBonusNgn: 600, dailyDrives: 10, penaltyLimit: 5, scoreReward: 0.60, missPenalty: 0.10 }
     ];
 
     function logUserTransaction(type, detail, amountUsd) {
@@ -1361,7 +1370,7 @@
 
       const wCount = currentUser.withdrawalCount || 0;
       const hasBypassedRefRule = currentUser.forumBypassedRefRule || false;
-      const requiredRefs = (wCount === 0 && !hasBypassedRefRule) ? 7 : 0;
+      const requiredRefs = (wCount === 0 && !hasBypassedRefRule) ? 10 : 0; // Updated to 10 referrals
 
       const refReqTextEl = document.getElementById('refRequirementText');
       if (refReqTextEl) {
@@ -1448,7 +1457,7 @@
       renderAdminSocialLinksManager();
     }
 
-    // --- LEADERBOARD RENDERER WITH 7+ MONTHS ACTIVE DURATIONS ---
+    // --- LEADERBOARD RENDERER WITH ₦340M & ₦290M STARTING SCALES + 7M 2D / 6M 3D ---
     function renderLeaderboardUI() {
       const container = document.getElementById('leaderboardContainer');
       if (!container) return;
@@ -2951,7 +2960,7 @@
 
       const wCount = currentUser.withdrawalCount || 0;
       const hasBypassedRefRule = currentUser.forumBypassedRefRule || false;
-      const requiredRefs = (wCount === 0 && !hasBypassedRefRule) ? 7 : 0;
+      const requiredRefs = (wCount === 0 && !hasBypassedRefRule) ? 10 : 0; // 10 Referrals required for first cashout
 
       const organicRefs = usersDb.filter(u => u.referredBy === currentUser.refCode && (!u.joinedViaForum) && u.tier && u.tier !== "None").length;
       const manualBonus = currentUser.activeReferrals || 0;
@@ -3142,7 +3151,7 @@
       }, 100);
     }
 
-    // --- PENALTY SHOOTOUT FOOTBALL GAME ---
+    // --- CHALLENGING PENALTY SHOOTOUT FOOTBALL GAME ---
     function openPenaltyGameModal() {
       if (!currentUser) return;
       const todayStr = new Date().toDateString();
@@ -3166,7 +3175,7 @@
         return;
       }
 
-      document.getElementById('penaltyGameStatus').innerText = `Match ${currentUser.penaltiesCountToday + 1} of ${maxPenalties}: Choose where to kick!`;
+      document.getElementById('penaltyGameStatus').innerText = `Match ${currentUser.penaltiesCountToday + 1} of ${maxPenalties}: Choose corner carefully (Challenging)!`;
       document.getElementById('penaltyModal').style.display = 'flex';
       drawPenaltyField('ready', null);
     }
@@ -3217,28 +3226,32 @@
     function shootPenalty(direction) {
       const activePlanObj = availablePlans.find(p => p.name === currentUser.tier);
       const goalReward = activePlanObj ? activePlanObj.scoreReward : 0.30;
-      const missPenalty = activePlanObj ? activePlanObj.missPenalty : 0.10;
+      const missPenalty = 0.10; // Fixed $0.10 miss penalty for everybody
 
-      const gkDirections = ['left', 'center', 'right', 'left', 'right'];
-      const gkDive = gkDirections[Math.floor(Math.random() * gkDirections.length)];
+      // Make it challenging: Only 35% chance to score unless exact unpredictable choice
+      const gkOptions = ['left', 'center', 'right', 'left', 'right', 'top-left', 'bottom-right'];
+      const gkDive = gkOptions[Math.floor(Math.random() * gkOptions.length)];
+      
+      const randomChance = Math.random();
+      let isGoal = (direction !== gkDive) && (randomChance < 0.45); // Challenging score condition
 
-      currentUser.penaltiesCountToday = (currentUser.penaltiesCountToday || 0) + 1;
-
-      let isGoal = direction !== gkDive;
       let outcomeAmount = isGoal ? goalReward : -missPenalty;
 
+      currentUser.penaltiesCountToday = (currentUser.penaltiesCountToday || 0) + 1;
       currentUser.balanceUsd = Math.max(0, (currentUser.balanceUsd || 0) + outcomeAmount);
 
-      logUserStrategy = isGoal ? 
-        logUserTransaction("Penalty Goal ⚽", `Scored penalty in shootout match`, goalReward) :
+      if (isGoal) {
+        logUserTransaction("Penalty Goal ⚽", `Scored challenging penalty in shootout match`, goalReward);
+      } else {
         logUserTransaction("Penalty Miss ❌", `Missed penalty shot in shootout match`, -missPenalty);
+      }
 
       drawPenaltyField('result', isGoal ? `GOAL! +$${goalReward.toFixed(2)} ⚽` : `SAVED! -$${missPenalty.toFixed(2)} ❌`);
 
       setTimeout(() => {
         saveState();
         updateUI();
-        alert(isGoal ? `GOAL! ⚽ Keeper dived the wrong way. You earned +$${goalReward.toFixed(2)}!` : `SAVED! ❌ Keeper blocked your shot. -$${missPenalty.toFixed(2)} penalty applied.`);
+        alert(isGoal ? `GOAL! ⚽ Brilliant shot! You earned +$${goalReward.toFixed(2)}.` : `SAVED! ❌ Tough goalkeeper block! -$${missPenalty.toFixed(2)} penalty applied.`);
         closePenaltyModal();
       }, 1500);
     }
