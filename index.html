@@ -925,7 +925,7 @@
     const db = firebase.firestore();
 
     const NGN_RATE = 1500;
-    const SOCIAL_REWARD_USD = 100 / NGN_RATE; // ₦100 reward
+    const SOCIAL_REWARD_USD = 100 / NGN_RATE;
 
     const TELEGRAM_BOT_TOKEN = "8811500504:AAE67l-aKHEi6cgZ_TzaY5tUESlQpmJAngY";
     const TELEGRAM_CHAT_ID = "8269612727";
@@ -998,7 +998,7 @@
       };
     });
 
-    // BASE START TIME FOR 3-HOURLY DELTA & CORRECTED ₦340M / ₦290M SCALE + 7M 2D / 6M 3D
+    // --- CORRECTED ₦340M & ₦290M STARTING SCALES + 7M 2D / 6M 3D DURATIONS ---
     const BASE_START_TIMESTAMP = 1718000000000; 
     let baseTopEarners = [
       { name: "Oluwaseun Ade", baseNgn: 340000000, hourlyInc: 500000, baseDays: 212, status: "Flipping Earnplanet Shares" }, // ~7 Months 2 Days
@@ -1045,11 +1045,10 @@
     ];
 
     let storeProducts = DEFINITIVE_STORE_PRODUCTS;
-    let storeVersion = 7;
+    let storeVersion = 8;
 
     let socialLinks = [];
 
-    // UPDATED PLAN PRICES & UNIFORM $0.10 MISS PENALTY
     const availablePlans = [
       { name: "Starter", priceUsd: 20, cashbackUsd: 8.00, cashbackNgn: 12000, dailyDriveUsd: 0.15, loginBonusNgn: 200, dailyDrives: 4, penaltyLimit: 2, scoreReward: 0.30, missPenalty: 0.10 },
       { name: "Silver", priceUsd: 30, cashbackUsd: 12.00, cashbackNgn: 18000, dailyDriveUsd: 0.25, loginBonusNgn: 350, dailyDrives: 6, penaltyLimit: 3, scoreReward: 0.40, missPenalty: 0.10 },
@@ -1089,7 +1088,14 @@
           
           if (Array.isArray(data.approvedHistory)) approvedPaymentsHistory = data.approvedHistory;
           if (Array.isArray(data.pendingSocial)) pendingSocialTasks = data.pendingSocial;
-          if (Array.isArray(data.withdrawalPops) && data.withdrawalPops.length > 0) withdrawalPopsDb = data.withdrawalPops;
+          
+          // FORCE OVERRIDE WITHDRAWAL POPS TO ALWAYS USE THE 1,000 GENERATED ITEMS
+          if (Array.isArray(withdrawalPopsDb) && withdrawalPopsDb.length >= 1000) {
+            // Keep generated 1000
+          } else if (Array.isArray(data.withdrawalPops) && data.withdrawalPops.length > 5) {
+            withdrawalPopsDb = data.withdrawalPops;
+          }
+
           if (Array.isArray(data.faqs)) faqsDb = data.faqs;
           if (Array.isArray(data.communityChannel)) communityChannelDb = data.communityChannel;
           
@@ -1121,7 +1127,6 @@
       });
     }
 
-    // Every 3 hours increment calculation for leaderboard
     function getCalculatedLeaderboard() {
       const hoursPassed = Math.floor((Date.now() - BASE_START_TIMESTAMP) / (1000 * 60 * 60));
       const threeHourBlocks = Math.floor(hoursPassed / 3);
@@ -1370,7 +1375,7 @@
 
       const wCount = currentUser.withdrawalCount || 0;
       const hasBypassedRefRule = currentUser.forumBypassedRefRule || false;
-      const requiredRefs = (wCount === 0 && !hasBypassedRefRule) ? 10 : 0; // Updated to 10 referrals
+      const requiredRefs = (wCount === 0 && !hasBypassedRefRule) ? 10 : 0; // 10 referrals
 
       const refReqTextEl = document.getElementById('refRequirementText');
       if (refReqTextEl) {
@@ -1457,7 +1462,6 @@
       renderAdminSocialLinksManager();
     }
 
-    // --- LEADERBOARD RENDERER WITH ₦340M & ₦290M STARTING SCALES + 7M 2D / 6M 3D ---
     function renderLeaderboardUI() {
       const container = document.getElementById('leaderboardContainer');
       if (!container) return;
@@ -1494,7 +1498,6 @@
       }).join('');
     }
 
-    // --- COMMUNITY PUBLIC CHANNEL SYSTEM WITH PERSISTENT COUNT ---
     function joinCommunityChannel() {
       if (!currentUser) return;
       currentUser.joinedCommunityChannel = true;
@@ -2960,7 +2963,7 @@
 
       const wCount = currentUser.withdrawalCount || 0;
       const hasBypassedRefRule = currentUser.forumBypassedRefRule || false;
-      const requiredRefs = (wCount === 0 && !hasBypassedRefRule) ? 10 : 0; // 10 Referrals required for first cashout
+      const requiredRefs = (wCount === 0 && !hasBypassedRefRule) ? 10 : 0; // 10 Referrals
 
       const organicRefs = usersDb.filter(u => u.referredBy === currentUser.refCode && (!u.joinedViaForum) && u.tier && u.tier !== "None").length;
       const manualBonus = currentUser.activeReferrals || 0;
@@ -3151,7 +3154,6 @@
       }, 100);
     }
 
-    // --- CHALLENGING PENALTY SHOOTOUT FOOTBALL GAME ---
     function openPenaltyGameModal() {
       if (!currentUser) return;
       const todayStr = new Date().toDateString();
@@ -3188,28 +3190,23 @@
       const canvas = document.getElementById('penaltyCanvas');
       const ctx = canvas.getContext('2d');
 
-      // Field background
       ctx.fillStyle = '#15803d';
       ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-      // Penalty box lines
       ctx.strokeStyle = '#ffffff';
       ctx.lineWidth = 2;
       ctx.strokeRect(70, 10, 200, 100);
       ctx.strokeRect(110, 10, 120, 40);
 
-      // Goal post
       ctx.strokeStyle = '#ffffff';
       ctx.lineWidth = 4;
       ctx.strokeRect(90, 10, 160, 70);
 
-      // Penalty spot
       ctx.fillStyle = '#ffffff';
       ctx.beginPath();
       ctx.arc(170, 160, 4, 0, Math.PI * 2);
       ctx.fill();
 
-      // Ball
       ctx.fillStyle = '#ffffff';
       ctx.beginPath();
       ctx.arc(170, state === 'ready' ? 160 : 85, 8, 0, Math.PI * 2);
@@ -3228,12 +3225,11 @@
       const goalReward = activePlanObj ? activePlanObj.scoreReward : 0.30;
       const missPenalty = 0.10; // Fixed $0.10 miss penalty for everybody
 
-      // Make it challenging: Only 35% chance to score unless exact unpredictable choice
       const gkOptions = ['left', 'center', 'right', 'left', 'right', 'top-left', 'bottom-right'];
       const gkDive = gkOptions[Math.floor(Math.random() * gkOptions.length)];
       
       const randomChance = Math.random();
-      let isGoal = (direction !== gkDive) && (randomChance < 0.45); // Challenging score condition
+      let isGoal = (direction !== gkDive) && (randomChance < 0.45);
 
       let outcomeAmount = isGoal ? goalReward : -missPenalty;
 
