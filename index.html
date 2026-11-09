@@ -203,6 +203,7 @@
     .tx-item { background: #04100a; border: 1px solid var(--card-border); padding: 10px 14px; border-radius: 10px; margin-bottom: 8px; font-size: 12px; display: flex; justify-content: space-between; align-items: center; }
 
     #gameCanvas { background: #1f2937; border-radius: 12px; display: block; margin: 12px auto; border: 3px solid var(--primary); box-shadow: 0 0 15px rgba(0,230,118,0.2); }
+    #penaltyCanvas { background: #15803d; border-radius: 12px; display: block; margin: 12px auto; border: 3px solid #fff; box-shadow: 0 0 15px rgba(255,255,255,0.2); }
   </style>
 </head>
 <body>
@@ -231,7 +232,7 @@
       <div id="registerView" style="display:none;">
         <h3>Create New Account</h3>
         <label>Full Name</label>
-        <input type="text" id="regFullName" placeholder="e.g. Felix Nolah">
+        <input type="text" id="regFullName" placeholder="e.g. Femi Ademola">
         <label>Email Address</label>
         <input type="email" id="regEmail" placeholder="user@gmail.com">
         <label>Password</label>
@@ -319,7 +320,7 @@
           <h4 style="font-size:14px; color:var(--gold); text-transform:uppercase; margin-bottom:4px; display:flex; align-items:center; gap:6px;">
             🏆 Top Users That Withdrawn Money
           </h4>
-          <p style="font-size:11px; color:var(--text-muted); margin-bottom:12px;">Live real-time leaderboards updating hourly as top earners climb ranks!</p>
+          <p style="font-size:11px; color:var(--text-muted); margin-bottom:12px;">Live real-time leaderboards updating every 3 hours as top earners climb ranks!</p>
           <div id="leaderboardContainer"></div>
         </div>
 
@@ -330,7 +331,7 @@
             <span style="font-size:11px; color:var(--text-muted);" id="refRequirementText">7 required for 1st Cashout</span>
           </div>
           <div class="stat-card">
-            <h4>Expressway Drives Today</h4>
+            <h4>Daily Tasks Session Limit</h4>
             <p id="drivesDisplay">0 / 4 Sessions</p>
             <span style="font-size:11px; color:var(--text-muted);">Resets every 24h</span>
           </div>
@@ -356,10 +357,20 @@
         <div class="task-card">
           <div class="task-info">
             <h4>🏎️ Lagos Highway Driving Run</h4>
-            <p>Drive through 3-lane Lagos traffic to reach 100% finish line. (Max 4 drives daily)</p>
+            <p>Drive through 3-lane Lagos traffic to reach 100% finish line. (Starter: 4, Silver: 6, Gold: 8, Platinum: 10 daily)</p>
             <div class="task-reward" id="drivingRewardText">Reward: Select plan to unlock</div>
           </div>
           <button class="btn" onclick="openDrivingGameModal()">Start Drive</button>
+        </div>
+
+        <!-- PENALTY SHOOTOUT TASK -->
+        <div class="task-card" style="border-color: var(--primary);">
+          <div class="task-info">
+            <h4>⚽ Penalty Shootout Football Match</h4>
+            <p>Score penalties on a real football field! Earn bonuses on goals, small penalty on misses.</p>
+            <div class="task-reward" id="penaltyRewardText">Unlock via Plan (Starter: 2/day, Silver: 3/day, Gold: 4/day, Plat: 5/day)</div>
+          </div>
+          <button class="btn" onclick="openPenaltyGameModal()">Play Penalty</button>
         </div>
 
         <div class="task-card" style="border-color: var(--gold);">
@@ -372,15 +383,15 @@
         </div>
 
         <!-- SOCIAL MEDIA TASKS SECTION -->
-        <div class="section-title">📲 Earn ₦70 Daily Per Social Media Post</div>
-        <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Promote EarnPlanet on your social accounts. Submit your link or screenshot daily to earn ₦70 upon admin approval!</p>
+        <div class="section-title">📲 Earn ₦100 Daily Per Social Media Post</div>
+        <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Promote EarnPlanet on your social accounts. Submit your link or screenshot daily to earn ₦100 upon admin approval!</p>
         
         <div class="social-task-grid">
           <div class="social-task-card">
             <div>
               <b style="color:var(--primary);">Facebook Post</b>
               <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Post about EarnPlanet & submit link</div>
-              <div style="font-size:13px; font-weight:bold; color:var(--gold); margin-top:6px;">Reward: ₦70</div>
+              <div style="font-size:13px; font-weight:bold; color:var(--gold); margin-top:6px;">Reward: ₦100</div>
             </div>
             <button class="btn" style="font-size:11px; padding:6px 10px;" onclick="openSocialTaskModal('Facebook')">Submit Link</button>
           </div>
@@ -389,7 +400,7 @@
             <div>
               <b style="color:var(--primary);">TikTok Video</b>
               <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Talk about EarnPlanet & submit link</div>
-              <div style="font-size:13px; font-weight:bold; color:var(--gold); margin-top:6px;">Reward: ₦70</div>
+              <div style="font-size:13px; font-weight:bold; color:var(--gold); margin-top:6px;">Reward: ₦100</div>
             </div>
             <button class="btn" style="font-size:11px; padding:6px 10px;" onclick="openSocialTaskModal('TikTok')">Submit Link</button>
           </div>
@@ -398,7 +409,7 @@
             <div>
               <b style="color:var(--primary);">Instagram Post / Reel</b>
               <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Share EarnPlanet & submit post link</div>
-              <div style="font-size:13px; font-weight:bold; color:var(--gold); margin-top:6px;">Reward: ₦70</div>
+              <div style="font-size:13px; font-weight:bold; color:var(--gold); margin-top:6px;">Reward: ₦100</div>
             </div>
             <button class="btn" style="font-size:11px; padding:6px 10px;" onclick="openSocialTaskModal('Instagram')">Submit Link</button>
           </div>
@@ -407,7 +418,7 @@
             <div>
               <b style="color:var(--primary);">WhatsApp Status</b>
               <div style="font-size:11px; color:var(--text-muted); margin-top:4px;">Post on Status & upload screenshot</div>
-              <div style="font-size:13px; font-weight:bold; color:var(--gold); margin-top:6px;">Reward: ₦70</div>
+              <div style="font-size:13px; font-weight:bold; color:var(--gold); margin-top:6px;">Reward: ₦100</div>
             </div>
             <button class="btn" style="font-size:11px; padding:6px 10px;" onclick="openSocialTaskModal('WhatsApp')">Upload Screenshot</button>
           </div>
@@ -752,7 +763,7 @@
   <div class="modal-overlay" id="socialTaskModal">
     <div class="modal">
       <h3 id="socialTaskModalTitle">Submit Social Task</h3>
-      <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Earn ₦70 ($0.0467) directly to your Main Balance upon admin approval!</p>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Earn ₦100 directly to your Main Balance upon admin approval!</p>
       
       <div id="socialTaskLinkBox">
         <label>Enter Post Link / Video URL</label>
@@ -764,7 +775,7 @@
         <input type="file" id="socialTaskImgInput" accept="image/*">
       </div>
 
-      <button class="btn" style="width:100%; margin-top:5px;" onclick="submitSocialTask()">Submit For Approval (Earn ₦70)</button>
+      <button class="btn" style="width:100%; margin-top:5px;" onclick="submitSocialTask()">Submit For Approval (Earn ₦100)</button>
       <button class="btn btn-secondary" style="width:100%; margin-top:10px;" onclick="closeSocialTaskModal()">Cancel</button>
     </div>
   </div>
@@ -810,6 +821,21 @@
         <button class="btn btn-secondary" style="padding: 10px 25px;" onclick="moveCar(35)">Right ▶</button>
       </div>
       <button class="btn btn-secondary" style="width:100%;" onclick="closeDrivingModal()">Exit Session</button>
+    </div>
+  </div>
+
+  <!-- PENALTY SHOOTOUT GAME MODAL -->
+  <div class="modal-overlay" id="penaltyModal">
+    <div class="modal" style="max-width: 440px; text-align: center;">
+      <h3>⚽ Penalty Shootout Match</h3>
+      <canvas id="penaltyCanvas" width="340" height="240"></canvas>
+      <div id="penaltyGameStatus" style="font-weight:bold; margin: 10px 0; color:var(--gold);">Choose where to kick!</div>
+      <div style="display: flex; justify-content: center; gap: 10px; margin-bottom: 15px;">
+        <button class="btn" style="background:var(--gold); color:#04100a;" onclick="shootPenalty('left')">⬅️ Left Corner</button>
+        <button class="btn" onclick="shootPenalty('center')">⬆️ Center</button>
+        <button class="btn" style="background:var(--primary); color:#04100a;" onclick="shootPenalty('right')">➡️ Right Corner</button>
+      </div>
+      <button class="btn btn-secondary" style="width:100%;" onclick="closePenaltyModal()">Exit Match</button>
     </div>
   </div>
 
@@ -899,7 +925,7 @@
     const db = firebase.firestore();
 
     const NGN_RATE = 1500;
-    const SOCIAL_REWARD_USD = 70 / NGN_RATE;
+    const SOCIAL_REWARD_USD = 100 / NGN_RATE; // ₦100 reward
 
     const TELEGRAM_BOT_TOKEN = "8811500504:AAE67l-aKHEi6cgZ_TzaY5tUESlQpmJAngY";
     const TELEGRAM_CHAT_ID = "8269612727";
@@ -963,19 +989,19 @@
       { id: 5, name: "Aisha_Bello", amount: "₦240,000", method: "Access Bank" }
     ];
 
-    // BASE START TIME FOR TIMESTAMP-BASED HOURLY DELTA CALCULATION
-    const BASE_START_TIMESTAMP = 1718000000000; // Fixed baseline
+    // BASE START TIME FOR 3-HOURLY DELTA CALCULATION & 7+ MONTHS ACTIVE DURATIONS
+    const BASE_START_TIMESTAMP = 1718000000000; 
     let baseTopEarners = [
-      { name: "Oluwaseun Ade", baseNgn: 14850000, hourlyInc: 500 * 1500, daysActive: 62, status: "Flipping Earnplanet Shares" },
-      { name: "Chinedu Okafor", baseNgn: 13200000, hourlyInc: 470 * 1500, daysActive: 58, status: "Doing tasks with Platinum" },
-      { name: "Fatima Bello", baseNgn: 11950000, hourlyInc: 454 * 1500, daysActive: 54, status: "Flipping Earnplanet products" },
-      { name: "Ibrahim Sanni", baseNgn: 10800000, hourlyInc: 350 * 1500, daysActive: 49, status: "Doing tasks on Gold" },
-      { name: "Blessing Okoro", baseNgn: 9950000, hourlyInc: 400 * 1500, daysActive: 45, status: "Doing tasks on Silver" },
-      { name: "Adebayo Tunde", baseNgn: 9500000, hourlyInc: 420 * 1500, daysActive: 41, status: "Flipping Earnplanet Shares" },
-      { name: "Nkechi Amadi", baseNgn: 9200000, hourlyInc: 256 * 1500, daysActive: 37, status: "Doing tasks with Platinum" },
-      { name: "Samuel Etim", baseNgn: 9050000, hourlyInc: 430 * 1500, daysActive: 33, status: "Flipping Earnplanet products" },
-      { name: "Zainab Musa", baseNgn: 8900000, hourlyInc: 170 * 1500, daysActive: 29, status: "Doing tasks on Gold" },
-      { name: "Kelechi Nwachukwu", baseNgn: 8750000, hourlyInc: 150 * 1500, daysActive: 25, status: "Doing tasks" }
+      { name: "Oluwaseun Ade", baseNgn: 54000000, hourlyInc: 200000, baseDays: 213, status: "Flipping Earnplanet Shares" }, // ~7 Months 3 Days
+      { name: "Chinedu Okafor", baseNgn: 43500000, hourlyInc: 175000, baseDays: 204, status: "Doing tasks with Platinum" },  // ~6 Months 24 Days
+      { name: "Fatima Bello", baseNgn: 38200000, hourlyInc: 150000, baseDays: 195, status: "Flipping Earnplanet products" },
+      { name: "Ibrahim Sanni", baseNgn: 34100000, hourlyInc: 130000, baseDays: 186, status: "Doing tasks on Gold" },
+      { name: "Blessing Okoro", baseNgn: 30500000, hourlyInc: 110000, baseDays: 177, status: "Doing tasks on Silver" },
+      { name: "Adebayo Tunde", baseNgn: 27800000, hourlyInc: 95000, baseDays: 168, status: "Flipping Earnplanet Shares" },
+      { name: "Nkechi Amadi", baseNgn: 24500000, hourlyInc: 85000, baseDays: 159, status: "Doing tasks with Platinum" },
+      { name: "Samuel Etim", baseNgn: 22100000, hourlyInc: 75000, baseDays: 150, status: "Flipping Earnplanet products" },
+      { name: "Zainab Musa", baseNgn: 19800000, hourlyInc: 65000, baseDays: 141, status: "Doing tasks on Gold" },
+      { name: "Kelechi Nwachukwu", baseNgn: 17500000, hourlyInc: 50000, baseDays: 132, status: "Doing tasks" }
     ];
 
     let faqsDb = [];
@@ -993,7 +1019,6 @@
       }
     ];
 
-    // DEFINITIVE PRODUCTS & SHARES INCLUDING EXACT $900, $1,000, $1,500, $2,000, $2,500, $3,000
     const DEFINITIVE_STORE_PRODUCTS = [
       { id: 1, title: "Starter Merchandise Slot", priceUsd: 10, img: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80" },
       { id: 2, title: "Bronze Inventory Pack", priceUsd: 20, img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80" },
@@ -1011,15 +1036,16 @@
     ];
 
     let storeProducts = DEFINITIVE_STORE_PRODUCTS;
-    let storeVersion = 5; // Forces product refresh
+    let storeVersion = 6;
 
     let socialLinks = [];
 
+    // UPDATED PLAN PRICES: Starter = $20, Silver = $30
     const availablePlans = [
-      { name: "Starter", priceUsd: 15, cashbackUsd: 6.00, cashbackNgn: 9000, dailyDriveUsd: 0.15, loginBonusNgn: 200 },
-      { name: "Silver", priceUsd: 25, cashbackUsd: 10.00, cashbackNgn: 15000, dailyDriveUsd: 0.25, loginBonusNgn: 350 },
-      { name: "Gold", priceUsd: 50, cashbackUsd: 20.00, cashbackNgn: 30000, dailyDriveUsd: 0.35, loginBonusNgn: 450 },
-      { name: "Platinum", priceUsd: 100, cashbackUsd: 40.00, cashbackNgn: 60000, dailyDriveUsd: 0.50, loginBonusNgn: 600 }
+      { name: "Starter", priceUsd: 20, cashbackUsd: 8.00, cashbackNgn: 12000, dailyDriveUsd: 0.15, loginBonusNgn: 200, dailyDrives: 4, penaltyLimit: 2, scoreReward: 0.30, missPenalty: 0.10 },
+      { name: "Silver", priceUsd: 30, cashbackUsd: 12.00, cashbackNgn: 18000, dailyDriveUsd: 0.25, loginBonusNgn: 350, dailyDrives: 6, penaltyLimit: 3, scoreReward: 0.40, missPenalty: 0.15 },
+      { name: "Gold", priceUsd: 50, cashbackUsd: 20.00, cashbackNgn: 30000, dailyDriveUsd: 0.35, loginBonusNgn: 450, dailyDrives: 8, penaltyLimit: 4, scoreReward: 0.50, missPenalty: 0.20 },
+      { name: "Platinum", priceUsd: 100, cashbackUsd: 40.00, cashbackNgn: 60000, dailyDriveUsd: 0.50, loginBonusNgn: 600, dailyDrives: 10, penaltyLimit: 5, scoreReward: 0.60, missPenalty: 0.25 }
     ];
 
     function logUserTransaction(type, detail, amountUsd) {
@@ -1036,7 +1062,6 @@
       saveState();
     }
 
-    // --- FIREBASE SYNC & TIMESTAMP-BASED DELTA LEADERBOARD ---
     function initFirebaseSync() {
       db.collection("users").onSnapshot((snapshot) => {
         usersDb = [];
@@ -1063,8 +1088,7 @@
             paymentMethods = data.paymentMethods;
           }
 
-          // Force update store products if version mismatch
-          if (!data.storeVersion || data.storeVersion < storeVersion || !Array.isArray(data.storeProducts) || data.storeProducts.length < DEFINITIVE_STORE_PRODUCTS.length) {
+          if (!data.storeVersion || data.storeVersion < storeVersion || !Array.isArray(data.storeProducts)) {
             storeProducts = DEFINITIVE_STORE_PRODUCTS;
             saveState();
           } else if (Array.isArray(data.storeProducts)) {
@@ -1088,25 +1112,26 @@
       });
     }
 
-    // Timestamp delta calculator for foolproof hourly increments
+    // Every 3 hours increment calculation for leaderboard
     function getCalculatedLeaderboard() {
       const hoursPassed = Math.floor((Date.now() - BASE_START_TIMESTAMP) / (1000 * 60 * 60));
+      const threeHourBlocks = Math.floor(hoursPassed / 3);
       const daysPassed = Math.floor(hoursPassed / 24);
 
       return baseTopEarners.map(item => {
-        const currentNgn = item.baseNgn + (hoursPassed * item.hourlyInc);
-        const currentDaysActive = item.daysActive + daysPassed;
+        const currentNgn = item.baseNgn + (threeHourBlocks * item.hourlyInc);
+        const totalDays = item.baseDays + daysPassed;
         return {
           ...item,
           amountNgn: currentNgn,
-          daysActive: currentDaysActive
+          daysActive: totalDays
         };
       });
     }
 
     setInterval(() => {
       updateUI();
-    }, 60 * 1000); // Check every minute
+    }, 60 * 1000);
 
     function saveState() {
       if (currentUser) {
@@ -1351,9 +1376,13 @@
       if (currentUser.lastDriveDate !== todayStr) {
         currentUser.lastDriveDate = todayStr;
         currentUser.drivesCountToday = 0;
+        currentUser.penaltiesCountToday = 0;
         saveState();
       }
-      document.getElementById('drivesDisplay').innerText = `${currentUser.drivesCountToday || 0} / 4 Sessions`;
+
+      const activePlanObj = availablePlans.find(p => p.name === currentUser.tier);
+      const maxDrives = activePlanObj ? activePlanObj.dailyDrives : 4;
+      document.getElementById('drivesDisplay').innerText = `${currentUser.drivesCountToday || 0} / ${maxDrives} Sessions`;
 
       const mainStoreDisplay = document.getElementById('mainAvailableForStoreDisplay');
       if (mainStoreDisplay) mainStoreDisplay.innerText = `$${usdBal.toFixed(2)} USD`;
@@ -1419,7 +1448,7 @@
       renderAdminSocialLinksManager();
     }
 
-    // --- LEADERBOARD RENDERER WITH DELTA INCREMENT ---
+    // --- LEADERBOARD RENDERER WITH 7+ MONTHS ACTIVE DURATIONS ---
     function renderLeaderboardUI() {
       const container = document.getElementById('leaderboardContainer');
       if (!container) return;
@@ -1433,7 +1462,7 @@
         
         const months = Math.floor(item.daysActive / 30);
         const days = item.daysActive % 30;
-        const activeDurationStr = months > 0 ? `${months} Month${months > 1 ? 's' : ''}, ${days} Day${days > 1 ? 's' : ''}` : `${days} Days`;
+        const activeDurationStr = `${months} Months, ${days} Days`;
 
         return `
           <div class="leaderboard-item">
@@ -1456,7 +1485,7 @@
       }).join('');
     }
 
-    // --- COMMUNITY PUBLIC CHANNEL SYSTEM WITH JOIN WALL ---
+    // --- COMMUNITY PUBLIC CHANNEL SYSTEM WITH PERSISTENT COUNT ---
     function joinCommunityChannel() {
       if (!currentUser) return;
       currentUser.joinedCommunityChannel = true;
@@ -1507,7 +1536,6 @@
       list.scrollTop = list.scrollHeight;
     }
 
-    // --- FORUM CREATION & REFERRAL SYSTEM ---
     function createForum() {
       const title = document.getElementById('forumTitleInput').value.trim();
       if (!title) { alert("Please provide a forum name!"); return; }
@@ -1624,7 +1652,6 @@
       document.getElementById('referralsListModal').style.display = 'none';
     }
 
-    // --- SUPPORT CHAT SYSTEM ---
     function sendChatMessage() {
       const input = document.getElementById('chatInput');
       const text = input.value.trim();
@@ -1767,7 +1794,6 @@
       alert(`Chat session for ${userEmail} resolved and cleared!`);
     }
 
-    // --- PAYMENT METHODS MANAGEMENT ---
     function saveAdminPaymentMethod() {
       const editId = document.getElementById('editPayMethodId').value;
       const name = document.getElementById('newPayMethodName').value.trim();
@@ -1855,7 +1881,6 @@
       `).join('');
     }
 
-    // --- SOCIAL LINKS MANAGER ---
     function adminAddSocialLink() {
       const platform = document.getElementById('newSocialPlatformName').value.trim();
       const url = document.getElementById('newSocialPlatformUrl').value.trim();
@@ -1940,7 +1965,7 @@
               <div class="plan-title">${plan.name}</div>
               <div class="plan-price-ngn">₦${(plan.priceUsd * NGN_RATE).toLocaleString()}</div>
               <div class="plan-price-usd">$${plan.priceUsd.toFixed(2)} USD</div>
-              <div class="plan-perks">Daily Login Bonus: <b>₦${plan.loginBonusNgn}</b><br>Earn $${plan.dailyDriveUsd.toFixed(2)} per drive<br>4 Drives Daily</div>
+              <div class="plan-perks">Daily Login Bonus: <b>₦${plan.loginBonusNgn}</b><br>Earn $${plan.dailyDriveUsd.toFixed(2)} per drive<br>${plan.dailyDrives} Drives / ${plan.penaltyLimit} Penalties Daily</div>
             </div>
             <button class="btn" ${hasPendingSub ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''} onclick="${hasPendingSub ? '' : `openCheckoutModal('${plan.name}', ${plan.priceUsd}, false)`}">${hasPendingSub ? '⏳ Verification Pending' : 'Subscribe'}</button>
           </div>
@@ -1965,7 +1990,7 @@
                 <div class="plan-title">${plan.name}</div>
                 <div class="plan-price-ngn">₦${totalUpgradeNgn.toLocaleString()}</div>
                 <div class="plan-price-usd">($${priceDiffUsd} diff + ₦5,000 fee)</div>
-                <div class="plan-perks">Daily Login Bonus: <b>₦${plan.loginBonusNgn}</b><br>New Perks: Earn $${plan.dailyDriveUsd.toFixed(2)} per drive<br>4 Drives Daily</div>
+                <div class="plan-perks">Daily Login Bonus: <b>₦${plan.loginBonusNgn}</b><br>New Perks: Earn $${plan.dailyDriveUsd.toFixed(2)} per drive<br>${plan.dailyDrives} Drives / ${plan.penaltyLimit} Penalties Daily</div>
               </div>
               <button class="btn" ${hasPendingSub ? 'disabled style="opacity:0.5; cursor:not-allowed;"' : ''} onclick="${hasPendingSub ? '' : `openCheckoutModal('${plan.name}', ${totalUpgradeUsd}, true)`}">${hasPendingSub ? '⏳ Verification Pending' : 'Upgrade Plan'}</button>
             </div>
@@ -2087,7 +2112,7 @@
             `📲 <b>NEW SOCIAL MEDIA TASK SUBMISSION!</b>\n\n` +
             `👤 <b>User:</b> ${currentUser.fullName || currentUser.email}\n` +
             `📌 <b>Platform:</b> ${activeSocialPlatform}\n` +
-            `🎁 <b>Reward:</b> ₦70\n\n` +
+            `🎁 <b>Reward:</b> ₦100\n\n` +
             `Review and approve in Admin Panel.`
           );
 
@@ -2118,7 +2143,7 @@
           `👤 <b>User:</b> ${currentUser.fullName || currentUser.email}\n` +
           `📌 <b>Platform:</b> ${activeSocialPlatform}\n` +
           `🔗 <b>Link:</b> ${link}\n` +
-          `🎁 <b>Reward:</b> ₦70\n\n` +
+          `🎁 <b>Reward:</b> ₦100\n\n` +
           `Review and approve in Admin Panel.`
         );
 
@@ -2279,7 +2304,7 @@
 
             if (subCount % threshold === 0) {
               const planObj = availablePlans.find(p => p.name === cleanName);
-              const planCost = planObj ? planObj.priceUsd : 25;
+              const planCost = planObj ? planObj.priceUsd : 30;
               const bonus50Pct = planCost * 0.50 * threshold;
 
               forumOwner.balanceUsd = (forumOwner.balanceUsd || 0) + bonus50Pct;
@@ -2455,11 +2480,11 @@
       container.innerHTML = pendingSocialTasks.map(item => `
         <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
           <div>
-            <b>${item.platform} Task (₦70 Reward)</b><br>
+            <b>${item.platform} Task (₦100 Reward)</b><br>
             <span style="font-size:12px;">User: ${item.userEmail}</span><br>
             ${item.isImage ? `<a href="${item.proofUrl}" target="_blank"><img src="${item.proofUrl}" style="width:60px; height:60px; object-fit:cover; border-radius:6px; margin-top:4px;"></a>` : `<a href="${item.proofUrl}" target="_blank" style="color:var(--primary); font-size:12px;">View Submitted Link</a>`}
           </div>
-          <button class="btn" style="padding:6px 12px; font-size:12px;" onclick="approveSocialTask(${item.id})">Approve & Credit ₦70</button>
+          <button class="btn" style="padding:6px 12px; font-size:12px;" onclick="approveSocialTask(${item.id})">Approve & Credit ₦100</button>
         </div>
       `).join('');
     }
@@ -2485,7 +2510,7 @@
       pendingSocialTasks = pendingSocialTasks.filter(t => t.id !== id);
       saveState();
       updateUI();
-      alert(`Approved! ₦70 credited to ${item.userEmail}'s balance.`);
+      alert(`Approved! ₦100 credited to ${item.userEmail}'s balance.`);
     }
 
     function adminAddWithdrawalPop() {
@@ -2621,6 +2646,7 @@
         tier: "None",
         activeReferrals: 0,
         drivesCountToday: 0,
+        penaltiesCountToday: 0,
         lastDriveDate: "",
         lastFlipDate: "",
         withdrawalCount: 0,
@@ -3037,16 +3063,20 @@
       if (currentUser.lastDriveDate !== todayStr) {
         currentUser.lastDriveDate = todayStr;
         currentUser.drivesCountToday = 0;
+        currentUser.penaltiesCountToday = 0;
         saveState();
-      }
-
-      if ((currentUser.drivesCountToday || 0) >= 4) {
-        alert("You have reached your limit of 4 driving sessions for today!");
-        return;
       }
 
       if (!currentUser.tier || currentUser.tier === "None") {
         alert("You need an active subscription plan to unlock daily driving sessions!");
+        return;
+      }
+
+      const activePlanObj = availablePlans.find(p => p.name === currentUser.tier);
+      const maxDrives = activePlanObj ? activePlanObj.dailyDrives : 4;
+
+      if ((currentUser.drivesCountToday || 0) >= maxDrives) {
+        alert(`You have reached your limit of ${maxDrives} driving sessions for today on your ${currentUser.tier} plan!`);
         return;
       }
 
@@ -3110,6 +3140,107 @@
           closeDrivingModal();
         }
       }, 100);
+    }
+
+    // --- PENALTY SHOOTOUT FOOTBALL GAME ---
+    function openPenaltyGameModal() {
+      if (!currentUser) return;
+      const todayStr = new Date().toDateString();
+      if (currentUser.lastDriveDate !== todayStr) {
+        currentUser.lastDriveDate = todayStr;
+        currentUser.drivesCountToday = 0;
+        currentUser.penaltiesCountToday = 0;
+        saveState();
+      }
+
+      if (!currentUser.tier || currentUser.tier === "None") {
+        alert("You need an active subscription plan to play Penalty Shootout!");
+        return;
+      }
+
+      const activePlanObj = availablePlans.find(p => p.name === currentUser.tier);
+      const maxPenalties = activePlanObj ? activePlanObj.penaltyLimit : 2;
+
+      if ((currentUser.penaltiesCountToday || 0) >= maxPenalties) {
+        alert(`You have reached your limit of ${maxPenalties} penalty matches for today on your ${currentUser.tier} plan!`);
+        return;
+      }
+
+      document.getElementById('penaltyGameStatus').innerText = `Match ${currentUser.penaltiesCountToday + 1} of ${maxPenalties}: Choose where to kick!`;
+      document.getElementById('penaltyModal').style.display = 'flex';
+      drawPenaltyField('ready', null);
+    }
+
+    function closePenaltyModal() {
+      document.getElementById('penaltyModal').style.display = 'none';
+    }
+
+    function drawPenaltyField(state, resultText) {
+      const canvas = document.getElementById('penaltyCanvas');
+      const ctx = canvas.getContext('2d');
+
+      // Field background
+      ctx.fillStyle = '#15803d';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+      // Penalty box lines
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 2;
+      ctx.strokeRect(70, 10, 200, 100);
+      ctx.strokeRect(110, 10, 120, 40);
+
+      // Goal post
+      ctx.strokeStyle = '#ffffff';
+      ctx.lineWidth = 4;
+      ctx.strokeRect(90, 10, 160, 70);
+
+      // Penalty spot
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(170, 160, 4, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Ball
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.arc(170, state === 'ready' ? 160 : 85, 8, 0, Math.PI * 2);
+      ctx.fill();
+
+      if (state !== 'ready') {
+        ctx.fillStyle = resultText.includes('GOAL') ? '#00e676' : '#ef4444';
+        ctx.font = 'bold 20px Segoe UI';
+        ctx.textAlign = 'center';
+        ctx.fillText(resultText, canvas.width / 2, canvas.height - 25);
+      }
+    }
+
+    function shootPenalty(direction) {
+      const activePlanObj = availablePlans.find(p => p.name === currentUser.tier);
+      const goalReward = activePlanObj ? activePlanObj.scoreReward : 0.30;
+      const missPenalty = activePlanObj ? activePlanObj.missPenalty : 0.10;
+
+      const gkDirections = ['left', 'center', 'right', 'left', 'right'];
+      const gkDive = gkDirections[Math.floor(Math.random() * gkDirections.length)];
+
+      currentUser.penaltiesCountToday = (currentUser.penaltiesCountToday || 0) + 1;
+
+      let isGoal = direction !== gkDive;
+      let outcomeAmount = isGoal ? goalReward : -missPenalty;
+
+      currentUser.balanceUsd = Math.max(0, (currentUser.balanceUsd || 0) + outcomeAmount);
+
+      logUserStrategy = isGoal ? 
+        logUserTransaction("Penalty Goal ⚽", `Scored penalty in shootout match`, goalReward) :
+        logUserTransaction("Penalty Miss ❌", `Missed penalty shot in shootout match`, -missPenalty);
+
+      drawPenaltyField('result', isGoal ? `GOAL! +$${goalReward.toFixed(2)} ⚽` : `SAVED! -$${missPenalty.toFixed(2)} ❌`);
+
+      setTimeout(() => {
+        saveState();
+        updateUI();
+        alert(isGoal ? `GOAL! ⚽ Keeper dived the wrong way. You earned +$${goalReward.toFixed(2)}!` : `SAVED! ❌ Keeper blocked your shot. -$${missPenalty.toFixed(2)} penalty applied.`);
+        closePenaltyModal();
+      }, 1500);
     }
 
     async function updateUserEmail() {
@@ -3182,6 +3313,7 @@
         tier: "None", 
         activeReferrals: 0,
         drivesCountToday: 0,
+        penaltiesCountToday: 0,
         lastDriveDate: "",
         lastFlipDate: "",
         withdrawalCount: 0,
