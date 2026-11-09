@@ -981,28 +981,32 @@
       active: false
     };
 
-    // --- 1,000 AUTOMATED HIGH-VALUE WITHDRAWAL POP-UPS ---
-    const popNames = ["Femi_O", "Blessing99", "Tunde_Wealth", "Chinonso_E", "Aisha_Bello", "Emeka_Trader", "Zainab_M", "Oluwaseun_A", "Kabiru_N", "Chinedu_X", "Grace_P", "Ibrahim_S", "Nkechi_V", "Samuel_E", "Adebayo_T"];
-    const popAmounts = ["₦800,000", "₦1,000,000", "₦1,250,000", "₦1,500,000", "₦2,000,000", "₦500,000", "₦350,000", "₦2,500,000", "₦950,000", "₦1,800,000"];
+    // --- UNIQUE 1,000 WITHDRAWAL POP-UPS WITH VARYING NAMES ---
+    const firstNames = ["Femi", "Blessing", "Tunde", "Chinonso", "Aisha", "Emeka", "Zainab", "Oluwaseun", "Kabiru", "Chinedu", "Grace", "Ibrahim", "Nkechi", "Samuel", "Adebayo", "Funke", "Chibuzor", "Hadiza", "Olawale", "Kehinde", "Yusuf", "Titilayo", "Chika", "Abiodun", "Ejiro"];
+    const lastNames = ["Ade", "Okafor", "Bello", "Sanni", "Okoro", "Tunde", "Amadi", "Etim", "Musa", "Nwachukwu", "Aliu", "Obinna", "Yakubu", "Eze", "Balogun", "Okonkwo", "Usman", "Danjuma", "Adeleke", "Olowu"];
+    const popAmounts = ["₦150,000", "₦250,000", "₦450,000", "₦600,000", "₦800,000", "₦1,000,000", "₦1,250,000", "₦1,500,000", "₦2,000,000", "₦350,000", "₦2,500,000", "₦750,000", "₦1,800,000"];
     const popMethods = ["OPay", "PalmPay", "USDT TRC20", "Kuda Bank", "Access Bank", "GTBank", "Zenith Bank", "UBA"];
 
     let withdrawalPopsDb = Array.from({ length: 1000 }, (_, index) => {
-      const name = popNames[index % popNames.length] + (index > 15 ? (index + 1) : "");
-      const amount = popAmounts[index % popAmounts.length];
-      const method = popMethods[index % popMethods.length];
+      const randomFirst = firstNames[Math.floor(Math.random() * firstNames.length)];
+      const randomLast = lastNames[Math.floor(Math.random() * lastNames.length)];
+      const uniqueTag = Math.floor(10 + Math.random() * 89);
+      const amount = popAmounts[Math.floor(Math.random() * popAmounts.length)];
+      const method = popMethods[Math.floor(Math.random() * popMethods.length)];
+      
       return {
         id: index + 1,
-        name: name,
+        name: `${randomFirst}_${randomLast}${uniqueTag}`,
         amount: amount,
         method: method
       };
     });
 
-    // --- CORRECTED ₦340M & ₦290M STARTING SCALES + 7M 2D / 6M 3D DURATIONS ---
+    // --- FORCED ₦340M & ₦290M STARTING SCALE (7M 2D / 6M 3D) ---
     const BASE_START_TIMESTAMP = 1718000000000; 
     let baseTopEarners = [
-      { name: "Oluwaseun Ade", baseNgn: 340000000, hourlyInc: 500000, baseDays: 212, status: "Flipping Earnplanet Shares" }, // ~7 Months 2 Days
-      { name: "Chinedu Okafor", baseNgn: 290000000, hourlyInc: 450000, baseDays: 183, status: "Doing tasks with Platinum" },  // ~6 Months 3 Days
+      { name: "Oluwaseun Ade", baseNgn: 340000000, hourlyInc: 500000, baseDays: 212, status: "Flipping Earnplanet Shares" }, // 7 Months, 2 Days
+      { name: "Chinedu Okafor", baseNgn: 290000000, hourlyInc: 450000, baseDays: 183, status: "Doing tasks with Platinum" },  // 6 Months, 3 Days
       { name: "Fatima Bello", baseNgn: 245000000, hourlyInc: 400000, baseDays: 154, status: "Flipping Earnplanet products" },
       { name: "Ibrahim Sanni", baseNgn: 210000000, hourlyInc: 350000, baseDays: 125, status: "Doing tasks on Gold" },
       { name: "Blessing Okoro", baseNgn: 180000000, hourlyInc: 300000, baseDays: 96, status: "Doing tasks on Silver" },
@@ -1045,7 +1049,7 @@
     ];
 
     let storeProducts = DEFINITIVE_STORE_PRODUCTS;
-    let storeVersion = 8;
+    let storeVersion = 9; // Bumped version to force Firebase cloud sync overwrite
 
     let socialLinks = [];
 
@@ -1089,10 +1093,8 @@
           if (Array.isArray(data.approvedHistory)) approvedPaymentsHistory = data.approvedHistory;
           if (Array.isArray(data.pendingSocial)) pendingSocialTasks = data.pendingSocial;
           
-          // FORCE OVERRIDE WITHDRAWAL POPS TO ALWAYS USE THE 1,000 GENERATED ITEMS
-          if (Array.isArray(withdrawalPopsDb) && withdrawalPopsDb.length >= 1000) {
-            // Keep generated 1000
-          } else if (Array.isArray(data.withdrawalPops) && data.withdrawalPops.length > 5) {
+          // FORCE OVERRIDE WITHDRAWAL POPS & LEADERBOARD SYNC
+          if (Array.isArray(data.withdrawalPops) && data.withdrawalPops.length > 50) {
             withdrawalPopsDb = data.withdrawalPops;
           }
 
@@ -1128,17 +1130,13 @@
     }
 
     function getCalculatedLeaderboard() {
-      const hoursPassed = Math.floor((Date.now() - BASE_START_TIMESTAMP) / (1000 * 60 * 60));
-      const threeHourBlocks = Math.floor(hoursPassed / 3);
-      const daysPassed = Math.floor(hoursPassed / 24);
-
-      return baseTopEarners.map(item => {
-        const currentNgn = item.baseNgn + (threeHourBlocks * item.hourlyInc);
-        const totalDays = item.baseDays + daysPassed;
+      // Use forced base scale directly without old delta scaling to lock exact figures
+      return baseTopEarners.map((item, index) => {
+        const days = item.baseDays;
         return {
           ...item,
-          amountNgn: currentNgn,
-          daysActive: totalDays
+          amountNgn: item.baseNgn,
+          daysActive: days
         };
       });
     }
@@ -1375,7 +1373,7 @@
 
       const wCount = currentUser.withdrawalCount || 0;
       const hasBypassedRefRule = currentUser.forumBypassedRefRule || false;
-      const requiredRefs = (wCount === 0 && !hasBypassedRefRule) ? 10 : 0; // 10 referrals
+      const requiredRefs = (wCount === 0 && !hasBypassedRefRule) ? 10 : 0; // 10 Referrals
 
       const refReqTextEl = document.getElementById('refRequirementText');
       if (refReqTextEl) {
