@@ -173,6 +173,7 @@
     .product-img { width: 100%; height: 140px; object-fit: cover; border-radius: 10px; margin-bottom: 10px; background: #04100a; }
     .product-title { font-size: 15px; font-weight: 800; color: #fff; margin-bottom: 4px; }
     .product-price { font-size: 16px; font-weight: 900; color: var(--primary); }
+    .product-daily-yield { font-size: 12px; font-weight: 700; color: var(--gold); margin: 6px 0; background: rgba(251,191,36,0.1); padding: 4px; border-radius: 6px; border: 1px solid rgba(251,191,36,0.3); }
 
     .task-card { background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 16px; padding: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; }
     .task-info h4 { font-size: 15px; font-weight: 800; color: #fff; }
@@ -375,8 +376,8 @@
 
         <div class="task-card" style="border-color: var(--gold);">
           <div class="task-info">
-            <h4>🛍️ Resell Flip Store & Shares (Choose 30, 60, or Unlimited Days)</h4>
-            <p>Select your preferred lock period: 30 Days, 60 Days, or Unlimited. Daily returns drop directly into your Flip Share Balance!</p>
+            <h4>🛍️ Resell Flip Store & Shares (30, 60, or Unlimited Days)</h4>
+            <p>Daily returns drop directly into your Flip Share Balance. Only earnings from flips that are 30 days old or more can be withdrawn to Main!</p>
             <div class="task-reward" style="color:var(--gold);">Available Mon - Fri Only</div>
           </div>
           <button class="btn" onclick="switchTab('store')">Open Resell Store</button>
@@ -502,7 +503,7 @@
           <div class="wallet-actions" style="gap:8px;">
             <button class="btn" style="background:var(--gold); color:#04100a; font-size:12px; padding:8px 12px;" onclick="openDepositModal()">+ Deposit</button>
             <button class="btn btn-secondary" style="font-size:12px; padding:8px 12px;" onclick="openAddFromMainModal()">+ Add From Main</button>
-            <button class="btn btn-secondary" style="font-size:12px; padding:8px 12px;" onclick="openTransferModal()">Withdraw Every Penny to Main</button>
+            <button class="btn btn-secondary" style="font-size:12px; padding:8px 12px;" onclick="openTransferModal()">Withdraw 30D+ Earnings to Main</button>
           </div>
         </div>
 
@@ -798,9 +799,9 @@
   <!-- WITHDRAW TO MAIN MODAL -->
   <div class="modal-overlay" id="transferModal">
     <div class="modal">
-      <h3>Withdraw Every Penny to Main Dashboard</h3>
+      <h3>Withdraw 30D+ Earnings to Main</h3>
       <div class="payment-account-card">
-        <span style="font-size:11px; color:var(--text-muted);">Available Flip Share Balance:</span><br>
+        <span style="font-size:11px; color:var(--text-muted);">Withdrawable Balance (From Flips &gt;= 30 Days Old):</span><br>
         <b style="font-size:18px; color:var(--gold);" id="transferAvailableDisplay">$0.00 USD</b>
       </div>
       <label>Enter Transfer Amount in USD ($)</label>
@@ -1057,7 +1058,7 @@
     ];
 
     let storeProducts = DEFINITIVE_STORE_PRODUCTS;
-    let storeVersion = 10;
+    let storeVersion = 11;
 
     let socialLinks = [];
 
@@ -1328,6 +1329,24 @@
     }
     setInterval(startWithdrawalTicker, 2500);
 
+    // --- HELPER TO CALCULATE WITHDRAWABLE STORE BALANCE (ONLY FLIPS >= 30 DAYS OLD) ---
+    function getWithdrawableStoreBalanceUsd() {
+      if (!currentUser || !currentUser.activeFlips) return 0;
+      let withdrawableUsd = 0;
+
+      currentUser.activeFlips.forEach(f => {
+        const daysPassed = f.daysElapsed || 0;
+        // Only allow withdrawing earnings from flips that have completed at least 30 days
+        if (daysPassed >= 30) {
+          const dailyUsd = f.dailyYieldUsd || 0;
+          withdrawableUsd += (dailyUsd * daysPassed);
+        }
+      });
+
+      // Cap withdrawable to what's actually currently in the store balance
+      return Math.min(currentUser.storeBalanceUsd || 0, withdrawableUsd);
+    }
+
     function updateUI() {
       if (!currentUser) return;
 
@@ -1348,7 +1367,6 @@
 
           const daysLimit = f.daysLocked; // 30, 60, or 99999 for unlimited
           
-          // Check if a full day has passed since last credit
           while ((now - f.lastCreditedTime) >= oneDayMs && (daysLimit === 99999 || f.daysElapsed < daysLimit)) {
             f.lastCreditedTime += oneDayMs;
             f.daysElapsed += 1;
@@ -1358,7 +1376,6 @@
             updated = true;
           }
 
-          // If finite plan (30 or 60 days) has reached its duration and status is still active
           if (daysLimit !== 99999 && f.daysElapsed >= daysLimit && f.status === 'active') {
             f.status = 'matured';
             updated = true;
@@ -1387,8 +1404,9 @@
       document.getElementById('storeBalanceNgn').innerText = `₦${storeNgn.toLocaleString('en-NG', {minimumFractionDigits: 2})}`;
       document.getElementById('storeBalanceUsd').innerText = `≈ $${storeUsd.toFixed(2)} USD`;
       
+      const withdrawableStoreUsd = getWithdrawableStoreBalanceUsd();
       const transferAvail = document.getElementById('transferAvailableDisplay');
-      if (transferAvail) transferAvail.innerText = `$${storeUsd.toFixed(2)} USD`;
+      if (transferAvail) transferAvail.innerText = `$${withdrawableStoreUsd.toFixed(2)} USD (From 30D+ Flips)`;
 
       document.getElementById('headerTier').innerText = currentUser.tier === "None" ? "No Active Plan" : `${currentUser.tier} Plan`;
       document.getElementById('refLinkInput').value = `https://earnplanet.com.ng/?ref=${currentUser.refCode}`;
@@ -2771,22 +2789,33 @@
         container.innerHTML = `<div class="stat-card" style="grid-column: 1/-1;"><p style="color:var(--text-muted);">No products available in store right now. Check back soon!</p></div>`;
         return;
       }
-      container.innerHTML = storeProducts.map(p => `
-        <div class="product-card">
-          <img src="${p.img}" class="product-img" alt="${p.title}">
-          <div class="product-title">${p.title}</div>
-          <div class="product-price">₦${(p.priceUsd * NGN_RATE).toLocaleString()} ($${p.priceUsd})</div>
-          
-          <label style="font-size:11px; color:var(--text-muted); margin-top:8px; display:block; text-align:left;">Choose Lock Duration & Returns:</label>
-          <select id="lockDuration_${p.id}" style="width:100%; padding:8px; font-size:12px; margin-bottom:10px;">
-            <option value="30">30 Days Lock (Daily Returns)</option>
-            <option value="60">60 Days Lock (Extended Daily Returns)</option>
-            <option value="unlimited">Unlimited Days (Continuous Returns)</option>
-          </select>
 
-          <button class="btn" onclick="buyProduct(${p.id})">Flip Product / Share</button>
-        </div>
-      `).join('');
+      container.innerHTML = storeProducts.map(p => {
+        // Daily yield calculation: $50 -> ₦5k daily
+        const dailyNgn = (p.priceUsd / 50) * 5000;
+        const dailyUsd = dailyNgn / NGN_RATE;
+
+        return `
+          <div class="product-card">
+            <img src="${p.img}" class="product-img" alt="${p.title}">
+            <div class="product-title">${p.title}</div>
+            <div class="product-price">₦${(p.priceUsd * NGN_RATE).toLocaleString()} ($${p.priceUsd})</div>
+            
+            <div class="product-daily-yield">
+              ⚡ Daily Return: ₦${dailyNgn.toLocaleString()} ($${dailyUsd.toFixed(2)}) / day
+            </div>
+
+            <label style="font-size:11px; color:var(--text-muted); margin-top:4px; display:block; text-align:left;">Choose Lock Duration & Returns:</label>
+            <select id="lockDuration_${p.id}" style="width:100%; padding:8px; font-size:12px; margin-bottom:10px;">
+              <option value="30">30 Days Lock (Daily Returns)</option>
+              <option value="60">60 Days Lock (Extended Daily Returns)</option>
+              <option value="unlimited">Unlimited Days (Continuous Returns)</option>
+            </select>
+
+            <button class="btn" onclick="buyProduct(${p.id})">Flip Product / Share</button>
+          </div>
+        `;
+      }).join('');
     }
 
     function renderAdminUsersList() {
@@ -2907,7 +2936,6 @@
 
       currentUser.storeBalanceUsd -= price;
       
-      // Proportional daily yield calculation based on $50 -> ₦5k (approx $3.33) daily
       const dailyYieldNgn = (price / 50) * 5000;
       const dailyYieldUsd = dailyYieldNgn / NGN_RATE;
       
@@ -2943,8 +2971,9 @@
       if (!flip) return;
 
       const daysPassed = flip.daysElapsed || 0;
-      if (flip.daysLocked !== 99999 && daysPassed < 30) {
-        alert(`You can only cancel or end this flip after 30 days have passed. Current days elapsed: ${daysPassed}/30.`);
+      // REQUIREMENT: Only flips that are MORE THAN 30 days can be Ended
+      if (flip.daysLocked <= 30 || daysPassed <= 30) {
+        alert(`Only flips with durations greater than 30 days that have completed at least 30 days can be ended. Current days elapsed: ${daysPassed}/30.`);
         return;
       }
 
@@ -2966,14 +2995,16 @@
 
       container.innerHTML = currentUser.activeFlips.map(f => {
         const daysPassed = f.daysElapsed || 0;
-        const canCancel = (f.daysLocked === 99999 || daysPassed >= 30) && f.status === 'active';
+        // REQUIREMENT: Only flips with duration > 30 days AND daysPassed > 30 can be ended
+        const isMoreThan30DaysPlan = f.daysLocked > 30;
+        const canCancel = isMoreThan30DaysPlan && daysPassed > 30 && f.status === 'active';
 
         return `
           <div class="payment-account-card" style="margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
             <div>
               <b>${f.title}</b> (Capital: $${f.priceUsd} | Daily Yield: <span style="color:var(--primary);">₦${(f.dailyYieldNgn || 0).toLocaleString()} daily</span>)<br>
               <span style="font-size:11px; color:var(--gold);">Duration: <b>${f.durationLabel || '30 Days'}</b> | Elapsed: <b>${daysPassed} Days</b></span><br>
-              <span style="font-size:11px; color:var(--text-muted);">Purchased: ${f.purchaseDate}</span>
+              <span style="font-size:11px; color:var(--text-muted);">Purchased: ${f.purchaseDate} | Status: <b style="color:${daysPassed >= 30 ? 'var(--primary)' : 'var(--gold)'};">${daysPassed >= 30 ? '✔ Withdrawable (30D+)' : '⏳ Locked (< 30D)'}</b></span>
             </div>
             <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
               <span style="font-size:11px; font-weight:bold; padding:6px 12px; border-radius:8px; background:${f.status === 'active' ? 'rgba(251,191,36,0.2); color:var(--gold); border:1px solid var(--gold);' : 'rgba(0,230,118,0.2); color:var(--primary); border:1px solid var(--primary);'}">${f.status === 'active' ? `⏳ ACTIVE (${daysPassed}d)` : '✔ ENDED'}</span>
@@ -3110,16 +3141,22 @@
     function submitInternalTransfer() {
       const amt = parseFloat(document.getElementById('transferAmountUsd').value);
       if (isNaN(amt) || amt <= 0) { alert("Enter a valid amount!"); return; }
-      if ((currentUser.storeBalanceUsd || 0) < amt) { alert("Insufficient store balance!"); return; }
+
+      // REQUIREMENT: Only withdraw earnings from flips >= 30 days old
+      const withdrawableStoreUsd = getWithdrawableStoreBalanceUsd();
+      if (amt > withdrawableStoreUsd) { 
+        alert(`You can only withdraw earnings from flips that have completed 30 days or more! Your withdrawable balance from 30D+ flips is $${withdrawableStoreUsd.toFixed(2)}.`); 
+        return; 
+      }
 
       currentUser.storeBalanceUsd -= amt;
       currentUser.balanceUsd = (currentUser.balanceUsd || 0) + amt;
 
-      logUserTransaction("Store Cashout", `Withdrew earnings from Resell Flip Store to Main`, amt);
+      logUserTransaction("Store Cashout", `Withdrew 30D+ earnings from Resell Flip Store to Main`, amt);
       saveState();
       updateUI();
       closeTransferModal();
-      alert(`Transferred $${amt.toFixed(2)} to main dashboard!`);
+      alert(`Successfully transferred $${amt.toFixed(2)} from 30D+ flips to main dashboard!`);
     }
 
     let drivingGameInterval = null;
