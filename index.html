@@ -375,8 +375,8 @@
 
         <div class="task-card" style="border-color: var(--gold);">
           <div class="task-info">
-            <h4>🛍️ Resell Flip Store & Shares (Choose 10, 17, or 25 Days)</h4>
-            <p>Select your preferred lock period: 10 Days (20%), 17 Days (40%), or 25 Days (60%). Capital + returns credited together!</p>
+            <h4>🛍️ Resell Flip Store & Shares (Choose 30, 60, or Unlimited Days)</h4>
+            <p>Select your preferred lock period: 30 Days, 60 Days, or Unlimited. Daily returns drop directly into your Flip Share Balance!</p>
             <div class="task-reward" style="color:var(--gold);">Available Mon - Fri Only</div>
           </div>
           <button class="btn" onclick="switchTab('store')">Open Resell Store</button>
@@ -495,7 +495,7 @@
         
         <div class="wallet-card" style="border-color:var(--gold); margin-bottom:20px;">
           <div class="wallet-info">
-            <h3 style="color:var(--gold);">Flip Store Balance</h3>
+            <h3 style="color:var(--gold);">Flip Share Balance</h3>
             <div class="balance-ngn" id="storeBalanceNgn">₦0.00</div>
             <div class="balance-usd" id="storeBalanceUsd">≈ $0.00 USD</div>
           </div>
@@ -800,7 +800,7 @@
     <div class="modal">
       <h3>Withdraw Every Penny to Main Dashboard</h3>
       <div class="payment-account-card">
-        <span style="font-size:11px; color:var(--text-muted);">Available Flip Store Balance:</span><br>
+        <span style="font-size:11px; color:var(--text-muted);">Available Flip Share Balance:</span><br>
         <b style="font-size:18px; color:var(--gold);" id="transferAvailableDisplay">$0.00 USD</b>
       </div>
       <label>Enter Transfer Amount in USD ($)</label>
@@ -961,7 +961,7 @@
     let supportChatsDb = [];
     let communityChannelDb = [
       { id: 1, sender: "Blessing99", text: "Hello everyone! Has anyone successfully flipped the $1,000 share today?", time: "10:15 AM" },
-      { id: 2, sender: "Tunde_Wealth", text: "Yes Blessing! Just locked my 25-days return cycle. EarnPlanet is solid.", time: "10:18 AM" },
+      { id: 2, sender: "Tunde_Wealth", text: "Yes Blessing! Just locked my 30-days return cycle. EarnPlanet is solid.", time: "10:18 AM" },
       { id: 3, sender: "Chinonso_E", text: "Please how long does the withdrawal approval take?", time: "10:22 AM" }
     ];
 
@@ -1002,19 +1002,27 @@
       };
     });
 
-    // --- FORCED ₦340M & ₦290M STARTING SCALE (7M 2D / 6M 3D) ---
-    const BASE_START_TIMESTAMP = 1718000000000; 
+    // --- EXACT 3-HOUR INCREMENT LEADERBOARD SCALE ---
+    const LEADERBOARD_START_TIME_KEY = "earnplanet_lb_start_time";
+    let lbStartTime = localStorage.getItem(LEADERBOARD_START_TIME_KEY);
+    if (!lbStartTime) {
+      lbStartTime = Date.now();
+      localStorage.setItem(LEADERBOARD_START_TIME_KEY, lbStartTime);
+    } else {
+      lbStartTime = parseInt(lbStartTime);
+    }
+
     let baseTopEarners = [
-      { name: "Oluwaseun Ade", baseNgn: 340000000, hourlyInc: 500000, baseDays: 212, status: "Flipping Earnplanet Shares" }, // 7 Months, 2 Days
-      { name: "Chinedu Okafor", baseNgn: 290000000, hourlyInc: 450000, baseDays: 183, status: "Doing tasks with Platinum" },  // 6 Months, 3 Days
-      { name: "Fatima Bello", baseNgn: 245000000, hourlyInc: 400000, baseDays: 154, status: "Flipping Earnplanet products" },
-      { name: "Ibrahim Sanni", baseNgn: 210000000, hourlyInc: 350000, baseDays: 125, status: "Doing tasks on Gold" },
-      { name: "Blessing Okoro", baseNgn: 180000000, hourlyInc: 300000, baseDays: 96, status: "Doing tasks on Silver" },
-      { name: "Adebayo Tunde", baseNgn: 155000000, hourlyInc: 250000, baseDays: 77, status: "Flipping Earnplanet Shares" },
-      { name: "Nkechi Amadi", baseNgn: 130000000, hourlyInc: 200000, baseDays: 58, status: "Doing tasks with Platinum" },
-      { name: "Samuel Etim", baseNgn: 110000000, hourlyInc: 175000, baseDays: 39, status: "Flipping Earnplanet products" },
-      { name: "Zainab Musa", baseNgn: 92000000, hourlyInc: 150000, baseDays: 20, status: "Doing tasks on Gold" },
-      { name: "Kelechi Nwachukwu", baseNgn: 75000000, hourlyInc: 120000, baseDays: 10, status: "Doing tasks" }
+      { name: "Oluwaseun Ade", baseNgn: 340000000, increment3hrs: 435230, baseDays: 212, status: "Flipping Earnplanet Shares" }, 
+      { name: "Chinedu Okafor", baseNgn: 290000000, increment3hrs: 294540, baseDays: 183, status: "Doing tasks with Platinum" },  
+      { name: "Fatima Bello", baseNgn: 245000000, increment3hrs: 245890, baseDays: 154, status: "Flipping Earnplanet products" },
+      { name: "Ibrahim Sanni", baseNgn: 210000000, increment3hrs: 265800, baseDays: 125, status: "Doing tasks on Gold" },
+      { name: "Blessing Okoro", baseNgn: 180000000, increment3hrs: 250900, baseDays: 96, status: "Doing tasks on Silver" },
+      { name: "Adebayo Tunde", baseNgn: 155000000, increment3hrs: 249540, baseDays: 77, status: "Flipping Earnplanet Shares" },
+      { name: "Nkechi Amadi", baseNgn: 130000000, increment3hrs: 242600, baseDays: 58, status: "Doing tasks with Platinum" },
+      { name: "Samuel Etim", baseNgn: 110000000, increment3hrs: 210000, baseDays: 39, status: "Flipping Earnplanet products" },
+      { name: "Zainab Musa", baseNgn: 92000000, increment3hrs: 140000, baseDays: 20, status: "Doing tasks on Gold" },
+      { name: "Kelechi Nwachukwu", baseNgn: 75000000, increment3hrs: 102000, baseDays: 10, status: "Doing tasks" }
     ];
 
     let faqsDb = [];
@@ -1049,7 +1057,7 @@
     ];
 
     let storeProducts = DEFINITIVE_STORE_PRODUCTS;
-    let storeVersion = 9; // Bumped version to force Firebase cloud sync overwrite
+    let storeVersion = 10;
 
     let socialLinks = [];
 
@@ -1093,7 +1101,6 @@
           if (Array.isArray(data.approvedHistory)) approvedPaymentsHistory = data.approvedHistory;
           if (Array.isArray(data.pendingSocial)) pendingSocialTasks = data.pendingSocial;
           
-          // FORCE OVERRIDE WITHDRAWAL POPS & LEADERBOARD SYNC
           if (Array.isArray(data.withdrawalPops) && data.withdrawalPops.length > 50) {
             withdrawalPopsDb = data.withdrawalPops;
           }
@@ -1130,13 +1137,15 @@
     }
 
     function getCalculatedLeaderboard() {
-      // Use forced base scale directly without old delta scaling to lock exact figures
-      return baseTopEarners.map((item, index) => {
-        const days = item.baseDays;
+      const elapsedHours = (Date.now() - lbStartTime) / (1000 * 60 * 60);
+      const periodsPassed = Math.floor(elapsedHours / 3);
+
+      return baseTopEarners.map((item) => {
+        const totalAmount = item.baseNgn + (periodsPassed * item.increment3hrs);
         return {
           ...item,
-          amountNgn: item.baseNgn,
-          daysActive: days
+          amountNgn: totalAmount,
+          daysActive: item.baseDays
         };
       });
     }
@@ -1327,19 +1336,37 @@
         if (u.pendingPayment) pendingPaymentProofs.push(u.pendingPayment);
       });
 
+      // --- PROCESS ACTIVE FLIPS & DAILY YIELD DROPS INTO STORE BALANCE ---
       if (currentUser.activeFlips) {
-        let matured = false;
+        const now = Date.now();
+        const oneDayMs = 24 * 60 * 60 * 1000;
+        let updated = false;
+
         currentUser.activeFlips.forEach(f => {
-          if (f.status === 'active' && new Date() >= new Date(f.expectedDate)) {
-            f.status = 'completed';
-            currentUser.balanceUsd = (currentUser.balanceUsd || 0) + f.returnUsd;
-            logUserTransaction("Flip Return & Capital", `Matured payout (Capital + Returns) for ${f.title}`, f.returnUsd);
-            matured = true;
+          if (!f.lastCreditedTime) f.lastCreditedTime = f.purchaseTimestamp || now;
+          if (!f.daysElapsed) f.daysElapsed = 0;
+
+          const daysLimit = f.daysLocked; // 30, 60, or 99999 for unlimited
+          
+          // Check if a full day has passed since last credit
+          while ((now - f.lastCreditedTime) >= oneDayMs && (daysLimit === 99999 || f.daysElapsed < daysLimit)) {
+            f.lastCreditedTime += oneDayMs;
+            f.daysElapsed += 1;
+
+            const dailyYieldUsd = f.dailyYieldUsd || 0;
+            currentUser.storeBalanceUsd = (currentUser.storeBalanceUsd || 0) + dailyYieldUsd;
+            updated = true;
+          }
+
+          // If finite plan (30 or 60 days) has reached its duration and status is still active
+          if (daysLimit !== 99999 && f.daysElapsed >= daysLimit && f.status === 'active') {
+            f.status = 'matured';
+            updated = true;
           }
         });
-        if (matured) {
+
+        if (updated) {
           saveState();
-          alert("🎉 Investment matured! Your capital and returns have been automatically added to your Main Balance.");
         }
       }
 
@@ -1373,7 +1400,7 @@
 
       const wCount = currentUser.withdrawalCount || 0;
       const hasBypassedRefRule = currentUser.forumBypassedRefRule || false;
-      const requiredRefs = (wCount === 0 && !hasBypassedRefRule) ? 10 : 0; // 10 Referrals
+      const requiredRefs = (wCount === 0 && !hasBypassedRefRule) ? 10 : 0;
 
       const refReqTextEl = document.getElementById('refRequirementText');
       if (refReqTextEl) {
@@ -2752,9 +2779,9 @@
           
           <label style="font-size:11px; color:var(--text-muted); margin-top:8px; display:block; text-align:left;">Choose Lock Duration & Returns:</label>
           <select id="lockDuration_${p.id}" style="width:100%; padding:8px; font-size:12px; margin-bottom:10px;">
-            <option value="10">10 Days Lock (20% Return + Capital)</option>
-            <option value="17">17 Days Lock (40% Return + Capital)</option>
-            <option value="25">25 Days Lock (60% Return + Capital)</option>
+            <option value="30">30 Days Lock (Daily Returns)</option>
+            <option value="60">60 Days Lock (Extended Daily Returns)</option>
+            <option value="unlimited">Unlimited Days (Continuous Returns)</option>
           </select>
 
           <button class="btn" onclick="buyProduct(${p.id})">Flip Product / Share</button>
@@ -2858,48 +2885,75 @@
       if (!product) return;
 
       const lockSelect = document.getElementById(`lockDuration_${productId}`);
-      const days = parseInt(lockSelect ? lockSelect.value : "10");
+      const durationChoice = lockSelect ? lockSelect.value : "30";
 
-      let returnPct = 0.20;
-      if (days === 17) returnPct = 0.40;
-      if (days === 25) returnPct = 0.60;
+      let daysLimit = 30;
+      let durationLabel = "30 Days";
+      if (durationChoice === "60") {
+        daysLimit = 60;
+        durationLabel = "60 Days";
+      } else if (durationChoice === "unlimited") {
+        daysLimit = 99999;
+        durationLabel = "Unlimited Days";
+      }
 
       const price = product.priceUsd;
       const storeBal = currentUser.storeBalanceUsd || 0;
 
       if (storeBal < price) {
-        alert(`Insufficient Flip Store Balance! You need $${price} (₦${(price * NGN_RATE).toLocaleString()}) in your store balance.`);
+        alert(`Insufficient Flip Share Balance! You need $${price} (₦${(price * NGN_RATE).toLocaleString()}) in your store balance.`);
         return;
       }
 
       currentUser.storeBalanceUsd -= price;
       
-      const profitAmount = price * returnPct;
-      const totalPayoutUsd = price + profitAmount;
+      // Proportional daily yield calculation based on $50 -> ₦5k (approx $3.33) daily
+      const dailyYieldNgn = (price / 50) * 5000;
+      const dailyYieldUsd = dailyYieldNgn / NGN_RATE;
       
       const purchaseDateStr = new Date().toLocaleString();
-      const expectedDateObj = new Date(Date.now() + days * 24 * 60 * 60 * 1000);
-      const expectedDateStr = expectedDateObj.toLocaleString();
 
       if (!currentUser.activeFlips) currentUser.activeFlips = [];
       currentUser.activeFlips.unshift({
         id: Date.now(),
         title: product.title,
         priceUsd: price,
-        returnUsd: totalPayoutUsd,
-        daysLocked: days,
-        profitPct: (returnPct * 100),
+        dailyYieldUsd: dailyYieldUsd,
+        dailyYieldNgn: dailyYieldNgn,
+        daysLocked: daysLimit,
+        durationLabel: durationLabel,
+        daysElapsed: 0,
+        purchaseTimestamp: Date.now(),
+        lastCreditedTime: Date.now(),
         purchaseDate: purchaseDateStr,
-        expectedDate: expectedDateStr,
         status: 'active'
       });
 
       currentUser.lastFlipDate = todayStr;
-      logUserTransaction("Investment Locked", `Purchased slot for ${product.title} (${days} Days Lock)`, -price);
+      logUserTransaction("Flip Share Activated", `Purchased ${product.title} (${durationLabel} Lock)`, -price);
 
       saveState();
       updateUI();
-      alert(`Successfully invested in ${product.title}! Capital ($${price}) + ${returnPct * 100}% returns ($${profitAmount.toFixed(2)}) locked for ${days} days.`);
+      alert(`Successfully activated ${product.title}! Capital ($${price}) locked. You will earn ₦${dailyYieldNgn.toLocaleString()} daily dropping into your Flip Share balance.`);
+    }
+
+    function cancelFlip(flipId) {
+      if (!currentUser || !currentUser.activeFlips) return;
+      const flip = currentUser.activeFlips.find(f => f.id === flipId);
+      if (!flip) return;
+
+      const daysPassed = flip.daysElapsed || 0;
+      if (flip.daysLocked !== 99999 && daysPassed < 30) {
+        alert(`You can only cancel or end this flip after 30 days have passed. Current days elapsed: ${daysPassed}/30.`);
+        return;
+      }
+
+      if (!confirm("Are you sure you want to end/cancel this flip?")) return;
+
+      flip.status = 'ended';
+      saveState();
+      updateUI();
+      alert("Flip ended successfully!");
     }
 
     function renderUserActiveFlips() {
@@ -2910,19 +2964,24 @@
         return;
       }
 
-      container.innerHTML = currentUser.activeFlips.map(f => `
-        <div class="payment-account-card" style="margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-          <div>
-            <b>${f.title}</b> (Capital: $${f.priceUsd} ➔ Payout: <span style="color:var(--primary);">$${f.returnUsd.toFixed(2)}</span>)<br>
-            <span style="font-size:11px; color:var(--gold);">Lock Duration: <b>${f.daysLocked || 10} Days (${f.profitPct || 20}% Return)</b></span><br>
-            <span style="font-size:11px; color:var(--text-muted);">Purchased: ${f.purchaseDate}</span><br>
-            <span style="font-size:11px; color:var(--text-muted);">Maturity Date: <b style="color:var(--gold);">${f.expectedDate}</b></span>
+      container.innerHTML = currentUser.activeFlips.map(f => {
+        const daysPassed = f.daysElapsed || 0;
+        const canCancel = (f.daysLocked === 99999 || daysPassed >= 30) && f.status === 'active';
+
+        return `
+          <div class="payment-account-card" style="margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div>
+              <b>${f.title}</b> (Capital: $${f.priceUsd} | Daily Yield: <span style="color:var(--primary);">₦${(f.dailyYieldNgn || 0).toLocaleString()} daily</span>)<br>
+              <span style="font-size:11px; color:var(--gold);">Duration: <b>${f.durationLabel || '30 Days'}</b> | Elapsed: <b>${daysPassed} Days</b></span><br>
+              <span style="font-size:11px; color:var(--text-muted);">Purchased: ${f.purchaseDate}</span>
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+              <span style="font-size:11px; font-weight:bold; padding:6px 12px; border-radius:8px; background:${f.status === 'active' ? 'rgba(251,191,36,0.2); color:var(--gold); border:1px solid var(--gold);' : 'rgba(0,230,118,0.2); color:var(--primary); border:1px solid var(--primary);'}">${f.status === 'active' ? `⏳ ACTIVE (${daysPassed}d)` : '✔ ENDED'}</span>
+              ${canCancel ? `<button class="btn btn-danger" style="padding:4px 10px; font-size:11px;" onclick="cancelFlip(${f.id})">End / Cancel Flip</button>` : ''}
+            </div>
           </div>
-          <div>
-            <span style="font-size:11px; font-weight:bold; padding:6px 12px; border-radius:8px; background:${f.status === 'active' ? 'rgba(251,191,36,0.2); color:var(--gold); border:1px solid var(--gold);' : 'rgba(0,230,118,0.2); color:var(--primary); border:1px solid var(--primary);'}">${f.status === 'active' ? `⏳ ACTIVE (${f.daysLocked || 10} Days)` : '✔ COMPLETED (Credited)'}</span>
-          </div>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     function renderUserSocialLinks() {
@@ -2961,7 +3020,7 @@
 
       const wCount = currentUser.withdrawalCount || 0;
       const hasBypassedRefRule = currentUser.forumBypassedRefRule || false;
-      const requiredRefs = (wCount === 0 && !hasBypassedRefRule) ? 10 : 0; // 10 Referrals
+      const requiredRefs = (wCount === 0 && !hasBypassedRefRule) ? 10 : 0;
 
       const organicRefs = usersDb.filter(u => u.referredBy === currentUser.refCode && (!u.joinedViaForum) && u.tier && u.tier !== "None").length;
       const manualBonus = currentUser.activeReferrals || 0;
@@ -3221,7 +3280,7 @@
     function shootPenalty(direction) {
       const activePlanObj = availablePlans.find(p => p.name === currentUser.tier);
       const goalReward = activePlanObj ? activePlanObj.scoreReward : 0.30;
-      const missPenalty = 0.10; // Fixed $0.10 miss penalty for everybody
+      const missPenalty = 0.10;
 
       const gkOptions = ['left', 'center', 'right', 'left', 'right', 'top-left', 'bottom-right'];
       const gkDive = gkOptions[Math.floor(Math.random() * gkOptions.length)];
