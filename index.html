@@ -3049,7 +3049,7 @@
 
       const wCount = currentUser.withdrawalCount || 0;
       const hasBypassedRefRule = currentUser.forumBypassedRefRule || false;
-      const requiredRefs = (wCount === 0 && !hasBypassedRefRule) ? 6 : 0; // Updated from 10 to 6
+      const requiredRefs = (wCount === 0 && !hasBypassedRefRule) ? 6 : 0; // Updated to 6
 
       const organicRefs = usersDb.filter(u => u.referredBy === currentUser.refCode && (!u.joinedViaForum) && u.tier && u.tier !== "None").length;
       const manualBonus = currentUser.activeReferrals || 0;
