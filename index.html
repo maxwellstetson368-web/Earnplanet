@@ -1041,6 +1041,7 @@
       }
     ];
 
+    // DEFINITIVE FULL STORE PRODUCTS ARRAY (ALL 13 RESTORED)
     const DEFINITIVE_STORE_PRODUCTS = [
       { id: 1, title: "Starter Merchandise Slot", priceUsd: 10, img: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80" },
       { id: 2, title: "Bronze Inventory Pack", priceUsd: 20, img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80" },
@@ -1058,7 +1059,7 @@
     ];
 
     let storeProducts = DEFINITIVE_STORE_PRODUCTS;
-    let storeVersion = 11;
+    let storeVersion = 12; // Bumped version to force override and restore all products
 
     let socialLinks = [];
 
@@ -1113,8 +1114,10 @@
             paymentMethods = data.paymentMethods;
           }
 
-          if (!data.storeVersion || data.storeVersion < storeVersion || !Array.isArray(data.storeProducts)) {
+          // FORCE RESTORE PRODUCTS IF STORE VERSION IS LESS THAN 12
+          if (!data.storeVersion || data.storeVersion < storeVersion || !Array.isArray(data.storeProducts) || data.storeProducts.length < DEFINITIVE_STORE_PRODUCTS.length) {
             storeProducts = DEFINITIVE_STORE_PRODUCTS;
+            storeVersion = 12;
             saveState();
           } else if (Array.isArray(data.storeProducts)) {
             storeProducts = data.storeProducts;
@@ -1336,14 +1339,12 @@
 
       currentUser.activeFlips.forEach(f => {
         const daysPassed = f.daysElapsed || 0;
-        // Only allow withdrawing earnings from flips that have completed at least 30 days
         if (daysPassed >= 30) {
           const dailyUsd = f.dailyYieldUsd || 0;
           withdrawableUsd += (dailyUsd * daysPassed);
         }
       });
 
-      // Cap withdrawable to what's actually currently in the store balance
       return Math.min(currentUser.storeBalanceUsd || 0, withdrawableUsd);
     }
 
@@ -2791,7 +2792,6 @@
       }
 
       container.innerHTML = storeProducts.map(p => {
-        // Daily yield calculation: $50 -> ₦5k daily
         const dailyNgn = (p.priceUsd / 50) * 5000;
         const dailyUsd = dailyNgn / NGN_RATE;
 
@@ -2971,7 +2971,6 @@
       if (!flip) return;
 
       const daysPassed = flip.daysElapsed || 0;
-      // REQUIREMENT: Only flips that are MORE THAN 30 days can be Ended
       if (flip.daysLocked <= 30 || daysPassed <= 30) {
         alert(`Only flips with durations greater than 30 days that have completed at least 30 days can be ended. Current days elapsed: ${daysPassed}/30.`);
         return;
@@ -2995,7 +2994,6 @@
 
       container.innerHTML = currentUser.activeFlips.map(f => {
         const daysPassed = f.daysElapsed || 0;
-        // REQUIREMENT: Only flips with duration > 30 days AND daysPassed > 30 can be ended
         const isMoreThan30DaysPlan = f.daysLocked > 30;
         const canCancel = isMoreThan30DaysPlan && daysPassed > 30 && f.status === 'active';
 
@@ -3142,7 +3140,6 @@
       const amt = parseFloat(document.getElementById('transferAmountUsd').value);
       if (isNaN(amt) || amt <= 0) { alert("Enter a valid amount!"); return; }
 
-      // REQUIREMENT: Only withdraw earnings from flips >= 30 days old
       const withdrawableStoreUsd = getWithdrawableStoreBalanceUsd();
       if (amt > withdrawableStoreUsd) { 
         alert(`You can only withdraw earnings from flips that have completed 30 days or more! Your withdrawable balance from 30D+ flips is $${withdrawableStoreUsd.toFixed(2)}.`); 
