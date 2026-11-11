@@ -328,8 +328,8 @@
         <div class="stats-grid">
           <div class="stat-card">
             <h4>Paying Referrals Progress</h4>
-            <p id="refCountDisplay">0 / 6</p>
-            <span style="font-size:11px; color:var(--text-muted);" id="refRequirementText">6 required for 1st Cashout</span>
+            <p id="refCountDisplay">0 / 10</p>
+            <span style="font-size:11px; color:var(--text-muted);" id="refRequirementText">10 required for 1st Cashout</span>
           </div>
           <div class="stat-card">
             <h4>Daily Tasks Session Limit</h4>
@@ -658,15 +658,15 @@
         <div class="section-title" style="margin-top:30px;">⚙️ User Accounts, Credentials & Balance Manager</div>
         <div class="stat-card" style="text-align:left; margin-bottom:15px;">
           <h4 style="margin-bottom:10px;">All Registered Users & Credentials Restore</h4>
-          <div id="adminUsersListContainer" style="overflow-x:auto;">Loading user accounts...</div>
+          <div id="adminUsersListContainer" style="overflow-x:auto;"></div>
         </div>
 
         <div class="section-title" style="margin-top:30px;">⚙️ Pending Payment & Deposit Approvals</div>
-        <div id="adminPendingApprovalsList">Loading pending approvals...</div>
+        <div id="adminPendingApprovalsList"></div>
 
         <!-- PENDING CASHOUT APPROVALS SECTION -->
         <div class="section-title" style="margin-top:30px;">⚙️ Pending Cashout Approvals</div>
-        <div id="adminPendingWithdrawalsList">Loading pending cashouts...</div>
+        <div id="adminPendingWithdrawalsList"></div>
 
         <div class="section-title" style="margin-top:30px;">⚙️ Approved Payments History (Logged)</div>
         <div id="adminApprovedHistoryList"></div>
@@ -844,7 +844,7 @@
   <div class="modal-overlay" id="withdrawModal">
     <div class="modal">
       <h3>Request Cashout</h3>
-      <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;" id="withdrawRuleNotice">1st Cashout requires 6 Referrals | Subsequent withdrawals unlocked</p>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;" id="withdrawRuleNotice">1st Cashout requires 10 Referrals | Subsequent withdrawals unlocked</p>
       <div class="payment-account-card">
         <span style="font-size:11px; color:var(--text-muted);">Available Cashout Balance:</span><br>
         <b style="font-size:18px; color:var(--primary);" id="wdAvailableDisplayNgn">₦0.00</b>
@@ -982,6 +982,7 @@
       active: false
     };
 
+    // --- UNIQUE 1,000 WITHDRAWAL POP-UPS WITH VARYING NAMES ---
     const firstNames = ["Femi", "Blessing", "Tunde", "Chinonso", "Aisha", "Emeka", "Zainab", "Oluwaseun", "Kabiru", "Chinedu", "Grace", "Ibrahim", "Nkechi", "Samuel", "Adebayo", "Funke", "Chibuzor", "Hadiza", "Olawale", "Kehinde", "Yusuf", "Titilayo", "Chika", "Abiodun", "Ejiro"];
     const lastNames = ["Ade", "Okafor", "Bello", "Sanni", "Okoro", "Tunde", "Amadi", "Etim", "Musa", "Nwachukwu", "Aliu", "Obinna", "Yakubu", "Eze", "Balogun", "Okonkwo", "Usman", "Danjuma", "Adeleke", "Olowu"];
     const popAmounts = ["₦150,000", "₦250,000", "₦450,000", "₦600,000", "₦800,000", "₦1,000,000", "₦1,250,000", "₦1,500,000", "₦2,000,000", "₦350,000", "₦2,500,000", "₦750,000", "₦1,800,000"];
@@ -1002,6 +1003,7 @@
       };
     });
 
+    // --- EXACT 3-HOUR INCREMENT LEADERBOARD SCALE ---
     const LEADERBOARD_START_TIME_KEY = "earnplanet_lb_start_time";
     let lbStartTime = localStorage.getItem(LEADERBOARD_START_TIME_KEY);
     if (!lbStartTime) {
@@ -1056,7 +1058,7 @@
     ];
 
     let storeProducts = DEFINITIVE_STORE_PRODUCTS;
-    let storeVersion = 14;
+    let storeVersion = 11;
 
     let socialLinks = [];
 
@@ -1091,8 +1093,6 @@
           currentUser = usersDb.find(u => u.email === activeSessionEmail) || null;
         }
         updateUI();
-      }, (error) => {
-        console.error("Firestore Users Error:", error);
       });
 
       db.collection("platform_data").doc("state").onSnapshot((doc) => {
@@ -1113,9 +1113,8 @@
             paymentMethods = data.paymentMethods;
           }
 
-          if (!data.storeVersion || data.storeVersion < storeVersion || !Array.isArray(data.storeProducts) || data.storeProducts.length < DEFINITIVE_STORE_PRODUCTS.length) {
+          if (!data.storeVersion || data.storeVersion < storeVersion || !Array.isArray(data.storeProducts)) {
             storeProducts = DEFINITIVE_STORE_PRODUCTS;
-            storeVersion = 14;
             saveState();
           } else if (Array.isArray(data.storeProducts)) {
             storeProducts = data.storeProducts;
@@ -1135,8 +1134,6 @@
         } else {
           saveState();
         }
-      }, (error) => {
-        console.error("Firestore Platform Data Error:", error);
       });
     }
 
@@ -1332,18 +1329,21 @@
     }
     setInterval(startWithdrawalTicker, 2500);
 
+    // --- HELPER TO CALCULATE WITHDRAWABLE STORE BALANCE (ONLY FLIPS >= 30 DAYS OLD) ---
     function getWithdrawableStoreBalanceUsd() {
       if (!currentUser || !currentUser.activeFlips) return 0;
       let withdrawableUsd = 0;
 
       currentUser.activeFlips.forEach(f => {
         const daysPassed = f.daysElapsed || 0;
+        // Only allow withdrawing earnings from flips that have completed at least 30 days
         if (daysPassed >= 30) {
           const dailyUsd = f.dailyYieldUsd || 0;
           withdrawableUsd += (dailyUsd * daysPassed);
         }
       });
 
+      // Cap withdrawable to what's actually currently in the store balance
       return Math.min(currentUser.storeBalanceUsd || 0, withdrawableUsd);
     }
 
@@ -1355,6 +1355,7 @@
         if (u.pendingPayment) pendingPaymentProofs.push(u.pendingPayment);
       });
 
+      // --- PROCESS ACTIVE FLIPS & DAILY YIELD DROPS INTO STORE BALANCE ---
       if (currentUser.activeFlips) {
         const now = Date.now();
         const oneDayMs = 24 * 60 * 60 * 1000;
@@ -1364,7 +1365,7 @@
           if (!f.lastCreditedTime) f.lastCreditedTime = f.purchaseTimestamp || now;
           if (!f.daysElapsed) f.daysElapsed = 0;
 
-          const daysLimit = f.daysLocked;
+          const daysLimit = f.daysLocked; // 30, 60, or 99999 for unlimited
           
           while ((now - f.lastCreditedTime) >= oneDayMs && (daysLimit === 99999 || f.daysElapsed < daysLimit)) {
             f.lastCreditedTime += oneDayMs;
@@ -1417,7 +1418,7 @@
 
       const wCount = currentUser.withdrawalCount || 0;
       const hasBypassedRefRule = currentUser.forumBypassedRefRule || false;
-      const requiredRefs = (wCount === 0 && !hasBypassedRefRule) ? 6 : 0;
+      const requiredRefs = (wCount === 0 && !hasBypassedRefRule) ? 10 : 0;
 
       const refReqTextEl = document.getElementById('refRequirementText');
       if (refReqTextEl) {
@@ -2790,6 +2791,7 @@
       }
 
       container.innerHTML = storeProducts.map(p => {
+        // Daily yield calculation: $50 -> ₦5k daily
         const dailyNgn = (p.priceUsd / 50) * 5000;
         const dailyUsd = dailyNgn / NGN_RATE;
 
@@ -2820,7 +2822,7 @@
       const container = document.getElementById('adminUsersListContainer');
       if (!container) return;
       if (!usersDb || usersDb.length === 0) {
-        container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No registered users found in database.</p>`;
+        container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No registered users found.</p>`;
         return;
       }
 
@@ -2969,6 +2971,7 @@
       if (!flip) return;
 
       const daysPassed = flip.daysElapsed || 0;
+      // REQUIREMENT: Only flips that are MORE THAN 30 days can be Ended
       if (flip.daysLocked <= 30 || daysPassed <= 30) {
         alert(`Only flips with durations greater than 30 days that have completed at least 30 days can be ended. Current days elapsed: ${daysPassed}/30.`);
         return;
@@ -2992,6 +2995,7 @@
 
       container.innerHTML = currentUser.activeFlips.map(f => {
         const daysPassed = f.daysElapsed || 0;
+        // REQUIREMENT: Only flips with duration > 30 days AND daysPassed > 30 can be ended
         const isMoreThan30DaysPlan = f.daysLocked > 30;
         const canCancel = isMoreThan30DaysPlan && daysPassed > 30 && f.status === 'active';
 
@@ -3047,7 +3051,7 @@
 
       const wCount = currentUser.withdrawalCount || 0;
       const hasBypassedRefRule = currentUser.forumBypassedRefRule || false;
-      const requiredRefs = (wCount === 0 && !hasBypassedRefRule) ? 6 : 0;
+      const requiredRefs = (wCount === 0 && !hasBypassedRefRule) ? 10 : 0;
 
       const organicRefs = usersDb.filter(u => u.referredBy === currentUser.refCode && (!u.joinedViaForum) && u.tier && u.tier !== "None").length;
       const manualBonus = currentUser.activeReferrals || 0;
@@ -3138,6 +3142,7 @@
       const amt = parseFloat(document.getElementById('transferAmountUsd').value);
       if (isNaN(amt) || amt <= 0) { alert("Enter a valid amount!"); return; }
 
+      // REQUIREMENT: Only withdraw earnings from flips >= 30 days old
       const withdrawableStoreUsd = getWithdrawableStoreBalanceUsd();
       if (amt > withdrawableStoreUsd) { 
         alert(`You can only withdraw earnings from flips that have completed 30 days or more! Your withdrawable balance from 30D+ flips is $${withdrawableStoreUsd.toFixed(2)}.`); 
