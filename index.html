@@ -658,15 +658,15 @@
         <div class="section-title" style="margin-top:30px;">⚙️ User Accounts, Credentials & Balance Manager</div>
         <div class="stat-card" style="text-align:left; margin-bottom:15px;">
           <h4 style="margin-bottom:10px;">All Registered Users & Credentials Restore</h4>
-          <div id="adminUsersListContainer" style="overflow-x:auto;"></div>
+          <div id="adminUsersListContainer" style="overflow-x:auto;">Loading user accounts...</div>
         </div>
 
         <div class="section-title" style="margin-top:30px;">⚙️ Pending Payment & Deposit Approvals</div>
-        <div id="adminPendingApprovalsList"></div>
+        <div id="adminPendingApprovalsList">Loading pending approvals...</div>
 
         <!-- PENDING CASHOUT APPROVALS SECTION -->
         <div class="section-title" style="margin-top:30px;">⚙️ Pending Cashout Approvals</div>
-        <div id="adminPendingWithdrawalsList"></div>
+        <div id="adminPendingWithdrawalsList">Loading pending cashouts...</div>
 
         <div class="section-title" style="margin-top:30px;">⚙️ Approved Payments History (Logged)</div>
         <div id="adminApprovedHistoryList"></div>
@@ -982,7 +982,6 @@
       active: false
     };
 
-    // --- UNIQUE 1,000 WITHDRAWAL POP-UPS WITH VARYING NAMES ---
     const firstNames = ["Femi", "Blessing", "Tunde", "Chinonso", "Aisha", "Emeka", "Zainab", "Oluwaseun", "Kabiru", "Chinedu", "Grace", "Ibrahim", "Nkechi", "Samuel", "Adebayo", "Funke", "Chibuzor", "Hadiza", "Olawale", "Kehinde", "Yusuf", "Titilayo", "Chika", "Abiodun", "Ejiro"];
     const lastNames = ["Ade", "Okafor", "Bello", "Sanni", "Okoro", "Tunde", "Amadi", "Etim", "Musa", "Nwachukwu", "Aliu", "Obinna", "Yakubu", "Eze", "Balogun", "Okonkwo", "Usman", "Danjuma", "Adeleke", "Olowu"];
     const popAmounts = ["₦150,000", "₦250,000", "₦450,000", "₦600,000", "₦800,000", "₦1,000,000", "₦1,250,000", "₦1,500,000", "₦2,000,000", "₦350,000", "₦2,500,000", "₦750,000", "₦1,800,000"];
@@ -1003,7 +1002,6 @@
       };
     });
 
-    // --- EXACT 3-HOUR INCREMENT LEADERBOARD SCALE ---
     const LEADERBOARD_START_TIME_KEY = "earnplanet_lb_start_time";
     let lbStartTime = localStorage.getItem(LEADERBOARD_START_TIME_KEY);
     if (!lbStartTime) {
@@ -1041,7 +1039,6 @@
       }
     ];
 
-    // DEFINITIVE FULL STORE PRODUCTS ARRAY (ALL 13 RESTORED)
     const DEFINITIVE_STORE_PRODUCTS = [
       { id: 1, title: "Starter Merchandise Slot", priceUsd: 10, img: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80" },
       { id: 2, title: "Bronze Inventory Pack", priceUsd: 20, img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80" },
@@ -1059,7 +1056,7 @@
     ];
 
     let storeProducts = DEFINITIVE_STORE_PRODUCTS;
-    let storeVersion = 13; // Bumped version to force override
+    let storeVersion = 14;
 
     let socialLinks = [];
 
@@ -1094,6 +1091,8 @@
           currentUser = usersDb.find(u => u.email === activeSessionEmail) || null;
         }
         updateUI();
+      }, (error) => {
+        console.error("Firestore Users Error:", error);
       });
 
       db.collection("platform_data").doc("state").onSnapshot((doc) => {
@@ -1116,7 +1115,7 @@
 
           if (!data.storeVersion || data.storeVersion < storeVersion || !Array.isArray(data.storeProducts) || data.storeProducts.length < DEFINITIVE_STORE_PRODUCTS.length) {
             storeProducts = DEFINITIVE_STORE_PRODUCTS;
-            storeVersion = 13;
+            storeVersion = 14;
             saveState();
           } else if (Array.isArray(data.storeProducts)) {
             storeProducts = data.storeProducts;
@@ -1136,6 +1135,8 @@
         } else {
           saveState();
         }
+      }, (error) => {
+        console.error("Firestore Platform Data Error:", error);
       });
     }
 
@@ -2819,7 +2820,7 @@
       const container = document.getElementById('adminUsersListContainer');
       if (!container) return;
       if (!usersDb || usersDb.length === 0) {
-        container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No registered users found.</p>`;
+        container.innerHTML = `<p style="font-size:12px; color:var(--text-muted);">No registered users found in database.</p>`;
         return;
       }
 
