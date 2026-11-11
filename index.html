@@ -1059,7 +1059,7 @@
     ];
 
     let storeProducts = DEFINITIVE_STORE_PRODUCTS;
-    let storeVersion = 12; // Bumped version to force override and restore all products
+    let storeVersion = 13; // Bumped version to force override
 
     let socialLinks = [];
 
@@ -1114,10 +1114,9 @@
             paymentMethods = data.paymentMethods;
           }
 
-          // FORCE RESTORE PRODUCTS IF STORE VERSION IS LESS THAN 12
           if (!data.storeVersion || data.storeVersion < storeVersion || !Array.isArray(data.storeProducts) || data.storeProducts.length < DEFINITIVE_STORE_PRODUCTS.length) {
             storeProducts = DEFINITIVE_STORE_PRODUCTS;
-            storeVersion = 12;
+            storeVersion = 13;
             saveState();
           } else if (Array.isArray(data.storeProducts)) {
             storeProducts = data.storeProducts;
@@ -1332,7 +1331,6 @@
     }
     setInterval(startWithdrawalTicker, 2500);
 
-    // --- HELPER TO CALCULATE WITHDRAWABLE STORE BALANCE (ONLY FLIPS >= 30 DAYS OLD) ---
     function getWithdrawableStoreBalanceUsd() {
       if (!currentUser || !currentUser.activeFlips) return 0;
       let withdrawableUsd = 0;
@@ -1356,7 +1354,6 @@
         if (u.pendingPayment) pendingPaymentProofs.push(u.pendingPayment);
       });
 
-      // --- PROCESS ACTIVE FLIPS & DAILY YIELD DROPS INTO STORE BALANCE ---
       if (currentUser.activeFlips) {
         const now = Date.now();
         const oneDayMs = 24 * 60 * 60 * 1000;
@@ -1366,7 +1363,7 @@
           if (!f.lastCreditedTime) f.lastCreditedTime = f.purchaseTimestamp || now;
           if (!f.daysElapsed) f.daysElapsed = 0;
 
-          const daysLimit = f.daysLocked; // 30, 60, or 99999 for unlimited
+          const daysLimit = f.daysLocked;
           
           while ((now - f.lastCreditedTime) >= oneDayMs && (daysLimit === 99999 || f.daysElapsed < daysLimit)) {
             f.lastCreditedTime += oneDayMs;
@@ -3049,7 +3046,7 @@
 
       const wCount = currentUser.withdrawalCount || 0;
       const hasBypassedRefRule = currentUser.forumBypassedRefRule || false;
-      const requiredRefs = (wCount === 0 && !hasBypassedRefRule) ? 6 : 0; // Updated to 6
+      const requiredRefs = (wCount === 0 && !hasBypassedRefRule) ? 6 : 0;
 
       const organicRefs = usersDb.filter(u => u.referredBy === currentUser.refCode && (!u.joinedViaForum) && u.tier && u.tier !== "None").length;
       const manualBonus = currentUser.activeReferrals || 0;
