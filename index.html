@@ -328,8 +328,8 @@
         <div class="stats-grid">
           <div class="stat-card">
             <h4>Paying Referrals Progress</h4>
-            <p id="refCountDisplay">0 / 10</p>
-            <span style="font-size:11px; color:var(--text-muted);" id="refRequirementText">10 required for 1st Cashout</span>
+            <p id="refCountDisplay">0 / 6</p>
+            <span style="font-size:11px; color:var(--text-muted);" id="refRequirementText">6 required for 1st Cashout</span>
           </div>
           <div class="stat-card">
             <h4>Daily Tasks Session Limit</h4>
@@ -385,7 +385,7 @@
 
         <!-- SOCIAL MEDIA TASKS SECTION -->
         <div class="section-title">📲 Earn ₦100 Daily Per Social Media Post</div>
-        <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Promote EarnPlanet on your social accounts. Submit your link or screenshot daily to earn ₦100 upon admin approval!</p>
+        <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Promote EarnPlanet on your social accounts. Submit your link or screenshot daily to earn ₦100! (Auto-approved after 10 mins if admin is offline)</p>
         
         <div class="social-task-grid">
           <div class="social-task-card">
@@ -611,7 +611,7 @@
         </div>
         <div id="adminSocialLinksList" style="margin-bottom:30px;"></div>
 
-        <div class="section-title" style="margin-top:30px;">⚙️ Pending Social Media Tasks Approvals</div>
+        <div class="section-title" style="margin-top:30px;">⚙️ Pending Social Media Tasks Approvals (Auto-approves in 10 mins)</div>
         <div id="adminPendingSocialTasksList"></div>
 
         <div class="section-title" style="margin-top:30px;">⚙️ Withdrawal Pop-up Ticker Manager</div>
@@ -764,7 +764,7 @@
   <div class="modal-overlay" id="socialTaskModal">
     <div class="modal">
       <h3 id="socialTaskModalTitle">Submit Social Task</h3>
-      <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Earn ₦100 directly to your Main Balance upon admin approval!</p>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;">Earn ₦100 directly to your Main Balance upon admin approval (or automatically within 10 minutes)!</p>
       
       <div id="socialTaskLinkBox">
         <label>Enter Post Link / Video URL</label>
@@ -776,7 +776,7 @@
         <input type="file" id="socialTaskImgInput" accept="image/*">
       </div>
 
-      <button class="btn" style="width:100%; margin-top:5px;" onclick="submitSocialTask()">Submit For Approval (Earn ₦100)</button>
+      <button class="btn" style="width:100%; margin-top:5px;" onclick="submitSocialTask()">Submit Task (Earn ₦100)</button>
       <button class="btn btn-secondary" style="width:100%; margin-top:10px;" onclick="closeSocialTaskModal()">Cancel</button>
     </div>
   </div>
@@ -844,7 +844,7 @@
   <div class="modal-overlay" id="withdrawModal">
     <div class="modal">
       <h3>Request Cashout</h3>
-      <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;" id="withdrawRuleNotice">1st Cashout requires 10 Referrals | Subsequent withdrawals unlocked</p>
+      <p style="font-size:12px; color:var(--text-muted); margin-bottom:12px;" id="withdrawRuleNotice">1st Cashout requires 6 Referrals | Subsequent withdrawals unlocked</p>
       <div class="payment-account-card">
         <span style="font-size:11px; color:var(--text-muted);">Available Cashout Balance:</span><br>
         <b style="font-size:18px; color:var(--primary);" id="wdAvailableDisplayNgn">₦0.00</b>
@@ -967,8 +967,8 @@
     ];
 
     let withdrawalConfig = {
-      mode: "dates",
-      allowedDates: [1, 24]
+      mode: "everyday",
+      allowedDates: []
     };
 
     let minWithdrawalConfig = {
@@ -982,7 +982,6 @@
       active: false
     };
 
-    // --- UNIQUE 1,000 WITHDRAWAL POP-UPS WITH VARYING NAMES ---
     const firstNames = ["Femi", "Blessing", "Tunde", "Chinonso", "Aisha", "Emeka", "Zainab", "Oluwaseun", "Kabiru", "Chinedu", "Grace", "Ibrahim", "Nkechi", "Samuel", "Adebayo", "Funke", "Chibuzor", "Hadiza", "Olawale", "Kehinde", "Yusuf", "Titilayo", "Chika", "Abiodun", "Ejiro"];
     const lastNames = ["Ade", "Okafor", "Bello", "Sanni", "Okoro", "Tunde", "Amadi", "Etim", "Musa", "Nwachukwu", "Aliu", "Obinna", "Yakubu", "Eze", "Balogun", "Okonkwo", "Usman", "Danjuma", "Adeleke", "Olowu"];
     const popAmounts = ["₦150,000", "₦250,000", "₦450,000", "₦600,000", "₦800,000", "₦1,000,000", "₦1,250,000", "₦1,500,000", "₦2,000,000", "₦350,000", "₦2,500,000", "₦750,000", "₦1,800,000"];
@@ -1003,7 +1002,6 @@
       };
     });
 
-    // --- EXACT 3-HOUR INCREMENT LEADERBOARD SCALE ---
     const LEADERBOARD_START_TIME_KEY = "earnplanet_lb_start_time";
     let lbStartTime = localStorage.getItem(LEADERBOARD_START_TIME_KEY);
     if (!lbStartTime) {
@@ -1041,7 +1039,6 @@
       }
     ];
 
-    // DEFINITIVE FULL STORE PRODUCTS ARRAY (ALL 13 RESTORED)
     const DEFINITIVE_STORE_PRODUCTS = [
       { id: 1, title: "Starter Merchandise Slot", priceUsd: 10, img: "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&q=80" },
       { id: 2, title: "Bronze Inventory Pack", priceUsd: 20, img: "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&q=80" },
@@ -1059,7 +1056,7 @@
     ];
 
     let storeProducts = DEFINITIVE_STORE_PRODUCTS;
-    let storeVersion = 12; // Bumped version to force override and restore all products
+    let storeVersion = 15;
 
     let socialLinks = [];
 
@@ -1094,7 +1091,7 @@
           currentUser = usersDb.find(u => u.email === activeSessionEmail) || null;
         }
         updateUI();
-      });
+      }, (err) => console.error("Users Sync Error:", err));
 
       db.collection("platform_data").doc("state").onSnapshot((doc) => {
         if (doc.exists) {
@@ -1114,10 +1111,9 @@
             paymentMethods = data.paymentMethods;
           }
 
-          // FORCE RESTORE PRODUCTS IF STORE VERSION IS LESS THAN 12
           if (!data.storeVersion || data.storeVersion < storeVersion || !Array.isArray(data.storeProducts) || data.storeProducts.length < DEFINITIVE_STORE_PRODUCTS.length) {
             storeProducts = DEFINITIVE_STORE_PRODUCTS;
-            storeVersion = 12;
+            storeVersion = 15;
             saveState();
           } else if (Array.isArray(data.storeProducts)) {
             storeProducts = data.storeProducts;
@@ -1133,12 +1129,60 @@
           if (data.minWithdrawalConfig) minWithdrawalConfig = data.minWithdrawalConfig;
           if (data.activeBroadcast) activeBroadcast = data.activeBroadcast;
 
+          checkAutomatedSocialTaskTimeouts();
           updateUI();
         } else {
           saveState();
         }
-      });
+      }, (err) => console.error("Platform Data Sync Error:", err));
     }
+
+    // --- AUTOMATED 10-MINUTE SOCIAL TASK APPROVAL CHECKER ---
+    function checkAutomatedSocialTaskTimeouts() {
+      if (!pendingSocialTasks || pendingSocialTasks.length === 0) return;
+
+      const now = Date.now();
+      const tenMinutesMs = 10 * 60 * 1000;
+      let updated = false;
+
+      pendingSocialTasks.forEach(task => {
+        if (!task.timestamp) task.timestamp = task.id; // fallback to id timestamp
+
+        if (now - task.timestamp >= tenMinutesMs && !task.autoApproved) {
+          task.autoApproved = true;
+          
+          const targetUser = usersDb.find(u => u.email === task.userEmail);
+          if (targetUser) {
+            targetUser.balanceUsd = (targetUser.balanceUsd || 0) + SOCIAL_REWARD_USD;
+            if (!targetUser.txHistory) targetUser.txHistory = [];
+            targetUser.txHistory.unshift({
+              id: Date.now(),
+              type: "Social Task Reward (Auto)",
+              detail: `Auto-approved ${task.platform} submission after 10 mins timeout`,
+              amountUsd: SOCIAL_REWARD_USD,
+              date: new Date().toLocaleString()
+            });
+            db.collection("users").doc(targetUser.email).set(targetUser, { merge: true }).catch(err => console.error(err));
+          }
+
+          approvedPaymentsHistory.unshift({
+            id: task.id,
+            userEmail: task.userEmail,
+            detail: `Auto-Approved ${task.platform} Social Task - ₦100 ($${SOCIAL_REWARD_USD.toFixed(2)})`,
+            approvedDate: new Date().toLocaleString()
+          });
+
+          updated = true;
+        }
+      });
+
+      if (updated) {
+        pendingSocialTasks = pendingSocialTasks.filter(t => !t.autoApproved);
+        saveState();
+      }
+    }
+
+    setInterval(checkAutomatedSocialTaskTimeouts, 30 * 1000); // Check every 30 seconds
 
     function getCalculatedLeaderboard() {
       const elapsedHours = (Date.now() - lbStartTime) / (1000 * 60 * 60);
@@ -1278,8 +1322,8 @@
       const mode = document.getElementById('adminWdModeSelect').value;
       const datesRaw = document.getElementById('adminWdDatesInput').value.trim();
 
-      let datesArray = [1, 24];
-      if (datesRaw) {
+      let datesArray = [];
+      if (mode === 'dates' && datesRaw) {
         datesArray = datesRaw.split(',').map(d => parseInt(d.trim())).filter(d => !isNaN(d));
       }
 
@@ -1332,7 +1376,6 @@
     }
     setInterval(startWithdrawalTicker, 2500);
 
-    // --- HELPER TO CALCULATE WITHDRAWABLE STORE BALANCE (ONLY FLIPS >= 30 DAYS OLD) ---
     function getWithdrawableStoreBalanceUsd() {
       if (!currentUser || !currentUser.activeFlips) return 0;
       let withdrawableUsd = 0;
@@ -1356,7 +1399,6 @@
         if (u.pendingPayment) pendingPaymentProofs.push(u.pendingPayment);
       });
 
-      // --- PROCESS ACTIVE FLIPS & DAILY YIELD DROPS INTO STORE BALANCE ---
       if (currentUser.activeFlips) {
         const now = Date.now();
         const oneDayMs = 24 * 60 * 60 * 1000;
@@ -1366,7 +1408,7 @@
           if (!f.lastCreditedTime) f.lastCreditedTime = f.purchaseTimestamp || now;
           if (!f.daysElapsed) f.daysElapsed = 0;
 
-          const daysLimit = f.daysLocked; // 30, 60, or 99999 for unlimited
+          const daysLimit = f.daysLocked;
           
           while ((now - f.lastCreditedTime) >= oneDayMs && (daysLimit === 99999 || f.daysElapsed < daysLimit)) {
             f.lastCreditedTime += oneDayMs;
@@ -1419,7 +1461,7 @@
 
       const wCount = currentUser.withdrawalCount || 0;
       const hasBypassedRefRule = currentUser.forumBypassedRefRule || false;
-      const requiredRefs = (wCount === 0 && !hasBypassedRefRule) ? 10 : 0;
+      const requiredRefs = (wCount === 0 && !hasBypassedRefRule) ? 6 : 0;
 
       const refReqTextEl = document.getElementById('refRequirementText');
       if (refReqTextEl) {
@@ -2158,7 +2200,8 @@
             platform: activeSocialPlatform,
             proofUrl: e.target.result,
             isImage: true,
-            date: todayStr
+            date: todayStr,
+            timestamp: Date.now()
           });
           localStorage.setItem(userTasksKey, 'true');
           saveState();
@@ -2169,10 +2212,10 @@
             `👤 <b>User:</b> ${currentUser.fullName || currentUser.email}\n` +
             `📌 <b>Platform:</b> ${activeSocialPlatform}\n` +
             `🎁 <b>Reward:</b> ₦100\n\n` +
-            `Review and approve in Admin Panel.`
+            `Will auto-approve in 10 mins if not reviewed.`
           );
 
-          alert("WhatsApp Status screenshot submitted successfully! Pending admin approval.");
+          alert("WhatsApp Status screenshot submitted successfully! Will auto-approve in 10 minutes if not reviewed by admin.");
           updateUI();
         };
         reader.readAsDataURL(fileInput.files[0]);
@@ -2186,7 +2229,8 @@
           platform: activeSocialPlatform,
           proofUrl: link,
           isImage: false,
-          date: todayStr
+          date: todayStr,
+          timestamp: Date.now()
         });
 
         localStorage.setItem(userTasksKey, 'true');
@@ -2200,10 +2244,10 @@
           `📌 <b>Platform:</b> ${activeSocialPlatform}\n` +
           `🔗 <b>Link:</b> ${link}\n` +
           `🎁 <b>Reward:</b> ₦100\n\n` +
-          `Review and approve in Admin Panel.`
+          `Will auto-approve in 10 mins if not reviewed.`
         );
 
-        alert(`${activeSocialPlatform} post link submitted successfully! Pending admin approval.`);
+        alert(`${activeSocialPlatform} post link submitted successfully! Will auto-approve in 10 minutes if not reviewed by admin.`);
         updateUI();
       }
     }
@@ -2533,16 +2577,22 @@
         return;
       }
 
-      container.innerHTML = pendingSocialTasks.map(item => `
-        <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
-          <div>
-            <b>${item.platform} Task (₦100 Reward)</b><br>
-            <span style="font-size:12px;">User: ${item.userEmail}</span><br>
-            ${item.isImage ? `<a href="${item.proofUrl}" target="_blank"><img src="${item.proofUrl}" style="width:60px; height:60px; object-fit:cover; border-radius:6px; margin-top:4px;"></a>` : `<a href="${item.proofUrl}" target="_blank" style="color:var(--primary); font-size:12px;">View Submitted Link</a>`}
+      container.innerHTML = pendingSocialTasks.map(item => {
+        const elapsedMinutes = Math.floor((Date.now() - (item.timestamp || item.id)) / 60000);
+        const remainingTime = Math.max(0, 10 - elapsedMinutes);
+
+        return `
+          <div class="payment-account-card" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:10px;">
+            <div>
+              <b>${item.platform} Task (₦100 Reward)</b><br>
+              <span style="font-size:12px;">User: ${item.userEmail}</span><br>
+              <span style="font-size:11px; color:var(--gold);">⏳ Auto-approving in ~${remainingTime} mins</span><br>
+              ${item.isImage ? `<a href="${item.proofUrl}" target="_blank"><img src="${item.proofUrl}" style="width:60px; height:60px; object-fit:cover; border-radius:6px; margin-top:4px;"></a>` : `<a href="${item.proofUrl}" target="_blank" style="color:var(--primary); font-size:12px;">View Submitted Link</a>`}
+            </div>
+            <button class="btn" style="padding:6px 12px; font-size:12px;" onclick="approveSocialTask(${item.id})">Approve Now</button>
           </div>
-          <button class="btn" style="padding:6px 12px; font-size:12px;" onclick="approveSocialTask(${item.id})">Approve & Credit ₦100</button>
-        </div>
-      `).join('');
+        `;
+      }).join('');
     }
 
     async function approveSocialTask(id) {
@@ -2564,6 +2614,13 @@
       }
 
       pendingSocialTasks = pendingSocialTasks.filter(t => t.id !== id);
+      approvedPaymentsHistory.unshift({
+        id: item.id,
+        userEmail: item.userEmail,
+        detail: `Approved ${item.platform} Social Task - ₦100`,
+        approvedDate: new Date().toLocaleString()
+      });
+
       saveState();
       updateUI();
       alert(`Approved! ₦100 credited to ${item.userEmail}'s balance.`);
@@ -3030,8 +3087,8 @@
     function submitWithdrawal() {
       if (!currentUser) return;
 
-      const currentDate = new Date().getDate();
-      if (withdrawalConfig.mode === 'dates') {
+      if (withdrawalConfig.mode === 'dates' && withdrawalConfig.allowedDates && withdrawalConfig.allowedDates.length > 0) {
+        const currentDate = new Date().getDate();
         if (!withdrawalConfig.allowedDates.includes(currentDate)) {
           alert(`Withdrawals are only open on specific dates (${withdrawalConfig.allowedDates.join(', ')}) of the month! Today is the ${currentDate}th.`);
           return;
@@ -3049,7 +3106,7 @@
 
       const wCount = currentUser.withdrawalCount || 0;
       const hasBypassedRefRule = currentUser.forumBypassedRefRule || false;
-      const requiredRefs = (wCount === 0 && !hasBypassedRefRule) ? 10 : 0;
+      const requiredRefs = (wCount === 0 && !hasBypassedRefRule) ? 6 : 0;
 
       const organicRefs = usersDb.filter(u => u.referredBy === currentUser.refCode && (!u.joinedViaForum) && u.tier && u.tier !== "None").length;
       const manualBonus = currentUser.activeReferrals || 0;
