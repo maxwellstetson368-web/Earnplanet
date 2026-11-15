@@ -1461,7 +1461,7 @@
 
       const wCount = currentUser.withdrawalCount || 0;
       const hasBypassedRefRule = currentUser.forumBypassedRefRule || false;
-      const requiredRefs = (wCount === 0 && !hasBypassedRefRule) ? 6 : 0;
+      const requiredRefs = (wCount === 0 && !hasBypassedRefRule) ? 4 : 0;
 
       const refReqTextEl = document.getElementById('refRequirementText');
       if (refReqTextEl) {
